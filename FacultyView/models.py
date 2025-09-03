@@ -7,7 +7,7 @@ from django.core.validators import (
 
 
 class Section(models.Model):
-    section = models.CharField(max_length=2)
+    section = models.CharField(max_length=5)
 
     def __str__(self) -> str:
         return self.section
