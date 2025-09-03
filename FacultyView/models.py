@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db import models
 from django.core.validators import (
     MinValueValidator,
@@ -14,7 +15,7 @@ class Section(models.Model):
 
 class Year(models.Model):
     year = models.IntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(4)],
+        validators=[MinValueValidator(1), MaxValueValidator(datetime.today().year + 1)],
     )
 
     def __str__(self) -> str:
