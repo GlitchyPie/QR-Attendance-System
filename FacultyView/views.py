@@ -7,15 +7,13 @@ import socket
 from StudentView.views import present
 
 
-def qrgenerator():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(("8.8.8.8", 80))
-    ip = s.getsockname()[0]
+def qrgenerator(request):
+    #s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    #s.connect(("8.8.8.8", 80))
+    #ip = s.getsockname()[0]
 
-    #This really shouldn't be hardcoded to port 8000
-    link = f"http://{ip}:8000/add_manually"
+    link = f"{request.scheme}://{request.META['HTTP_HOST']}:{request.META['SERVER_PORT']}/add_manually"
 
-    # Function to generate and display a QR code
     def generate_qr_code(link):
         qr = qrcode.QRCode(
             version=1,
@@ -40,7 +38,7 @@ def faculty_view(request):
         return HttpResponseRedirect("/")
 
     else:
-        qrgenerator()
+        qrgenerator(request)
         return render(
             request,
             "FacultyView/FacultyViewIndex.html",
