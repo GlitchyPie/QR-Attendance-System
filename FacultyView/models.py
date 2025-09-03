@@ -38,4 +38,4 @@ class Student(models.Model):
     s_year = models.ForeignKey(Year, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
-        return f"{self.s_fname} {self.s_lname} - {self.s_roll} - {self.s_branch}({self.s_year}{self.s_section})"
+        return f"{self.s_roll} - {self.s_fname} {self.s_lname} - {self.s_branch} {self.s_section} {self.s_year})"
