@@ -59,8 +59,8 @@ def render_student_list(request,students):
 
 def add_manually(request):
     students = Student.objects.all().order_by("s_roll")
-    render_student_list(request, students)
+    return render_student_list(request, students)
 
 def add_manually_year(request, year):
     students = Student.objects.filter(s_year=year)
-    render_student_list(request, students)
+    return render_student_list(request, students)
