@@ -12,6 +12,7 @@ def qrgenerator():
     s.connect(("8.8.8.8", 80))
     ip = s.getsockname()[0]
 
+    #This really shouldn't be hardcoded to port 8000
     link = f"http://{ip}:8000/add_manually"
 
     # Function to generate and display a QR code
