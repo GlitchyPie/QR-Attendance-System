@@ -28,7 +28,6 @@ def qrgenerator(request):
 
     generate_qr_code(link)
 
-
 def faculty_view(request):
     if request.method == "POST":
         student_roll = request.POST["student_id"]
@@ -47,7 +46,6 @@ def faculty_view(request):
             },
         )
 
-
 def render_student_list(request,students):
     return render(
         request,
@@ -63,4 +61,8 @@ def add_manually(request):
 
 def add_manually_year(request, year):
     students = Student.objects.filter(s_year=year)
+    return render_student_list(request, students)
+
+def add_manually_fitltered(request, branch, section, year):
+    students = Student.objects.filter(s_branch=branch).filter(s_section=section).filter(s_year=year)
     return render_student_list(request, students)
