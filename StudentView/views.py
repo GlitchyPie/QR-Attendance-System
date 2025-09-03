@@ -17,3 +17,4 @@ def add_manually_post(request):
 
 def submitted(request):
     return render(request, "StudentView/Submitted.html")
+
