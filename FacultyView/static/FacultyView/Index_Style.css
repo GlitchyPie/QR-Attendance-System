@@ -58,9 +58,9 @@ main {
 }
 
 .attendance-card img {
-  width: 480px;
-  height: 480px;
-  margin: 20px auto;
+  width: 100%;
+  height: 100%;
+  margin: 10px auto;
   display: block;
 }
 
