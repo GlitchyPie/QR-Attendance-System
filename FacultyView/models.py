@@ -5,7 +5,6 @@ from django.core.validators import (
     MaxValueValidator,
 )
 
-
 class Section(models.Model):
     section = models.CharField(max_length=5)
 
@@ -39,3 +38,14 @@ class Student(models.Model):
 
     def __str__(self) -> str:
         return f"{self.s_roll} - {self.s_fname} {self.s_lname} - {self.s_branch} {self.s_section} ({self.s_year})"
+
+class ClassName(models.Model):
+    s_className = models.CharField(max_length=40)
+
+class Attendance(models.Model):
+    s_class = models.ForeignKey(ClassName, on_delete=models.RESTRICT)
+    dte_date = models.DateField()
+    student = models.ForeignKey(Student, on_delete=models.RESTRICT)
+
+    def __str__(self) -> str:
+        return f"{self.dte_date} - {self.student.__str__}"
