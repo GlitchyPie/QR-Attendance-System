@@ -52,7 +52,7 @@ def faculty_view(request):
         request,
         "FacultyView/FacultyViewIndex.html",
         {
-            "classes",classes
+            "classes": classes
         },
     )
         
