@@ -64,5 +64,5 @@ def add_manually_year(request, year):
     return render_student_list(request, students)
 
 def add_manually_filtered(request, branch, section, year):
-    students = Student.objects.filter(s_branch=branch).filter(s_section=section).filter(s_year=year)
+    students = Student.objects.filter(branch__branch=branch).filter(section__section=section).filter(s_year=year)
     return render_student_list(request, students)
