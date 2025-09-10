@@ -65,13 +65,13 @@ def add_manually_year(request, year):
 
 #https://stackoverflow.com/questions/57989320/django-filter-foreignkey-related-model-filtering
 def add_manually_filtered(request, branch, section, year):
-    students = Student.objects.filter(s_branch__branch__i=branch).filter(s_section__section__i=section).filter(s_year__year=year)
+    students = Student.objects.filter(s_branch__branch__iexact=branch).filter(s_section__section__iexact=section).filter(s_year__year=year)
     return render_student_list(request, students)
 
 def add_manually_filtered_2(request, branch, section):
-    students = Student.objects.filter(s_branch__branch__i=branch).filter(s_section__section__i=section)
+    students = Student.objects.filter(s_branch__branch__iexact=branch).filter(s_section__section__iexact=section)
     return render_student_list(request, students)
 
 def add_manually_filtered_3(request, branch):
-    students = Student.objects.filter(s_branch__branch__i=branch)
+    students = Student.objects.filter(s_branch__branch__iexact=branch)
     return render_student_list(request, students)
