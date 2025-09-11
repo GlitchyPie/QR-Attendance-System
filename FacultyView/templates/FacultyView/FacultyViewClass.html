@@ -29,12 +29,13 @@
             <li class="student">
               <label class="student-label">
                 <span class="student-name">
-                  {{student.s_roll}} - {{ student.s_fname }} {{student.s_lname}}
+                  {{ student.s_fname }} {{student.s_lname}}
                 </span>
                 <button
                   type="submit"
-                  name="student_id"
-                  value="{{student.s_roll}}"
+                  name="student_email"
+                  id="student_email"
+                  value="{{student.s_eml}}"
                   class="delete-button"
                 >
                   <i class="fas fa-trash-alt"></i>

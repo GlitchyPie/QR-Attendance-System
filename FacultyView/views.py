@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
+from django.http import HttpResponseBadRequest
 from django.urls import reverse
 from .models import Student, ClassName, Attendance
 import qrcode
-import socket
 from StudentView.views import present
 import urllib.parse
 
@@ -48,8 +48,13 @@ def faculty_view_class(request,classId,className):
 
 #=======================
 def faculty_view_create_class(request):
-    #Do stuff here...
-    return HttpResponseRedirect("/")
+    if request.method == "GET" :
+        return HttpResponseBadRequest() #This should only accept POST requests
+    
+    className = request.POST["class_name"]
+    classNameEntry = ClassName(s_className=className)
+    newClassNameEntry = classNameEntry.save()
+    return HttpResponseRedirect(reverse('faculty_view_class_id',classId=newClassNameEntry.id))
 
 def faculty_view(request):
     classes = ClassName.objects.all()
