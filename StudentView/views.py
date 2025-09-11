@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from FacultyView.models import Student, ClassName
 from django.http import HttpResponseRedirect
+from django.http import HttpResponseBadRequest
 from django.urls import reverse
 
 # Create your views here.
@@ -34,7 +35,12 @@ def submit_attendance_id(request,classId):
     return submit_attendance(request,classId,className)
 
 def submit_attendance(request,classId,className):
+    if request.method == "GET" :
+        return HttpResponseBadRequest() #This should only accept POST requests
     #Do stuff here.....
+    studentName = request.POST["student_name"].strip()
+    parts = studentName.partition(" ")
+
     return HttpResponseRedirect("/submitted")
 
 #=======================
