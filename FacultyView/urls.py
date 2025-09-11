@@ -4,8 +4,8 @@ from django.urls import path
 urlpatterns = [
     path("", views.faculty_view, name="faculty_view"),
     path("class/<str:className>/", views.faculty_view_class, name="faculty_view_class"),
-    path("add_manually", views.add_manually, name="add_manually"),
-    path("add_manually/<str:branch>/<str:section>/<int:year>/",views.add_manually_filtered, name="add_manually_filtered"),
-    path("add_manually/<str:branch>/<str:section>/",views.add_manually_filtered_2, name="add_manually_filtered_2"),
-    path("add_manually/<str:branch>/",views.add_manually_filtered_3, name="add_manually_filtered_3")
+    path("add_manually/class/<str:className>", views.add_manually_class, name="add_manually_class"),
+    #path("add_manually/<str:branch>/<str:section>/<int:year>/",views.add_manually_filtered, name="add_manually_filtered"),
+    #path("add_manually/<str:branch>/<str:section>/",views.add_manually_filtered_2, name="add_manually_filtered_2"),
+    #path("add_manually/<str:branch>/",views.add_manually_filtered_3, name="add_manually_filtered_3"),
 ]

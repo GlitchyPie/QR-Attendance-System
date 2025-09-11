@@ -70,6 +70,10 @@ def add_manually(request):
     students = Student.objects.all().order_by("s_roll")
     return render_student_list(request, students)
 
+def add_manually_class(request,className):
+    students = Student.objects.all().order_by("s_roll")
+    return render_student_list(request, students)
+
 def add_manually_year(request, year):
     students = Student.objects.filter(s_year=year)
     return render_student_list(request, students)

@@ -2,6 +2,7 @@ from . import views
 from django.urls import path
 
 urlpatterns = [
-    path("add_manually_post", views.add_manually_post, name="add_manually_post"),
+    path("class/<str:className>/student_entry",views.student_entry,name="student_entry"),
+    path("class/<str:className>/submit_attendance",views.submit_attendance,name="submit_attendance"),
     path("submitted", views.submitted, name="submitted"),
 ]

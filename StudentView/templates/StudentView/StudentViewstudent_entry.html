@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Attendance Portal</title>
+    <link rel="stylesheet" href="{% static 'StudentView/Index_Style.css' %}" />
+  </head>
+  <body>
+    <header class="header">
+      <h1 class="header-title">Centre For Alternative Technology</h1>
+      <h2>Attendance Portal</h2>
+    </header>
+
+    <div class="container">
+      <section class="attendance-section">
+        <h2 class="section-title">Enter Your Name</h2>
+        <form
+          class="attendance-form"
+          method="POST"
+          action="{% url 'submit_attendance' %}"
+        >
+          {% csrf_token %}
+          <label>Name<input type="text"></label>
+          <button type="submit" class="submit-button">Submit</button>
+        </form>
+      </section>
+    </div>
+
+    <footer class="footer">
+      <p>&copy; QR Attendance System 2023 - Team Hokage</p>
+    </footer>
+  </body>
+</html>
