@@ -16,11 +16,7 @@
     <div class="container">
       <section class="attendance-section">
         <h2 class="section-title">Enter Your Name</h2>
-        <form
-          class="attendance-form"
-          method="POST"
-          action="{% url 'submit_attendance' %}"
-        >
+        <form class="attendance-form" method="POST" action="{% url 'submit_attendance' className %}">
           {% csrf_token %}
           <label>Name<input type="text"></label>
           <button type="submit" class="submit-button">Submit</button>

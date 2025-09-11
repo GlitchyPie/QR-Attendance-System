@@ -19,32 +19,24 @@
     <main>
       <div>
         <h3 class="present-list">Select your class</h3>
-
-        <form class="class-form" method="POST">
           <ul class="student-list">
             {% csrf_token %}
             {% for class in classes %}
             <li class="student">
-              <button
-                type="submit"
-                name="class_id"
-                value="{{class.id}}"
-              >
-                {{class.s_className}}
-              </button>
+              <a href="{% url 'faculty_view_class_id' classId}">{{class.s_name}}</a>
             </li>
             {% endfor %}
+
+            <li class="student">
+              <label>New Class:<input type="text"></label>
+            </li>
           </ul>
-        </form>
       </div>
       <div class="attendance-container">
         <div class="attendance-card">
           <h2>
             &nbsp;
           </h2>
-          {% comment %}
-          <a href="#">
-            {% endcomment %}
             <img
               src=""
               alt=""

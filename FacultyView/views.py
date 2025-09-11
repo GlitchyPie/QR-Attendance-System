@@ -7,10 +7,9 @@ import socket
 from StudentView.views import present
 import urllib.parse
 
-def qrgenerator(request,className = ""):
-    link = f"{request.scheme}://{request.META['HTTP_HOST']}:{request.META['SERVER_PORT']}/class/{urllib.parse.quote(className)}/student_entry"
-
-    def generate_qr_code(link,className):
+def qrgenerator(request,classId = -1):
+    link = f"{request.scheme}://{request.META['HTTP_HOST']}:{request.META['SERVER_PORT']}/class/{classId}/student_entry"
+    def generate_qr_code(link,classId):
         qr = qrcode.QRCode(
             version=1,
             error_correction=qrcode.constants.ERROR_CORRECT_H,
@@ -20,21 +19,34 @@ def qrgenerator(request,className = ""):
         qr.add_data(link)
         qr.make(fit=True)
         img = qr.make_image(fill_color="black", back_color="white")
-        img.save(f"FacultyView/static/FacultyView/qrcode_{className}.png")
+        img.save(f"FacultyView/static/FacultyView/qrcode_{classId}.png")
 
-    generate_qr_code(link,className)
+    generate_qr_code(link,classId)
 
-def faculty_view_class(request,className):
-    qrgenerator(request,className)
+#=======================
+
+def faculty_view_class_name(request,className):
+    classId = ClassName.objects.filter(s_className__iexact=className)
+    return faculty_view_class(request, classId, className)
+
+def faculty_view_class_id(request,classId):
+    className = ClassName.objects.filter(id=classId)[0]
+    return faculty_view_class(request,classId,className)
+
+def faculty_view_class(request,classId,className):
+    qrgenerator(request,classId)
     present = []
     return render(
         request,
         "FacultyView/FacultyViewClass.html",
         {
             "students": present,
-            "className": className
+            "className": className,
+            "classId": classId
         },
     )
+
+#=======================
 
 def faculty_view(request):
     classes = ClassName.objects.all()

@@ -42,7 +42,7 @@
             {% endfor %}
           </ul>
         </form>
-        <form class="attendance-form" method="POST" action="{% url 'submit_attendance' className %}">
+        <form class="attendance-form" method="POST" action="{% url 'submit_attendance_id' classId %}">
           {% csrf_token %}
           <label>Name<input type="text"></label>
           <button type="submit">+ Add Manually</button>
@@ -54,7 +54,7 @@
             Connect to CAT_STUDENT and Scan the QR Code to Mark Attendance
           </h2>
             <img
-              src="{% static 'FacultyView/qrcode_' %}{{className}}.png"
+              src="{% static 'FacultyView/qrcode_' %}{{classId}}.png"
               alt="QR Code"
               width="200"
               height="200"
