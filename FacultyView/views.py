@@ -26,11 +26,11 @@ def qrgenerator(request,classId = -1):
 #=======================
 
 def faculty_view_class_name(request,className):
-    classId = ClassName.objects.filter(s_className__iexact=className)
+    classId = ClassName.objects.filter(s_className__iexact=className)[0].id
     return faculty_view_class(request, classId, className)
 
 def faculty_view_class_id(request,classId):
-    className = ClassName.objects.filter(id=classId)[0]
+    className = ClassName.objects.filter(id=classId)[0].s_className
     return faculty_view_class(request,classId,className)
 
 def faculty_view_class(request,classId,className):
@@ -42,7 +42,7 @@ def faculty_view_class(request,classId,className):
         {
             "students": present,
             "className": className,
-            "classId": classId
+            "classId": classId,
         },
     )
 
