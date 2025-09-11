@@ -54,7 +54,7 @@
           <a href="{% url 'add_manually' %}">
             {% endcomment %}
             <img
-              src="{% static 'FacultyView/qrcode_{className}.png' %}"
+              src="{% static 'FacultyView/qrcode_' %}{{className}}.png"
               alt="QR Code"
               width="200"
               height="200"
