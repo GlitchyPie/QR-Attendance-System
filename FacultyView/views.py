@@ -53,8 +53,7 @@ def faculty_view_create_class(request):
     
     className = request.POST["class_name"]
     classNameEntry = ClassName(s_className=className)
-    newClassNameEntry = classNameEntry.save()
-    return HttpResponseRedirect(reverse('faculty_view_class_id',classId=newClassNameEntry.id))
+    return HttpResponseRedirect(reverse('faculty_view_class_id',classId=classNameEntry.id))
 
 def faculty_view(request):
     classes = ClassName.objects.all()
