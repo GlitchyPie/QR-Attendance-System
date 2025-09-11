@@ -2,7 +2,7 @@ from datetime import datetime
 from django.db import models
 
 class Student(models.Model):
-    s_eml = models.CharField(max_length=100, primary_key=True,default="-.-@-.-")
+    s_eml = models.CharField(max_length=100, primary_key=True)
     s_fname = models.CharField(max_length=30)
     s_lname = models.CharField(max_length=30)
 
