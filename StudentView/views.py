@@ -17,7 +17,12 @@ def student_entry_id(request,classId):
     return student_entry(request,classId,className)
 
 def student_entry(request,classId, className):
-    return render(request, "StudentView/StudentViewstudent_entry.html")
+    return render(request, 
+                  "StudentView/StudentViewstudent_entry.html",
+                  {
+                      "classId":classId,
+                      "className":className,
+                  })
 #=======================
 
 def submit_attendance_name(request,className):
