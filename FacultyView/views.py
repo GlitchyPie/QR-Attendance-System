@@ -36,7 +36,7 @@ def faculty_view_class(request,className):
             present.remove(student)
         return HttpResponseRedirect("/")
     else:
-        qrgenerator(request)
+        qrgenerator(request,className)
         return render(
             request,
             "FacultyView/FacultyViewClass.html",
