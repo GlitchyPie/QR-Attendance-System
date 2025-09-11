@@ -42,7 +42,7 @@
             {% endfor %}
           </ul>
         </form>
-        <form class="attendance-form" method="POST" action="{% url 'submit_attendance' %}">
+        <form class="attendance-form" method="POST" action="{% url 'submit_attendance' className %}">
           {% csrf_token %}
           <label>Name<input type="text"></label>
           <button type="submit">+ Add Manually</button>
