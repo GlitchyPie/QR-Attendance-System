@@ -28,7 +28,7 @@ def submit_attendance_id(request,classId):
     className = ClassName.objects.filter(id=classId)[0].s_className
     return submit_attendance(request,classId,className)
 
-def submit_attendance(request,className):
+def submit_attendance(request,classId,className):
     #Do stuff here.....
     return HttpResponseRedirect("/submitted")
 
