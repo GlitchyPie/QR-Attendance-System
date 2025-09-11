@@ -8,7 +8,7 @@ from StudentView.views import present
 import urllib.parse
 
 def qrgenerator(request,classId = -1):
-    link = f"{request.scheme}://{request.META['HTTP_HOST']}:{request.META['SERVER_PORT']}/class/{classId}/student_entry"
+    link = f"{request.scheme}://{request.META['HTTP_HOST']}/class/{classId}/student_entry"
     def generate_qr_code(link,classId):
         qr = qrcode.QRCode(
             version=1,
