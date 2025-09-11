@@ -22,17 +22,17 @@
           <ul class="student-list">
 
             {% for class in classes %}
-            <li class="student">
-              <a href="{% url 'faculty_view_class_id' class.id %}">
-                <button>{{class.s_className}}</button>
-              </a>
-            </li>
+              <li class="student">
+                <a href="{% url 'faculty_view_class_id' class.id %}">
+                  <button>{{class.s_className}}</button>
+                </a>
+              </li>
             {% endfor %}
 
             <li class="student">
               <form method="POST" action="{% url 'faculty_view_create_class' %}">
                 {% csrf_token %}
-                <input type="text">
+                <input type="text" name="class_name" id="class_name">
                 <button type="submit">+ Create</button>
               </form>
             </li>
