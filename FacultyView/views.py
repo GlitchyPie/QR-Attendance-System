@@ -47,7 +47,7 @@ def faculty_view_class(request,className):
         )
 
 def faculty_view(request):
-    classes = ClassName.objects
+    classes = ClassName.objects.get()
     return render(
         request,
         "FacultyView/FacultyViewIndex.html",
