@@ -47,6 +47,9 @@ def faculty_view_class(request,classId,className):
     )
 
 #=======================
+def faculty_view_create_class(request):
+    #Do stuff here...
+    return HttpResponseRedirect("/")
 
 def faculty_view(request):
     classes = ClassName.objects.all()

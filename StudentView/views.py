@@ -8,15 +8,15 @@ from django.urls import reverse
 present = set()
 
 #=======================
-def student_entry_name(request,className):
+def student_entry_name(request, className):
     classId = ClassName.objects.filter(s_className__iexact=className)[0].id
     return student_entry(request,classId,className)
 
-def student_entry_id(request,classId):
+def student_entry_id(request, classId):
     className = ClassName.objects.filter(id=classId)[0].s_className
     return student_entry(request,classId,className)
 
-def student_entry(request,classId, className):
+def student_entry(request, classId, className):
     return render(request, 
                   "StudentView/StudentViewstudent_entry.html",
                   {

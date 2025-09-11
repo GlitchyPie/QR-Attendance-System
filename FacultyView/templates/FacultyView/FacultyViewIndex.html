@@ -17,18 +17,24 @@
       <h2>Attendance Portal</h2>
     </header>
     <main>
-      <div>
+      <div class="marked-list">
         <h3 class="present-list">Select your class</h3>
           <ul class="student-list">
-            {% csrf_token %}
+
             {% for class in classes %}
             <li class="student">
-              <a href="{% url 'faculty_view_class_id' class.id %}">{{class.s_className}}</a>
+              <a href="{% url 'faculty_view_class_id' class.id %}">
+                <button>{{class.s_className}}</button>
+              </a>
             </li>
             {% endfor %}
 
             <li class="student">
-              <label>New Class:<input type="text"></label>
+              <form method="POST" action="{% url 'faculty_view_create_class' %}">
+                {% csrf_token %}
+                <input type="text">
+                <button type="submit">+ Create</button>
+              </form>
             </li>
           </ul>
       </div>
@@ -37,12 +43,7 @@
           <h2>
             &nbsp;
           </h2>
-            <img
-              src=""
-              alt=""
-              width="200"
-              height="200"
-            />
+            <img src="" alt="" width="200" height="200"/>
           </a>
         </div>
       </div>
