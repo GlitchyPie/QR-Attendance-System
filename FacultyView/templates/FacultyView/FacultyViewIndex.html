@@ -23,7 +23,7 @@
             {% csrf_token %}
             {% for class in classes %}
             <li class="student">
-              <a href="{% url 'faculty_view_class_id' classId}">{{class.s_name}}</a>
+              <a href="{% url 'faculty_view_class_id' classId}">{{class.s_className}}</a>
             </li>
             {% endfor %}
 
