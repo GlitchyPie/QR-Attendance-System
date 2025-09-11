@@ -20,9 +20,19 @@ def student_entry(request,classId, className):
     return render(request, "StudentView/StudentViewstudent_entry.html")
 #=======================
 
+def submit_attendance_name(request,className):
+    classId = ClassName.objects.filter(s_className__iexact=className)
+    return submit_attendance(request,classId,className)
+
+def submit_attendance_id(request,classId):
+    className = ClassName.objects.filter(id=classId)[0]
+    return submit_attendance(request,classId,className)
+
 def submit_attendance(request,className):
     #Do stuff here.....
     return HttpResponseRedirect("/submitted")
+
+#=======================
 
 def submitted(request):
     return render(request, "StudentView/Submitted.html")
