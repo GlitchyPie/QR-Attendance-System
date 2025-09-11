@@ -40,7 +40,9 @@ def submit_attendance(request,classId,className):
     #Do stuff here.....
     studentName = request.POST["student_name"].strip()
     parts = studentName.partition(" ")
-
+    fname = parts[0]
+    lname = parts[2]
+    
     return HttpResponseRedirect("/submitted")
 
 #=======================
