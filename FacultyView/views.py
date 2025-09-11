@@ -5,16 +5,16 @@ from .models import Student, ClassName, Attendance
 import qrcode
 import socket
 from StudentView.views import present
-
+import urllib.parse
 
 def qrgenerator(request,className = ""):
     #s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     #s.connect(("8.8.8.8", 80))
     #ip = s.getsockname()[0]
 
-    link = f"{request.scheme}://{request.META['HTTP_HOST']}:{request.META['SERVER_PORT']}/class/{className}/add_manually"
+    link = f"{request.scheme}://{request.META['HTTP_HOST']}:{request.META['SERVER_PORT']}/class/{urllib.parse.quote(className)}/add_manually"
 
-    def generate_qr_code(link):
+    def generate_qr_code(link,className):
         qr = qrcode.QRCode(
             version=1,
             error_correction=qrcode.constants.ERROR_CORRECT_H,
@@ -24,9 +24,9 @@ def qrgenerator(request,className = ""):
         qr.add_data(link)
         qr.make(fit=True)
         img = qr.make_image(fill_color="black", back_color="white")
-        img.save("FacultyView/static/FacultyView/qrcode_{className}.png")
+        img.save(f"FacultyView/static/FacultyView/qrcode_{className}.png")
 
-    generate_qr_code(link)
+    generate_qr_code(link,className)
 
 def faculty_view_class(request,className):
     if request.method == "POST":
