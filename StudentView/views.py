@@ -45,7 +45,7 @@ def submit_attendance(request,classId,className):
 
     stuQuery = Student.objects.filter(s_eml=eml)
     stuOb = None
-    if stuQuery.len() == 0:
+    if len(stuQuery) == 0:
         stuOb = Student(s_eml=eml,s_fname=fname,slname=lname)
         stuOb.save()
     else:
