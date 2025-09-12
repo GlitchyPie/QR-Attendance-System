@@ -1,5 +1,6 @@
+import datetime
 from django.shortcuts import render
-from FacultyView.models import Student, ClassName
+from FacultyView.models import Student, ClassName, Attendance
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseBadRequest
 from django.urls import reverse
@@ -37,12 +38,28 @@ def submit_attendance_id(request,classId):
 def submit_attendance(request,classId,className):
     if request.method == "GET" :
         return HttpResponseBadRequest() #This should only accept POST requests
-    #Do stuff here.....
-    studentName = request.POST["student_name"].strip()
-    parts = studentName.partition(" ")
-    fname = parts[0]
-    lname = parts[2]
     
+    eml = request.POST["student_email"].lower()
+    fname = request.POST["student_fname"]
+    lname = request.POST["student_lname"]
+
+    stuQuery = Student.objects.filter(s_eml=eml)
+    stuOb = None
+    if stuQuery.len() == 0:
+        stuOb = Student(s_eml=eml,s_fname=fname,slname=lname)
+        stuOb.save()
+    else:
+        stuOb = stuQuery[0]
+
+    eml = stuOb.s_eml
+    fname = stuOb.s_fname
+    lname = stuOb.s_lname
+
+    attendanceQuery = Attendance.objects.filter(dte_date__date=datetime.date, student=eml, s_class=classId)
+    if attendanceQuery.exists() == False:
+        attendanceOb = Attendance(dte_date=datetime.datetime.now(),s_class=classId,student=eml)
+        attendanceOb.save()
+
     return HttpResponseRedirect("/submitted")
 
 #=======================
