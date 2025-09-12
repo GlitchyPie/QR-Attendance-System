@@ -1,7 +1,13 @@
 <form class="attendance-form" method="POST" action="{% url 'submit_attendance_id' classId %}">
     {% csrf_token %}
-    <label>CAT email address:<input type="text" name="student_email" id="student_email"></label>
-    <label>First name:<input type="text" name="student_fname" id="student_fname"></label>
-    <label>Last Name<input type="text" name="student_lname" id="student_lname"></label>
-    <button type="submit" class="submit-button" name="submit_student" id="submit_student">+ Add</button>
+    <label for="student_email">CAT email address:</label>
+    <input type="text" name="student_email" id="student_email">
+
+    <label for="student_fname">First name:</label>
+    <input type="text" name="student_fname" id="student_fname">
+
+    <label for="submit_student">Last Name:</label>
+    <input type="text" name="student_lname" id="student_lname">
+
+    <button type="submit" class="submit-button" name="submit_student" id="">+ Add</button>
 </form>
