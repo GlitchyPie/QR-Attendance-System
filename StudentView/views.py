@@ -61,13 +61,18 @@ def submit_attendance(request,classId,className):
     if attendanceQuery.exists() == False:
         attendanceOb = Attendance(dte_date=datetime.datetime.now(),s_class=classOb,student=stuOb)
         attendanceOb.save()
-
-    return HttpResponseRedirect("/submitted")
+        return HttpResponseRedirect("/submitted")
+    else:
+        return HttpResponseRedirect("/alreadysubmitted")
+    
 
 #=======================
 
 def submitted(request):
     return render(request, "StudentView/Submitted.html")
+
+def already_submitted(request):
+    return render(request, "StudentView/AlreadySubmitted.html")
 
 #def add_manually_post(request):
 #    student_roll = request.POST["student-name"]

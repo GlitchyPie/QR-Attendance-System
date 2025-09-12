@@ -7,4 +7,6 @@ urlpatterns = [
     path("class/<str:className>/student_entry",views.student_entry_name,name="student_entry_name"),
     path("class/<str:className>/submit_attendance",views.submit_attendance_name,name="submit_attendance_name"),
     path("submitted", views.submitted, name="submitted"),
+    path("alreadysubmitted", views.already_submitted, name="already_submitted"),
+
 ]
