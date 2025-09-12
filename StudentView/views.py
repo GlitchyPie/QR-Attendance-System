@@ -55,7 +55,7 @@ def submit_attendance(request,classId,className):
     fname = stuOb.s_fname
     lname = stuOb.s_lname
 
-    attendanceQuery = Attendance.objects.filter(dte_date__date=datetime.date, student=eml, s_class=classId)
+    attendanceQuery = Attendance.objects.filter(dte_date__date=datetime.datetime.now(), student=eml, s_class=classId)
     if attendanceQuery.exists() == False:
         attendanceOb = Attendance(dte_date=datetime.datetime.now(),s_class=classId,student=eml)
         attendanceOb.save()
