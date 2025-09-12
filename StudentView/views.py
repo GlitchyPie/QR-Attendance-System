@@ -43,6 +43,8 @@ def submit_attendance(request,classId,className):
     fname = request.POST["student_fname"]
     lname = request.POST["student_lname"]
 
+    classOb = ClassName.objects.filter(id=classId)[0]
+
     stuQuery = Student.objects.filter(s_eml=eml)
     stuOb = None
     if len(stuQuery) == 0:
@@ -57,7 +59,7 @@ def submit_attendance(request,classId,className):
 
     attendanceQuery = Attendance.objects.filter(dte_date__date=datetime.datetime.now(), student=eml, s_class=classId)
     if attendanceQuery.exists() == False:
-        attendanceOb = Attendance(dte_date=datetime.datetime.now(),s_class=classId,student=eml)
+        attendanceOb = Attendance(dte_date=datetime.datetime.now(),s_class=classOb,student=stuOb)
         attendanceOb.save()
 
     return HttpResponseRedirect("/submitted")
