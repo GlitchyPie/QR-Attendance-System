@@ -22,10 +22,9 @@
         <h3 class="present-list">Present Students</h3>
 
         <form class="attendance-form" method="POST">
+          {% csrf_token %}
           <ul class="student-list">
-            {% csrf_token %}
             {% for student in students %}
-            
             <li class="student">
               <label class="student-label">
                 <span class="student-name">
@@ -47,8 +46,10 @@
         </form>
         <form class="attendance-form" method="POST" action="{% url 'submit_attendance_id' classId %}">
           {% csrf_token %}
-          <label>Name<input type="text" name="student_name" id="student_name"></label>
-          <button type="submit" class="submit-button" name="submit_student" id="submit_student">+ Add Manually</button>
+          <label>CAT email address:<input type="text" name="student_email" id="student_email"></label>
+          <label>First name:<input type="text" name="student_fname" id="student_fname"></label>
+          <label>Last Name<input type="text" name="student_lname" id="student_lname"></label>
+          <button type="submit" class="submit-button" name="submit_student" id="submit_student">+ Add</button>
         </form>
       </div>
       <div class="attendance-container">
