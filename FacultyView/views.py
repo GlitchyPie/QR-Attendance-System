@@ -1,3 +1,4 @@
+import datetime
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseBadRequest
@@ -35,12 +36,13 @@ def faculty_view_class_id(request,classId):
 
 def faculty_view_class(request,classId,className):
     qrgenerator(request,classId)
-    present = []
+
+    present = Attendance.objects.filter(dte_date__date=datetime.datetime.now(), s_class=classId)
     return render(
         request,
         "FacultyView/FacultyViewClass.html",
         {
-            "students": present,
+            "present": present,
             "className": className,
             "classId": classId,
         },

@@ -18,23 +18,23 @@
     </header>
     <main>
       <div class="marked-list">
-        <h2>Present Count : {{ students|length }}</h2>
+        <h2>Present Count : {{ present|length }}</h2>
         <h3 class="present-list">Present Students</h3>
 
         <form class="attendance-form" method="POST">
           {% csrf_token %}
           <ul class="student-list">
-            {% for student in students %}
+            {% for attendance in present %}
             <li class="student">
               <label class="student-label">
                 <span class="student-name">
-                  {{ student.s_fname }} {{student.s_lname}}
+                  {{ attendance.student.s_fname }} {{attendance.student.s_lname}}
                 </span>
                 <button
                   type="submit"
                   name="student_email"
                   id="student_email"
-                  value="{{student.s_eml}}"
+                  value="{{attendance.student.s_eml}}"
                   class="delete-button"
                 >
                   <i class="fas fa-trash-alt"></i>
