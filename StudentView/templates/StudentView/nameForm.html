@@ -10,4 +10,32 @@
     <input type="text" name="student_lname" id="student_lname">
 
     <button type="submit" class="submit-button" name="submit_student" id="">+ Add</button>
+    <script>
+        const naieveEmail = /^([a-z]+)\.(([a-z]+\.?)+)(?<!\.)@student\.cat\.org\.uk$/i
+        const eml = document.getElementById("student_email");
+        const fname = document.getElementById("student_fname");
+        const lname = document.getElementById("student_lname");
+
+        let fnameFocused = false;
+        let lnameFocused = false;
+
+        fname.addEventListener("focus",(event)=>{
+            fnameFocused = true;
+        });
+        lname.addEventListener("focus",(event)=>{
+            lnameFocused = true;
+        });
+
+        eml.addEventListener("change",(event)=>{
+            const regex = naieveEmail.exec(eml.value);
+            if(regex !== null){
+                if((fnameFocused == false) || (fname.value.length === 0)){
+                    fname.value = regex[1];
+                }
+                if((lnameFocused == false) || (lname.value.length === 0)){
+                    lname.value = regex[2];
+                }
+            };
+        });
+    </script>
 </form>
