@@ -9,7 +9,7 @@
     <label for="submit_student">Last Name:</label>
     <input type="text" name="student_lname" id="student_lname">
 
-    <button type="submit" class="submit-button" name="submit_student" id="submit_student" enabled="false">+ Add</button>
+    <button type="submit" class="submit-button" name="submit_student" id="submit_student" disabled>+ Add</button>
     <script>
         const naieveEmail = /^([a-z]+)\.(([a-z]+\.?)+)(?<!\.)(@student\.cat\.org\.uk$)?/i
         const eml = document.getElementById("student_email");
@@ -43,13 +43,13 @@
                     lnameFocused = false
                 }
                 if(lnameFocused == false){
-                    lname.value = regex[2];
+                    lname.value = regex[2].replace('.',' ');
                 }
 
                 btnEnable = eml[eml.length - 1].toLowerCase === '@student.cat.org.uk'
             };
 
-            btn.enabled = btnEnable;
+            btn.disabled = (!btnEnable);
         }
         eml.addEventListener("keyup", OnEmailChange);
         eml.addEventListener("change",OnEmailChange);
