@@ -11,7 +11,7 @@
 
     <button type="submit" class="submit-button" name="submit_student" id="submit_student" enabled="false">+ Add</button>
     <script>
-        const naieveEmail = /^([a-z]+)\.(([a-z]+\.?)+)(?<!\.)(@student\.cat\.org\.uk)?$/i
+        const naieveEmail = /^([a-z]+)\.(([a-z]+\.?)+)(?<!\.)(@student\.cat\.org\.uk$)?/i
         const eml = document.getElementById("student_email");
         const fname = document.getElementById("student_fname");
         const lname = document.getElementById("student_lname");
