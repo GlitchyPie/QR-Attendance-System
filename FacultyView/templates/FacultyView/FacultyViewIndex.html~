@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+  <head>
+    {% include "FacultyView/HTML_HEAD.html" %}
+  </head>
+  <body>
+    <header>
+      <h1>Centre For Alternative Technology</h1>
+      <h2>Attendance Portal</h2>
+    </header>
+    <main>
+      <div class="marked-list">
+        <h3 class="present-list">Select your class</h3>
+          <ul class="student-list">
+
+            {% for class in classes %}
+              <li class="student">
+                <a href="{% url 'faculty_view_class_id' class.id %}">
+                  <button>{{class.s_className}}</button>
+                </a>
+              </li>
+            {% endfor %}
+
+            <li class="student">
+              <form method="POST" action="{% url 'faculty_view_create_class' %}">
+                {% csrf_token %}
+                <input type="text" name="class_name" id="class_name">
+                <button type="submit">+ Create</button>
+              </form>
+            </li>
+          </ul>
+      </div>
+      <div class="attendance-container">
+        <div class="attendance-card">
+          <h2>
+            &nbsp;
+          </h2>
+            <img src="" alt="" width="200" height="200"/>
+          </a>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <p>&copy; QR Attendance System 2023 - Team Hokage</p>
+    </footer>
+  </body>
+</html>

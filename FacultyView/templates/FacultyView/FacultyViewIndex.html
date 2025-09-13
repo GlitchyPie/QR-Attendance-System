@@ -1,55 +1,35 @@
-<!DOCTYPE html>
-{% load static %}
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>QR Attendance System</title>
-    <link rel="stylesheet" href="{% static 'FacultyView/Index_Style.css' %}" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-    />
-  </head>
-  <body>
-    <header>
-      <h1>Centre For Alternative Technology</h1>
-      <h2>Attendance Portal</h2>
-    </header>
-    <main>
-      <div class="marked-list">
-        <h3 class="present-list">Select your class</h3>
-          <ul class="student-list">
+{% extends "FacultyView.html" %}
 
-            {% for class in classes %}
-              <li class="student">
-                <a href="{% url 'faculty_view_class_id' class.id %}">
-                  <button>{{class.s_className}}</button>
-                </a>
-              </li>
-            {% endfor %}
+{% block header_title %}Attendance Portal {{className}}{% endblock %}
 
-            <li class="student">
-              <form method="POST" action="{% url 'faculty_view_create_class' %}">
-                {% csrf_token %}
-                <input type="text" name="class_name" id="class_name">
-                <button type="submit">+ Create</button>
-              </form>
-            </li>
-          </ul>
-      </div>
-      <div class="attendance-container">
-        <div class="attendance-card">
-          <h2>
-            &nbsp;
-          </h2>
-            <img src="" alt="" width="200" height="200"/>
-          </a>
-        </div>
-      </div>
-    </main>
-    <footer>
-      <p>&copy; QR Attendance System 2023 - Team Hokage</p>
-    </footer>
-  </body>
-</html>
+{% block left_block %}
+    <h3 class="present-list">Select your class</h3>
+    <ul class="student-list">
+
+    {% for class in classes %}
+        <li class="student">
+        <a href="{% url 'faculty_view_class_id' class.id %}">
+            <button>{{class.s_className}}</button>
+        </a>
+        </li>
+    {% endfor %}
+
+        <li class="student">
+            <form method="POST" action="{% url 'faculty_view_create_class' %}">
+            {% csrf_token %}
+            <input type="text" name="class_name" id="class_name">
+            <button type="submit">+ Create</button>
+            </form>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block right_block %}
+    <div class="attendance-card">
+        <h2>
+        &nbsp;
+        </h2>
+        <img src="" alt="" width="200" height="200"/>
+        </a>
+    </div>
+{% endblock %}
