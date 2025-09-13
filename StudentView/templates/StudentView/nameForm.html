@@ -46,7 +46,7 @@
                     lname.value = regex[2].replace('.',' ');
                 }
 
-                btnEnable = regex[4].toLowerCase() === '@student.cat.org.uk'
+                btnEnable = regex[4]?.toLowerCase() === '@student.cat.org.uk'
             };
 
             btn.disabled = (!btnEnable);
