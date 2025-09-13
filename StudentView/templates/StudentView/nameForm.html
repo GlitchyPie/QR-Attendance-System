@@ -9,12 +9,13 @@
     <label for="submit_student">Last Name:</label>
     <input type="text" name="student_lname" id="student_lname">
 
-    <button type="submit" class="submit-button" name="submit_student" id="">+ Add</button>
+    <button type="submit" class="submit-button" name="submit_student" id="submit_student" enabled="false">+ Add</button>
     <script>
-        const naieveEmail = /^([a-z]+)\.(([a-z]+\.?)+)(?<!\.)@student\.cat\.org\.uk$/i
+        const naieveEmail = /^([a-z]+)\.(([a-z]+\.?)+)(?<!\.)(@student\.cat\.org\.uk)?$/i
         const eml = document.getElementById("student_email");
         const fname = document.getElementById("student_fname");
         const lname = document.getElementById("student_lname");
+        const btn = document.getElementById("submit_student");
 
         let fnameFocused = false;
         let lnameFocused = false;
@@ -29,6 +30,7 @@
 
         function OnEmailChange(event){
             const regex = naieveEmail.exec(eml.value);
+            let btnEnable = false;
             if(regex !== null){
                 if(fname.value.length === 0){
                     fnameFocused = false;
@@ -43,7 +45,11 @@
                 if(lnameFocused == false){
                     lname.value = regex[2];
                 }
+
+                btnEnable = eml[eml.length - 1].toLowerCase === '@student.cat.org.uk'
             };
+
+            btn.enabled = btnEnable;
         }
         eml.addEventListener("keyup", OnEmailChange);
         eml.addEventListener("change",OnEmailChange);
