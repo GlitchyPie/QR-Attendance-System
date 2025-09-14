@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{settings.LANGUAGE_CODE}}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block page_title %}QR Attendance System{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'TemplateCss.css' %}" />
+    {% block head %}{% endblock %}
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+  <body>
+    <header>
+      <h1>{{settings.INSTITUTION_NAME}}</h1>
+      <h2>{% block header_title %}Attendance Portal{% endblock %}</h2>
+    </header>
+    <main>
+        {%block main_block %}
+            <section class="block left_block">
+                {% block left_block %}<h2>No content</h2>{% endblock %}
+            </section>
+        {% endblock %}
+    </main>
+    <footer>
+      {% block footer %}<p>&copy; QR Attendance System 2023 - Team Hokage</p>{% endblock %}
+    </footer>
+  </body>
+</html>
