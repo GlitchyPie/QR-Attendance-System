@@ -32,7 +32,7 @@ main {
   height: 100vh;
 }
 
-.block {
+main>section {
   background-color: #fff;
   padding: 20px;
   border-radius: 10px;

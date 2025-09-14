@@ -27,6 +27,20 @@
             lnameFocused = true;
         });
 
+        function FirstToUpper(s){
+            let t = s;
+            if(s === undefined){
+                return s;
+            }else if(s.length === 1){
+                t = s.toUpperCase();
+            } else {
+                const u = s.substring(0,1);
+                const v = s.substring(1);
+                t = u.toUpperCase() + g.toLowerCase();
+            }
+            return t;
+        }
+
         function OnEmailChange(event){
             const regex = naieveEmail.exec(eml.value);
             let btnEnable = false;
@@ -35,14 +49,14 @@
                     fnameFocused = false;
                 }
                 if(fnameFocused == false){
-                    fname.value = regex[1];
+                    fname.value = FirstToUpper(regex[1]);
                 }
 
                 if(lname.value.length === 0){
                     lnameFocused = false
                 }
                 if(lnameFocused == false){
-                    lname.value = regex[2].replace('.',' ');
+                    lname.value = regex[2].split('.').map((s)=>FirstToUpper(s)).join(' ');
                 }
 
                 btnEnable = regex[4]?.toLowerCase() === '@student.cat.org.uk'
