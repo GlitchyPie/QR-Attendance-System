@@ -54,13 +54,14 @@ def submit_attendance(request,classId,className):
     else:
         stuOb = stuQuery[0]
 
+    d = datetime.datetime.now(pytz.utc)
     eml = stuOb.s_eml
     fname = stuOb.s_fname
     lname = stuOb.s_lname
-
-    attendanceQuery = Attendance.objects.filter(dte_date__date=datetime.datetime.now(), student=eml, s_class=classId)
+    
+    attendanceQuery = Attendance.objects.filter(dte_date__date=d, student=eml, s_class=classId)
     if attendanceQuery.exists() == False:
-        attendanceOb = Attendance(dte_date=datetime.datetime.now(pytz.utc),s_class=classOb,student=stuOb)
+        attendanceOb = Attendance(dte_date=d,s_class=classOb,student=stuOb)
         attendanceOb.save()
         return HttpResponseRedirect("/submitted")
     else:
@@ -72,7 +73,15 @@ def submit_attendance(request,classId,className):
 def delete_attendance_id(request, classId):
     if request.method == "GET" :
         return HttpResponseBadRequest() #This should only accept POST requests
-    #Need to actually delete here....
+    
+    d = datetime.datetime.now(pytz.utc)
+    eml = request.POST["student_email"].lower()
+
+    attendanceQuery = Attendance.objects.filter(dte_date__date=d, student=eml, s_class=classId)
+
+    if attendanceQuery.exists():
+        attendanceQuery[0].delete()
+
     return HttpResponseRedirect(reverse('faculty_view_class_id',kwargs={"classId":classId}))
     
 
