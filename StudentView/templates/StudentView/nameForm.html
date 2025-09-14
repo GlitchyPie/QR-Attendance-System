@@ -1,4 +1,4 @@
-<form class="attendance-form" method="POST" action="{% url 'submit_attendance_id' classId %}">
+<form class="attendance-student-form" method="POST" action="{% url 'submit_attendance_id' classId %}">
     {% csrf_token %}
     <label for="student_entry_email">CAT email address:</label>
     <input type="text" name="student_email" id="student_entry_email">
