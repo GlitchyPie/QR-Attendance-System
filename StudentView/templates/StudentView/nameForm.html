@@ -1,22 +1,22 @@
 <form class="attendance-form" method="POST" action="{% url 'submit_attendance_id' classId %}">
     {% csrf_token %}
-    <label for="student_email">CAT email address:</label>
-    <input type="text" name="student_email" id="student_email">
+    <label for="student_entry_email">CAT email address:</label>
+    <input type="text" name="student_email" id="student_entry_email">
 
-    <label for="student_fname">First name:</label>
-    <input type="text" name="student_fname" id="student_fname">
+    <label for="student_entry_fname">First name:</label>
+    <input type="text" name="student_fname" id="student_entry_fname">
 
-    <label for="submit_student">Last Name:</label>
-    <input type="text" name="student_lname" id="student_lname">
+    <label for="submit_entry_student">Last Name:</label>
+    <input type="text" name="student_lname" id="student_entry_lname">
 
-    <button type="submit" class="submit-button" name="submit_student" id="submit_student" disabled>+ Add</button>
+    <button type="submit" class="submit-button" name="submit_student" id="submit_student_entry" disabled>+ Add</button>
     <script>
         const naieveEmail = /^([a-z]+)\.(([a-z]+\.?)+)(?<!\.)(@student\.cat\.org\.uk$)?/i
         document.addEventListener("DOMContentLoaded",()=>{
-            const eml   = document.getElementById("student_email");
-            const fname = document.getElementById("student_fname");
-            const lname = document.getElementById("student_lname");
-            const btn   = document.getElementById("submit_student");
+            const eml   = document.getElementById("student_entry_email");
+            const fname = document.getElementById("student_entry_fname");
+            const lname = document.getElementById("student_entry_lname");
+            const btn   = document.getElementById("submit_student_entry");
 
             let fnameFocused = false;
             let lnameFocused = false;
