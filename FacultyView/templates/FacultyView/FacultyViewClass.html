@@ -38,9 +38,9 @@
                 }
                 
                 function XMLHttpRequestLoad(){
-                    const A = student_ul_container.innerHTML.replace(/\s{2,}|[\r\n]+/g," ");
-                    const B = this.responseText.replace(/\s{2,}|[\r\n]+/g," ");
-                    if(A != B){
+                    const A = student_ul_container.innerHTML;
+                    const B = this.responseText;
+                    if(A.replace(/\s+/g,"") != B.replace(/\s+/g,"")){
                         student_ul_container.innerHTML = B;
                         formatDates();
                     }
