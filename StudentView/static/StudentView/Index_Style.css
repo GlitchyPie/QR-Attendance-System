@@ -1,3 +1,4 @@
+/*Student View */
 * {
   margin: 0;
   padding: 0;
@@ -11,24 +12,24 @@ body {
   margin: 0;
 }
 
-.container {
-  display: flex;
-  flex-direction: column;
-  max-width: 650px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.header {
+header {
   background-color: #0351a5;
   color: #fff;
   padding: 20px 0;
   text-align: center;
 }
 
-.header-title {
+header h1 {
   font-size: 36px;
   font-weight: bold;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  max-width: 650px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 .attendance-section {
@@ -87,7 +88,7 @@ body {
   background-color: #0056b3;
 }
 
-.footer {
+footer {
   background-color: #0350a1;
   color: #fff;
   text-align: center;

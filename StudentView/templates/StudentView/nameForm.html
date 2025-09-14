@@ -12,10 +12,10 @@
     <button type="submit" class="submit-button" name="submit_student" id="submit_student" disabled>+ Add</button>
     <script>
         const naieveEmail = /^([a-z]+)\.(([a-z]+\.?)+)(?<!\.)(@student\.cat\.org\.uk$)?/i
-        const eml = document.getElementById("student_email");
+        const eml   = document.getElementById("student_email");
         const fname = document.getElementById("student_fname");
         const lname = document.getElementById("student_lname");
-        const btn = document.getElementById("submit_student");
+        const btn   = document.getElementById("submit_student");
 
         let fnameFocused = false;
         let lnameFocused = false;
@@ -26,7 +26,6 @@
         lname.addEventListener("focus",(event)=>{
             lnameFocused = true;
         });
-
 
         function OnEmailChange(event){
             const regex = naieveEmail.exec(eml.value);
