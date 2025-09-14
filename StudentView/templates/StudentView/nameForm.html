@@ -66,8 +66,7 @@
                 btn.disabled = (!btnEnable);
             }
             
-            eml.keyup = OnEmailChange;
-            eml.change = OnEmailChange;
+            eml.addEventListener('input', OnEmailChange);
         });
     </script>
 </form>
