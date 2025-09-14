@@ -5,7 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block page_title %}QR Attendance System{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'FacultyView/Index_Style.css' %}" />
+    <link rel="stylesheet" href="{% static 'FacultyView/TemplateCss.css' %}" />
+    <link rel="stylesheet" href="{% static 'FacultyView/FacultyView.css' %}" />
     <link rel="stylesheet" href="{% static 'StudentView/studentForm.css' %}" />
     <link
         rel="stylesheet"
@@ -18,13 +19,12 @@
       <h2>{% block header_title %}Attendance Portal{% endblock %}</h2>
     </header>
     <main>
-      <div class="marked-list">
+      <section class="block left_block marked-list">
         {% block left_block %}<h2>No content</h2>{% endblock %}
-      </div>
-      <div class="attendance-container">
+      </section>
+      <section class="block right_block attendance-container">
         {% block right_block %}<h2>No content</h2>{% endblock %}
-        </div>
-      </div>
+      </section>
     </main>
     <footer>
       {% block footer %}<p>&copy; QR Attendance System 2023 - Team Hokage</p>{% endblock %}
