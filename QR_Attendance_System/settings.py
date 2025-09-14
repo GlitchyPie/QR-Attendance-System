@@ -9,7 +9,8 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+from pytz import pytz
+from datetime import datetime
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -62,7 +63,9 @@ ROOT_URLCONF = "QR_Attendance_System.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+            BASE_DIR / "templates",
+            ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -126,6 +129,10 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+STATIC_DIRS = [
+    BASE_DIR / "static"
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -134,9 +141,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 #==================================
 
 INSTITUTION_NAME = "Centre For Alternative Technology"
-
-
+APP_NAME = "QR Attendance System"
+COPYRIGHT = "Centre For Alternative Technology"
+COPYRIGHT_YEAR = datetime.now(pytz.utc).year
 SETTINGS_EXPORT = [
     'INSTITUTION_NAME',
     'LANGUAGE_CODE',
+    'APP_NAME',
+    'COPYRIGHT'
 ]
