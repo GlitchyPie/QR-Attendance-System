@@ -1,12 +1,11 @@
 import datetime
+import pytz
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseBadRequest
 from django.urls import reverse
 from .models import Student, ClassName, Attendance
 import qrcode
-from StudentView.views import present
-import urllib.parse
 
 def qrgenerator(request,classId = -1):
     link = f"{request.scheme}://{request.META['HTTP_HOST']}/class/{classId}/student_entry"
@@ -37,7 +36,7 @@ def faculty_view_class_id(request,classId):
 def faculty_view_class(request,classId,className):
     qrgenerator(request,classId)
 
-    present = Attendance.objects.filter(dte_date__date=datetime.datetime.now(), s_class=classId)
+    present = Attendance.objects.filter(dte_date__date=datetime.datetime.now(pytz.utc), s_class=classId)
     return render(
         request,
         "FacultyView/FacultyViewClass.html",
@@ -47,7 +46,29 @@ def faculty_view_class(request,classId,className):
             "classId": classId,
         },
     )
+#=======================
 
+def faculty_view_presetn_name(request,className):
+    classId = ClassName.objects.filter(s_className__iexact=className)[0].id
+    return faculty_view_present(request, classId, className)
+
+def faculty_view_present_id(request,classId):
+    className = ClassName.objects.filter(id=classId)[0].s_className
+    return faculty_view_class(request,classId,className)
+
+def faculty_view_present(request,classId,className):
+    qrgenerator(request,classId)
+
+    present = Attendance.objects.filter(dte_date__date=datetime.datetime.now(pytz.utc), s_class=classId)
+    return render(
+        request,
+        "FacultyView/StudentList.html",
+        {
+            "present": present,
+            "className": className,
+            "classId": classId,
+        },
+    )
 #=======================
 def faculty_view_create_class(request):
     if request.method == "GET" :

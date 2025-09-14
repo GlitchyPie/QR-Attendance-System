@@ -6,10 +6,6 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponseBadRequest
 from django.urls import reverse
 
-# Create your views here.
-
-present = set()
-
 #=======================
 def student_entry_name(request, className):
     classId = ClassName.objects.filter(s_className__iexact=className)[0].id
@@ -92,12 +88,3 @@ def submitted(request):
 
 def already_submitted(request):
     return render(request, "StudentView/AlreadySubmitted.html")
-
-#def add_manually_post(request):
-#    student_roll = request.POST["student-name"]
-#    student = Student.objects.get(s_roll=student_roll)
-#    present.add(student)
-#    return HttpResponseRedirect("/submitted")
-
-
-
