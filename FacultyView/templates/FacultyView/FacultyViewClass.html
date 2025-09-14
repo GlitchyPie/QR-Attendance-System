@@ -46,7 +46,7 @@
                 function XMLHttpRequestLoad(){
                     const A = this.responseText;
                     const B = clearWhiteSpace(A);
-                    if(student_ul_html != A){
+                    if(student_ul_html != B){
                         student_ul_html = B
                         student_ul_container.innerHTML = A;
                         formatDates();
