@@ -9,10 +9,11 @@
     
     <form class="attendance-form" method="POST" action="{% url 'delete_attendance_id' classId %}">
         {% csrf_token %}
-        {% include "FacultyView/StudentList.html" %}
+        <div id="student_list_container">{% include "FacultyView/StudentList.html" %}</div>
         <script>
             document.addEventListener("DOMContentLoaded",()=>{
                 const student_ul = document.getElementById('student_present_list');
+                const student_ul_container = document.getElementById('student_list_container');
 
                 function formatDates(){
                     const li_items = student_ul.children;
@@ -37,10 +38,10 @@
                 }
                 
                 function XMLHttpRequestLoad(){
-                    const A = student_ul.innerHTML.replace(/\s{2,}|[\r\n]+/g," ");
+                    const A = student_ul_container.innerHTML.replace(/\s{2,}|[\r\n]+/g," ");
                     const B = this.responseText.replace(/\s{2,}|[\r\n]+/g," ");
                     if(A != B){
-                        student_ul.innerHTML = B;
+                        student_ul_container.innerHTML = B;
                         formatDates();
                     }
                     setTimeout(lookForUpdate, 2000);
