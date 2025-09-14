@@ -5,22 +5,27 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Attendance Submitted - Attendance Portal</title>
-    <link rel="stylesheet" href="{% static 'StudentView/submitted.css' %}" />
+    <link rel="stylesheet" href="{% static 'FacultyView/TemplateCss.css' %}" />
+    <link rel="stylesheet" href="{% static 'FacultyView/StudentView.css' %}" />
+    <link rel="stylesheet" href="{% static 'StudentView/studentForm.css' %}" />
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    {% block head %}{% endblock %}
   </head>
   <body>
     <header class="header">
-      <h1 class="header-title">Centre For Alternative Technology</h1>
-      <h2>Attendance Portal</h2>
+      <h1>Centre For Alternative Technology</h1>
+      <h2>{% block header_title %}Attendance Portal{% endblock %}</h2>
     </header>
 
-    <main>
-        <h2>Attendance already submitted today.</h2>
-        <br />
-        <h2>You may close this page.</h2>
+    <main class="block">
+      {% block main_block %}<h2>No Content</h2>{% endblock %}
     </main>
     
     <footer class="footer">
-      <p>&copy; QR Attendance System 2023 - Team Hokage</p>
+      {% block footer %}<p>&copy; QR Attendance System 2023 - Team Hokage</p>{% endblock %}
     </footer>
   </body>
 </html>
