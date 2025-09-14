@@ -1,12 +1,12 @@
 {% extends "FacultyView/FacultyView.html" %}
 {% load static %}
 
-{% block header_title %}Attendance Portal {{className}}{% endblock %}
+{% block header_title %}{{className}} | Attendance Portal{% endblock %}
 
 {% block left_block %}
-    <h2>Present Count : {{ present|length }}</h2>
-    <h3 class="present-list">Present Students</h3>
-
+    <h2>Present Students</h2>
+    <h3 class="present-list">Present Count : {{ present|length }}</h3>
+    
     <form class="attendance-form" method="POST" action="{% url 'delete_attendance_id' classId %}">
         {% csrf_token %}
         <ul class="student-list" id="student_present_list">
