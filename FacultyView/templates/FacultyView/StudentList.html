@@ -9,6 +9,7 @@
                     {{ attendance.dte_date|date:"H:i" }}
                 </span> - {{ attendance.student.s_fname }} {{attendance.student.s_lname}}
             </span>
+            </label>
             <button
                 type="submit"
                 name="student_email"
@@ -18,7 +19,6 @@
             >
                 <i class="fas fa-trash-alt"></i>
             </button>
-            </label>
         </li>
     {% endfor %}
 </ul>
