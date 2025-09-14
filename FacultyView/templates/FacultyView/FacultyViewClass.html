@@ -34,18 +34,18 @@
         </ul>
         <script>
             document.addEventListener("DOMContentLoaded",()=>{
-                const ul = document.getElementById('student_present_list');
-                const lis = ul.children;
+                const student_ul = document.getElementById('student_present_list');
+                const li_items = student_ul.children;
                 const localeOpts = {
                     hour:'2-digit',
                     minute: '2-digit'
                 }
-                for (const li of lis){
-                    const sname = li.getElementsByClassName("student-name")[0];
-                    const dte = sname = sname.getElementsByClassName('attendance-date')[0];
-                    const utcDateStr = dte.dataset.ISODate;
+                for (const li of li_items){
+                    const node_sname = li.getElementsByClassName("student-name")[0];
+                    const node_date = node_sname.getElementsByClassName('attendance-date')[0];
+                    const utcDateStr = node_date.dataset.ISODate;
                     const utcDate = Date.parse(utcDateStr);
-                    sname.innerText = utcDate.toLocaleString('en-GB',localeOpts);
+                    node_sname.innerText = utcDate.toLocaleString('en-GB',localeOpts);
                 }
             });
         </script>
