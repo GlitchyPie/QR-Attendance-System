@@ -45,7 +45,7 @@
                     const node_date = node_sname.getElementsByClassName('attendance-date')[0];
                     const utcDateStr = node_date.dataset.ISODate;
                     const utcDate = Date.parse(utcDateStr);
-                    node_sname.innerText = utcDate.toLocaleString('en-GB',localeOpts);
+                    node_date.innerText = utcDate.toLocaleString('en-GB',localeOpts);
                 }
             });
         </script>
