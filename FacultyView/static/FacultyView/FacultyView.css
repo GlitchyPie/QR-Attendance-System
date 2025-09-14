@@ -16,10 +16,6 @@
   color: #666;
 }
 
-.present-list {
-  margin: 2em;
-}
-
 /* Add custom scrollbar styles to the form */
 .attendance-form {
   max-height: 300px; /* Set a maximum height for the form */
@@ -85,10 +81,6 @@
   main {
     flex-direction: column;
   }
-}
-
-.attendance-card-submitted {
-  padding: 20px;
 }
 
 .attendance-student-form {
