@@ -2,3 +2,4 @@ qrcode
 django
 pillow
 django-case-insensitive-field
+pytz
