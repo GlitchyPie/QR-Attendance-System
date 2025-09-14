@@ -47,8 +47,8 @@
                     const A = this.responseText;
                     const B = clearWhiteSpace(A);
                     if(student_ul_html != A){
-                        student_ul_html = A
-                        student_ul_container.innerHTML = B;
+                        student_ul_html = B
+                        student_ul_container.innerHTML = A;
                         formatDates();
                     }
                     setTimeout(lookForUpdate, 2000);
