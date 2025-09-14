@@ -14,7 +14,8 @@
         <li id="student_present_list" class="student">
             <label class="student-label">
             <span class="student-name">
-                <span class="attendance-date" data-UNIXtimestamp="{{ attendance.dte_date|date:'U' }}"
+                <span class="attendance-date"
+                      data-UNIXtimestamp="{{ attendance.dte_date|date:'U' }}"
                       data-ISODate="{{ attendance.dte_date|date:'c' }}">
                       {{ attendance.dte_date|date:"H:i" }}
                 </span> - {{ attendance.student.s_fname }} {{attendance.student.s_lname}}
@@ -43,7 +44,7 @@
                 for (const li of li_items){
                     const node_sname = li.getElementsByClassName("student-name")[0];
                     const node_date = node_sname.getElementsByClassName('attendance-date')[0];
-                    const utcDateStr = node_date.dataset.ISODate;
+                    const utcDateStr = node_date.dataset.isodate;
                     const utcDate = Date.parse(utcDateStr);
                     node_date.innerText = utcDate.toLocaleString('en-GB',localeOpts);
                 }
