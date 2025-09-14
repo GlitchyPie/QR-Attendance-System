@@ -11,10 +11,13 @@
         {% csrf_token %}
         <ul class="student-list">
         {% for attendance in present %}
-        <li class="student">
+        <li id="student_present_list" class="student">
             <label class="student-label">
             <span class="student-name">
-                <span data-UNIXtimestamp="{{ attendance.dte_date|date:'U' }}" data-ISODate="{{ attendance.dte_date|date:'c' }}">{{ attendance.dte_date|date:"H:i" }}</span> - {{ attendance.student.s_fname }} {{attendance.student.s_lname}}
+                <span class="attendance-date" data-UNIXtimestamp="{{ attendance.dte_date|date:'U' }}"
+                      data-ISODate="{{ attendance.dte_date|date:'c' }}">
+                      {{ attendance.dte_date|date:"H:i" }}
+                </span> - {{ attendance.student.s_fname }} {{attendance.student.s_lname}}
             </span>
             <button
                 type="submit"
@@ -29,6 +32,23 @@
         </li>
         {% endfor %}
         </ul>
+        <script>
+            document.addEventListener("DOMContentLoaded",()=>{
+                const ul = document.getElementById('student_present_list');
+                const lis = ul.children;
+                const localeOpts = {
+                    hour:'2-digit',
+                    minute: '2-digit'
+                }
+                for (const li of lis){
+                    const sname = li.getElementsByClassName("student-name")[0];
+                    const dte = sname = sname.getElementsByClassName('attendance-date')[0];
+                    const utcDateStr = dte.dataset.ISODate;
+                    const utcDate = Date.parse(utcDateStr);
+                    sname.innerText = utcDate.toLocaleString('en-GB',localeOpts);
+                }
+            });
+        </script>
     </form>
     {% include "StudentView/nameForm.html" %}
 {% endblock %}
