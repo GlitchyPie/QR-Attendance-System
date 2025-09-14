@@ -18,7 +18,7 @@ body {
 }
 
 header {
-  background-color: #0056b3;
+  background-color: #5a5a5a;
   color: #fff;
   padding: 20px;
   text-align: center;
@@ -62,13 +62,13 @@ main>section {
 }
 
 footer {
-  background-color: #0056b3;
+  background-color: #5a5a5a;
   color: #fff;
   text-align: center;
   padding: 10px;
 }
 button {
-  background-color: #007bff;
+  background-color: #5d7f75;
   color: #fff;
   padding: 10px 20px;
   border: none;
@@ -77,6 +77,9 @@ button {
   font-weight: bold;
   font-size: 16px;
   margin-top: 20px;
+}
+button:hover{
+  background-color: #99aca2;
 }
 button[disabled]{
   background-color: gray;
