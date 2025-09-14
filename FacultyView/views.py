@@ -54,7 +54,7 @@ def faculty_view_present_name(request,className):
 
 def faculty_view_present_id(request,classId):
     className = ClassName.objects.filter(id=classId)[0].s_className
-    return faculty_view_class(request,classId,className)
+    return faculty_view_present(request,classId,className)
 
 def faculty_view_present(request,classId,className):
     qrgenerator(request,classId)
