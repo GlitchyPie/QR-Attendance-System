@@ -1,4 +1,5 @@
 import datetime
+import pytz
 from django.shortcuts import render
 from FacultyView.models import Student, ClassName, Attendance
 from django.http import HttpResponseRedirect
@@ -59,7 +60,7 @@ def submit_attendance(request,classId,className):
 
     attendanceQuery = Attendance.objects.filter(dte_date__date=datetime.datetime.now(), student=eml, s_class=classId)
     if attendanceQuery.exists() == False:
-        attendanceOb = Attendance(dte_date=datetime.datetime.now(),s_class=classOb,student=stuOb)
+        attendanceOb = Attendance(dte_date=datetime.datetime.now(pytz.utc),s_class=classOb,student=stuOb)
         attendanceOb.save()
         return HttpResponseRedirect("/submitted")
     else:
