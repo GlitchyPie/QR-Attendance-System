@@ -9,7 +9,7 @@
     
     <form class="attendance-form" method="POST" action="{% url 'delete_attendance_id' classId %}">
         {% csrf_token %}
-        {% include "FacultyView/studentList.html" %}
+        {% include "FacultyView/StudentList.html" %}
         <script>
             document.addEventListener("DOMContentLoaded",()=>{
                 const student_ul = document.getElementById('student_present_list');
