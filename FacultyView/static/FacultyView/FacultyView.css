@@ -90,3 +90,7 @@
 .attendance-card-submitted {
   padding: 20px;
 }
+
+.attendance-student-form {
+ border-top: 2px solid gray;
+}
