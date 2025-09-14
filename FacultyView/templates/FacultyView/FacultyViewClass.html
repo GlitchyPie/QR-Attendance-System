@@ -7,7 +7,7 @@
     <h2>Present Count : {{ present|length }}</h2>
     <h3 class="present-list">Present Students</h3>
 
-    <form class="attendance-form" method="POST">
+    <form class="attendance-form" method="POST" action="{% url 'delete_attendance_id' classId %}">
         {% csrf_token %}
         <ul class="student-list">
         {% for attendance in present %}
@@ -19,7 +19,7 @@
             <button
                 type="submit"
                 name="student_email"
-                id="student_email"
+                id="student_email_{{attendance.student.s_eml}}"
                 value="{{attendance.student.s_eml}}"
                 class="delete-button"
             >
