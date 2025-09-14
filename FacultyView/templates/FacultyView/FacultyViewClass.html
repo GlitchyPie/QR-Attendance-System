@@ -14,7 +14,7 @@
         <li class="student">
             <label class="student-label">
             <span class="student-name">
-                {{ attendance.dte_date|date:"H:i" }} - {{ attendance.student.s_fname }} {{attendance.student.s_lname}}
+                <span data-UNIXtimestamp="{{ attendance.dte_date|date:'U' }}" data-ISODate="{{ attendance.dte_date|date:'c' }}">{{ attendance.dte_date|date:"H:i" }}</span> - {{ attendance.student.s_fname }} {{attendance.student.s_lname}}
             </span>
             <button
                 type="submit"
