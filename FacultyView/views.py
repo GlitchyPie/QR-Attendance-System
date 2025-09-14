@@ -48,7 +48,7 @@ def faculty_view_class(request,classId,className):
     )
 #=======================
 
-def faculty_view_presetn_name(request,className):
+def faculty_view_present_name(request,className):
     classId = ClassName.objects.filter(s_className__iexact=className)[0].id
     return faculty_view_present(request, classId, className)
 
