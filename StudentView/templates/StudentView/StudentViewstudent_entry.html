@@ -1,6 +1,10 @@
 {% extends "StudentView/StudentView.html" %}
 {% load static %}
 
+{%block head %}
+    <link rel="stylesheet" href="{% static 'StudentView/studentForm.css' %}" />
+{%block}
+
 {% block header_title %}Attendance Portal {{className}}{% endblock %}
 
 {% block only_block %}
