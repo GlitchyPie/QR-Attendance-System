@@ -14,6 +14,12 @@
             document.addEventListener("DOMContentLoaded",()=>{
                 const student_ul = document.getElementById('student_present_list');
                 const student_ul_container = document.getElementById('student_list_container');
+                let student_ul_html = clearWhiteSpace(student_ul_container.innerHTML);
+
+                function clearWhiteSpace(s){
+                    if(s === undefined){return s;}
+                    return s.replace(/\s+/g,"");
+                }
 
                 function formatDates(){
                     const li_items = student_ul.children;
@@ -38,9 +44,10 @@
                 }
                 
                 function XMLHttpRequestLoad(){
-                    const A = student_ul_container.innerHTML;
-                    const B = this.responseText;
-                    if(A.replace(/\s+/g,"") != B.replace(/\s+/g,"")){
+                    const A = this.responseText;
+                    const B = clearWhiteSpace(A);
+                    if(student_ul_html != A){
+                        student_ul_html = A
                         student_ul_container.innerHTML = B;
                         formatDates();
                     }
