@@ -68,6 +68,15 @@ def submit_attendance(request,classId,className):
 
 #=======================
 
+def delete_attendance_id(request, classId):
+    if request.method == "GET" :
+        return HttpResponseBadRequest() #This should only accept POST requests
+    #Need to actually delete here....
+    return HttpResponseRedirect(reverse('faculty_view_class_id',kwargs={"classId":classId}))
+    
+
+#=======================
+
 def submitted(request):
     return render(request, "StudentView/Submitted.html")
 
