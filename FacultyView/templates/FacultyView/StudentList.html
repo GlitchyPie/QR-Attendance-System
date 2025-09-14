@@ -21,29 +21,4 @@
             </label>
         </li>
     {% endfor %}
-
-    <script>
-        document.addEventListener("DOMContentLoaded",()=>{
-            const student_ul = document.getElementById('student_present_list');
-
-            function lookForUpdate(){
-                const request = new XMLHttpRequest();
-                request.addEventListener("load", XMLHttpRequestLoad);
-                request.open("GET", "{% url 'faculty_view_present_id' classId %}");
-                request.send();
-            }
-            
-            function XMLHttpRequestLoad(){
-                const A = student_ul.innerHTML;
-                const B = this.responseText;
-                if(A != B){
-                    student_ul.innerHTML = B;
-                }
-                setTimeout(lookForUpdate, 2000);
-            }
-            
-            setTimeout(lookForUpdate, 2000)
-            
-        });
-    </script>
 </ul>

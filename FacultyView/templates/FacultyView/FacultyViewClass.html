@@ -13,18 +13,42 @@
         <script>
             document.addEventListener("DOMContentLoaded",()=>{
                 const student_ul = document.getElementById('student_present_list');
-                const li_items = student_ul.children;
-                const localeOpts = {
-                    hour:'2-digit',
-                    minute: '2-digit'
+
+                function formatDates(){
+                    const li_items = student_ul.children;
+                    const localeOpts = {
+                        hour:'2-digit',
+                        minute: '2-digit'
+                    }
+                    for (const li of li_items){
+                        const node_sname = li.getElementsByClassName("student-name")[0];
+                        const node_date = node_sname.getElementsByClassName('attendance-date')[0];
+                        const utcDateStr = node_date.dataset.isodate;
+                        const utcDate = new Date(utcDateStr); //Date.parse(utcDateStr);
+                        node_date.innerText = utcDate.toLocaleString('en-GB',localeOpts);
+                    }                    
                 }
-                for (const li of li_items){
-                    const node_sname = li.getElementsByClassName("student-name")[0];
-                    const node_date = node_sname.getElementsByClassName('attendance-date')[0];
-                    const utcDateStr = node_date.dataset.isodate;
-                    const utcDate = new Date(utcDateStr); //Date.parse(utcDateStr);
-                    node_date.innerText = utcDate.toLocaleString('en-GB',localeOpts);
+
+                function lookForUpdate(){
+                    const request = new XMLHttpRequest();
+                    request.addEventListener("load", XMLHttpRequestLoad);
+                    request.open("GET", "{% url 'faculty_view_present_id' classId %}");
+                    request.send();
                 }
+                
+                function XMLHttpRequestLoad(){
+                    const A = student_ul.innerHTML;
+                    const B = this.responseText;
+                    if(A != B){
+                        student_ul.innerHTML = B;
+                        formatDates();
+                    }
+                    setTimeout(lookForUpdate, 2000);
+                }
+                
+                setTimeout(lookForUpdate, 2000)
+
+                formatDates();
             });
         </script>
     </form>
