@@ -1,0 +1,71 @@
+{% extends "FacultyView/FacultyView.html" %}
+{% load static %}
+
+{% block header_title %}{{className}} | Attendance Portal{% endblock %}
+
+{% block left_block %}
+    <h2>Present Students</h2>
+    <h3 class="present-list">Present Count : {{ present|length }}</h3>
+    
+    <form class="attendance-form" method="POST" action="{% url 'delete_attendance_id' classId %}">
+        {% csrf_token %}
+        <ul class="student-list" id="student_present_list">
+            {% for attendance in present %}
+                <li class="student">
+                    <label class="student-label">
+                    <span class="student-name">
+                        <span class="attendance-date"
+                            data-UNIXtimestamp="{{ attendance.dte_date|date:'U' }}"
+                            data-ISODate="{{ attendance.dte_date|date:'c' }}">
+                            {{ attendance.dte_date|date:"H:i" }}
+                        </span> - {{ attendance.student.s_fname }} {{attendance.student.s_lname}}
+                    </span>
+                    <button
+                        type="submit"
+                        name="student_email"
+                        id="student_email_{{attendance.student.s_eml}}"
+                        value="{{attendance.student.s_eml}}"
+                        class="delete-button"
+                    >
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    </label>
+                </li>
+            {% endfor %}
+        </ul>
+        <script>
+            document.addEventListener("DOMContentLoaded",()=>{
+                const student_ul = document.getElementById('student_present_list');
+                const li_items = student_ul.children;
+                const localeOpts = {
+                    hour:'2-digit',
+                    minute: '2-digit'
+                }
+                for (const li of li_items){
+                    const node_sname = li.getElementsByClassName("student-name")[0];
+                    const node_date = node_sname.getElementsByClassName('attendance-date')[0];
+                    const utcDateStr = node_date.dataset.isodate;
+                    const utcDate = new Date(utcDateStr); //Date.parse(utcDateStr);
+                    node_date.innerText = utcDate.toLocaleString('en-GB',localeOpts);
+                }
+            });
+        </script>
+    </form>
+    {% include "StudentView/nameForm.html" %}
+{% endblock %}
+
+{% block right_block %}
+    <div class="attendance-card">
+        <h2>
+        Connect to CAT_STUDENT and Scan the QR Code to Mark Attendance
+        </h2>
+        <img
+            src="{% static 'FacultyView/qrcode_' %}{{classId}}.png"
+            alt="QR Code"
+            width="200"
+            height="200"
+        />
+        </a>
+        <p class="hint">Please scan the QR code to mark your attendance.</p>
+    </div>
+{% endblock %}

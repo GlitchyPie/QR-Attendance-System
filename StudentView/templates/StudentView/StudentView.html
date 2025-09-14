@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Attendance Submitted - Attendance Portal</title>
+    <link rel="stylesheet" href="{% static 'FacultyView/TemplateCss.css' %}" />
+    <link rel="stylesheet" href="{% static 'StudentView/StudentView.css' %}" />
+    <link rel="stylesheet" href="{% static 'StudentView/studentForm.css' %}" />
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    <header class="header">
+      <h1>Centre For Alternative Technology</h1>
+      <h2>{% block header_title %}Attendance Portal{% endblock %}</h2>
+    </header>
+
+    <main>
+      <section class="block">
+      {% block main_block %}<h2>No Content</h2>{% endblock %}
+      </section>
+    </main>
+    
+    <footer class="footer">
+      {% block footer %}<p>&copy; QR Attendance System 2023 - Team Hokage</p>{% endblock %}
+    </footer>
+  </body>
+</html>
