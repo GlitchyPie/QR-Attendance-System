@@ -106,9 +106,25 @@ def faculty_view_attendance_export_name(request,className, year, month, day):
     return faculty_view_attendance_export(request, classId, ClassName, year, month, day)
 
 def faculty_view_attendance_export(request, classId, className, year, month, day):
-    present = Attendance.objects.filter(dte_date__year=year, dte_date__month=month, dte_date__day=day, s_class=classId)
+    present_query = Attendance.objects.filter(dte_date__year=year, dte_date__month=month, dte_date__day=day, s_class=classId)
 
-    sio = io.StringIO()
-    csvWriter = csv.writer(sio)
-    csvWriter.writerows(present)
-    return HttpResponse(sio.getvalue(),content_type="text/plain")
+    response = HttpResponse (content_type='text/csv')
+    csvWriter = csv.writer(response)
+
+    csvWriter.writerow([
+        'Student email',
+        'First Name',
+        'Last Name',
+        'Class',
+        'Date / Time',
+    ])
+    for entry in present_query:
+        csvWriter.writerow([
+            entry.student.s_eml,
+            entry.student.s_fname,
+            entry.student.s_lname,
+            entry.s_class.s_className,
+            entry.dte_date,
+        ])
+
+    return response
