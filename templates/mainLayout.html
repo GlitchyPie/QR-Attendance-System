@@ -14,7 +14,7 @@
   <body>
     <header>
       <h1>{{settings.INSTITUTION_NAME}}</h1>
-      <h2>{% block header_title %}Attendance Portal{% endblock %}</h2>
+      <h2>{% block header_title %}{% if classname != "" %}{{className}} | {% endif %}Attendance Portal{% endblock %}Attendance Portal{% endblock %}</h2>
     </header>
     <main>
         {%block main_block %}
