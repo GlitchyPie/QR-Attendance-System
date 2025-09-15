@@ -31,4 +31,4 @@ class Attendance(models.Model):
     student = models.ForeignKey(Student, on_delete=models.RESTRICT)
 
     def __str__(self) -> str:
-        return f"{self.dte_date} - {self.student}"
+        return f"{self.dte_date} - {self.s_class} - {self.student}"
