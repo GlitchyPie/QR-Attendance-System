@@ -107,12 +107,12 @@ def faculty_view_attendance_export_name(request,className, year, month, day):
 
 def faculty_view_attendance_export(request, classId, className, year, month, day):
     present = Attendance.objects.filter(dte_date__year=year, dte_date__month=month, dte_date__day=day, s_class=classId)
-    csv = ""
+    s_csv = ""
     with tempfile.TemporaryFile() as tf:
         csvWriter = csv.writer(tf)
         csvWriter.writerows(present)
         tf.seek(0, )
-        csv = tf.read()
+        s_csv = tf.read()
         tf.close()
     
     return HttpResponse(csv,content_type="text/plain")
