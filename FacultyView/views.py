@@ -1,12 +1,16 @@
 import datetime
 import pytz
+import csv
+import tempfile
 from django.shortcuts import render
+from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseBadRequest
 from django.urls import reverse
 from .models import Student, ClassName, Attendance
 import qrcode
 
+#TODO: This will need to be changed once in production in order to correctly serve the image....
 def qrgenerator(request,classId = -1):
     link = f"{request.scheme}://{request.META['HTTP_HOST']}/class/{classId}/student_entry"
     def generate_qr_code(link,classId):
@@ -69,7 +73,9 @@ def faculty_view_present(request,classId,className):
             "classId": classId,
         },
     )
+
 #=======================
+
 def faculty_view_create_class(request):
     if request.method == "GET" :
         return HttpResponseBadRequest() #This should only accept POST requests
@@ -88,3 +94,25 @@ def faculty_view(request):
             "classes": classes
         },
     )
+
+#=======================
+
+def faculty_view_attendance_export_id(request,classId, year, month, day):
+    className = ClassName.objects.filter(id=classId)[0].s_className
+    return faculty_view_attendance_export(request, classId, ClassName, year, month, day)
+
+def faculty_view_attendance_export_name(request,className, year, month, day):
+    classId = ClassName.objects.filter(s_className__iexact=className)[0].id
+    return faculty_view_attendance_export(request, classId, ClassName, year, month, day)
+
+def faculty_view_attendance_export(request, classId, className, year, month, day):
+    present = Attendance.objects.filter(dte_date__year=datetime.datetime.now(pytz.utc), s_class=classId)
+    csv = ""
+    with tempfile.TemporaryFile() as tf:
+        csvWriter = csv.writer(tf)
+        csvWriter.writerows(present)
+        tf.seek(0, )
+        csv = tf.read()
+        tf.close()
+    
+    return HttpResponse(csv,content_type="text/plain")
