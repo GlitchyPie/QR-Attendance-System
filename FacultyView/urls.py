@@ -6,6 +6,7 @@ urlpatterns = [
     path("class/create/", views.faculty_view_create_class, name="faculty_view_create_class"),
     path("class/<int:classId>/export/<int:year>/<int:month>/<int:day>/", views.faculty_view_attendance_export_id, name="faculty_view_attendance_export_id"),
     path("class/<str:className>/export/<int:year>/<int:month>/<int:day>/", views.faculty_view_attendance_export_name, name="faculty_view_attendance_export_name"),
+    path("class/<int:classId>/export/",views.faculty_view_attendance_export_form, name="faculty_view_attendance_export_form"),
     path("class/<int:classId>/present/", views.faculty_view_present_id, name="faculty_view_present_id"),
     path("class/<int:classId>/", views.faculty_view_class_id, name="faculty_view_class_id"),
     path("class/<str:className>/present/", views.faculty_view_present_name, name="faculty_view_present_name"),

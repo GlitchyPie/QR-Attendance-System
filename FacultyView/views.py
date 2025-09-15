@@ -1,7 +1,7 @@
 import datetime
 import pytz
 import csv
-import io
+from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -23,7 +23,7 @@ def qrgenerator(request,classId = -1):
         qr.add_data(link)
         qr.make(fit=True)
         img = qr.make_image(fill_color="black", back_color="white")
-        img.save(f"FacultyView/static/FacultyView/qrcode_{classId}.png")
+        img.save(f"{settings.MEDIA_ROOT}/qrs/qrcode_{classId}.png")
 
     generate_qr_code(link,classId)
 
@@ -96,6 +96,16 @@ def faculty_view(request):
     )
 
 #=======================
+def faculty_view_attendance_export_form(request):
+    return render(
+        request,
+        "FacultyView/FacultyViewExport.html",
+        {
+            "year": datetime.datetime.now().year,
+            "month": datetime.datetime.now().month,
+            "day": datetime.datetime.now().day,
+        },
+    )
 
 def faculty_view_attendance_export_id(request,classId, year, month, day):
     className = ClassName.objects.filter(id=classId)[0].s_className
@@ -112,7 +122,7 @@ def faculty_view_attendance_export(request, classId, className, year, month, day
     csvWriter = csv.writer(response)
 
     csvWriter.writerow([
-        'Student email',
+        'Student Email',
         'First Name',
         'Last Name',
         'Class',

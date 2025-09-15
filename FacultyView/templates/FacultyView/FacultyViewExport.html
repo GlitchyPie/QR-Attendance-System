@@ -1,0 +1,9 @@
+{% extends "mainLayout.html" %}
+{% load static %}
+
+{% block only_block %}
+    <form class="attendance-student-form" method="POST" action="{% url 'submit_attendance_id' classId %}">
+    {% csrf_token %}
+
+    </form>
+{% endblock %}
