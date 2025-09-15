@@ -25,7 +25,11 @@ def qrgenerator(request,classId = -1):
         qr.make(fit=True)
         img = qr.make_image(fill_color="black", back_color="white")
         pth = f"{settings.MEDIA_ROOT}/qrs"
-        os.makedirs(pth)
+        try:
+            os.makedirs(pth)
+        except FileExistsError:
+            pass
+        
         img.save(f"{pth}/qrcode_{classId}.png")
 
     generate_qr_code(link,classId)
