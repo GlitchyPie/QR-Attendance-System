@@ -59,15 +59,15 @@ def faculty_view_class(request,classId,className):
     )
 #=======================
 
-def faculty_view_present_name(request,className):
+def faculty_view_ajax_present_name(request,className):
     classId = ClassName.objects.filter(s_className__iexact=className)[0].id
-    return faculty_view_present(request, classId, className)
+    return faculty_view_ajax_present(request, classId, className)
 
-def faculty_view_present_id(request,classId):
+def faculty_view_ajax_present_id(request,classId):
     className = ClassName.objects.filter(id=classId)[0].s_className
-    return faculty_view_present(request,classId,className)
+    return faculty_view_ajax_present(request,classId,className)
 
-def faculty_view_present(request,classId,className):
+def faculty_view_ajax_present(request,classId,className):
     qrgenerator(request,classId)
 
     present = Attendance.objects.filter(dte_date__date=datetime.datetime.now(pytz.utc), s_class=classId)
@@ -107,24 +107,18 @@ def faculty_view_attendance_export_form(request):
     return render(
         request,
         "FacultyView/FacultyViewExport.html",
-        {
-            "year": datetime.datetime.now().year,
-            "month": datetime.datetime.now().month,
-            "day": datetime.datetime.now().day,
-        },
+        {},
     )
 
-def faculty_view_attendance_export_id(request,classId, year, month, day):
+def faculty_view_attendance_export_id(request,action, classId, year, month, day):
     className = ClassName.objects.filter(id=classId)[0].s_className
-    return faculty_view_attendance_export(request, classId, ClassName, year, month, day)
+    return faculty_view_attendance_export(request, action, classId, ClassName, year, month, day)
 
-def faculty_view_attendance_export_name(request,className, year, month, day):
+def faculty_view_attendance_export_name(request,action, className, year, month, day):
     classId = ClassName.objects.filter(s_className__iexact=className)[0].id
-    return faculty_view_attendance_export(request, classId, ClassName, year, month, day)
+    return faculty_view_attendance_export(request, action, classId, ClassName, year, month, day)
 
-def faculty_view_attendance_export(request, classId, className, year, month, day):
-    present_query = Attendance.objects.filter(dte_date__year=year, dte_date__month=month, dte_date__day=day, s_class=classId)
-
+def faculty_view_attendance_export_export(request, present_query):
     response = HttpResponse (content_type='text/csv')
     csvWriter = csv.writer(response)
 
@@ -145,3 +139,18 @@ def faculty_view_attendance_export(request, classId, className, year, month, day
         ])
 
     return response
+
+def faculty_view_attendance_export_view(request, present_query):
+    pass
+    
+def faculty_view_attendance_export(request, action, classId, className, year, month, day):
+    present_query = Attendance.objects.filter(dte_date__year=year, dte_date__month=month, dte_date__day=day, s_class=classId)
+    match action:
+        case 'export':
+            return faculty_view_attendance_export_export(request, present_query)
+        
+        case 'view':
+            return faculty_view_attendance_export_view(request, present_query)
+        
+        case _:
+            return HttpResponseBadRequest()

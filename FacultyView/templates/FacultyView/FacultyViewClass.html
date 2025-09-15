@@ -36,7 +36,7 @@
                 function lookForUpdate(){
                     const request = new XMLHttpRequest();
                     request.addEventListener("load", XMLHttpRequestLoad);
-                    request.open("GET", "{% url 'faculty_view_present_id' classId %}");
+                    request.open("GET", "{% url 'faculty_view_ajax_present_id' classId %}");
                     request.send();
                 }
                 

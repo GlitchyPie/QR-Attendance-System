@@ -2,8 +2,65 @@
 {% load static %}
 
 {% block only_block %}
-    <form class="attendance-student-form" method="POST" action="{% url 'submit_attendance_id' classId %}">
-    {% csrf_token %}
-
+    <form class="export-date-form">
+        {% csrf_token %}
+        <label>Export:
+            <button id="btn-export-today">Today</button><button id="btn-export-yesterday">Yesterday</button>
+        </label>
+        <label>View:
+            <button id="btn-view-today">Today</button><button id="btn-view-yesterday">Yesterday</button>
+        </label>
+        <fieldset>
+            <label>Date: <input type="date" id="export-date-picker"></label>
+            <br>
+            <button id="btn-export-date">Export</button><button id="btn-view-date">View</button>
+        </fieldset>
     </form>
+    <script>
+        document.addEventListener("DOMContentLoaded",()=>{
+            const btn1 = document.getElementById("btn-export-today");
+            const btn3 = document.getElementById("btn-export-yesterday");
+            const btn4 = document.getElementById("btn-view-today");
+            const btn5 = document.getElementById("btn-view-today");
+            const btn6 = document.getElementById("btn-export-date");
+            const btn7 = document.getElementById("btn-view-date");
+
+            const picker = document.getElementById("export-date-picker");
+
+            function goto_export(dte){
+                const pth = `./${dte.getFullYear()}/${dte.getMonth()}/${dte.getDate()}/`
+                window.location = pth;
+            }
+            function goto_view(dte){
+                const pth = `../view/${dte.getFullYear()}/${dte.getMonth()}/${dte.getDate()}/`
+                window.location = pth;
+            }
+
+            btn1.addEventListener('click',(event)=>{
+                goto_export(Date());
+            });
+            btn2.addEventListener('click',(event)=>{
+                const D = Date();
+                D.setDate(D.getDate() - 1);
+                goto_export(D);
+            });
+
+            btn3.addEventListener('click',(event)=>{
+                goto_view(Date());
+            });
+            btn4.addEventListener('click',(event)=>{
+                const D = Date();
+                D.setDate(D.getDate() - 1);
+                goto_view(D);
+            });
+
+            btn5.addEventListener('click',(event)=>{
+                goto_export(Date(picker.value));
+            });
+            btn6.addEventListener('click',(event)=>{
+                goto_view(Date(picker.value));
+            });
+
+        });
+    </script>
 {% endblock %}
