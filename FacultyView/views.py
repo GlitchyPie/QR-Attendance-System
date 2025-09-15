@@ -1,6 +1,7 @@
 import datetime
 import pytz
 import csv
+import os
 from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -23,7 +24,9 @@ def qrgenerator(request,classId = -1):
         qr.add_data(link)
         qr.make(fit=True)
         img = qr.make_image(fill_color="black", back_color="white")
-        img.save(f"{settings.MEDIA_ROOT}/qrs/qrcode_{classId}.png")
+        pth = f"{settings.MEDIA_ROOT}/qrs"
+        os.makedirs(pth)
+        img.save(f"{pth}/qrcode_{classId}.png")
 
     generate_qr_code(link,classId)
 
