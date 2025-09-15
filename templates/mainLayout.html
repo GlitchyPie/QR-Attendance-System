@@ -14,7 +14,7 @@
   <body>
     <header>
       <h1>{{settings.INSTITUTION_NAME}}</h1>
-      <h2>{% block header_title %}{% if className|length > 0 %}{{className}} | {% endif %}Attendance Portal{% endblock %}</h2>
+      <h2>{% block header_title %}{% if className|length > 0 %}{{className}} | {% endif %}{{settings.PORTAL_TITLE}}{% endblock %}</h2>
     </header>
     <main>
         {%block main_block %}
@@ -24,7 +24,7 @@
         {% endblock %}
     </main>
     <footer>
-      {% block footer %}<p>&copy; QR Attendance System 2023 - Team Hokage</p>{% endblock %}
+      {% block footer %}<p>&copy; {{settings.COPYRIGHT_APP_NAME}} {{settings.COPYRIGHT_YEAR}} - {{settings.COPYRIGHT_ORG_NAME}}</p>{% endblock %}
     </footer>
   </body>
 </html>

@@ -141,12 +141,18 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 #==================================
 
 INSTITUTION_NAME = "Centre For Alternative Technology"
-APP_NAME = "QR Attendance System"
-COPYRIGHT = "Centre For Alternative Technology"
+PORTAL_TITLE = "Attendance Portal"
+
+COPYRIGHT_APP_NAME = "QR Attendance System"
+
+COPYRIGHT_ORG_NAME = "Centre For Alternative Technology"
 COPYRIGHT_YEAR = datetime.now(pytz.utc).year
+
 SETTINGS_EXPORT = [
     'INSTITUTION_NAME',
+    'PORTAL_TITLE',
     'LANGUAGE_CODE',
-    'APP_NAME',
-    'COPYRIGHT'
+    'COPYRIGHT_APP_NAME',
+    'COPYRIGHT_ORG_NAME',
+    'COPYRIGHT_YEAR',
 ]
