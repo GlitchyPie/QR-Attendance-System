@@ -1,7 +1,7 @@
 import datetime
 import pytz
 import csv
-from io import StringIO
+import io
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -107,7 +107,8 @@ def faculty_view_attendance_export_name(request,className, year, month, day):
 
 def faculty_view_attendance_export(request, classId, className, year, month, day):
     present = Attendance.objects.filter(dte_date__year=year, dte_date__month=month, dte_date__day=day, s_class=classId).values()
-    sio = StringIO.StringIO()
+
+    sio = io.StringIO()
     csvWriter = csv.writer(sio)
     csvWriter.writerows(present)
     return HttpResponse(sio.getvalue(),content_type="text/plain")
