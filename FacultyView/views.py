@@ -115,4 +115,4 @@ def faculty_view_attendance_export(request, classId, className, year, month, day
         s_csv = tf.read()
         tf.close()
     
-    return HttpResponse(csv,content_type="text/plain")
+    return HttpResponse(s_csv,content_type="text/plain")
