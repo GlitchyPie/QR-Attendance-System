@@ -106,7 +106,7 @@ def faculty_view_attendance_export_name(request,className, year, month, day):
     return faculty_view_attendance_export(request, classId, ClassName, year, month, day)
 
 def faculty_view_attendance_export(request, classId, className, year, month, day):
-    present = Attendance.objects.filter(dte_date__year=year, dte_date__month=month, dte_date__day=day, s_class=classId).values()
+    present = Attendance.objects.filter(dte_date__year=year, dte_date__month=month, dte_date__day=day, s_class=classId)
 
     sio = io.StringIO()
     csvWriter = csv.writer(sio)
