@@ -1,5 +1,8 @@
 <ul class="student-list" id="student_present_list">
     {% for attendance in present %}
+        {% ifchanged attendance.s_class.s_className %}
+            <li>{{ attendance.s_class.s_className }}</li>
+        {% endifchanged %}
         <li class="student">
             <label class="student-label">
             <span class="student-name">
