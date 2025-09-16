@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.db import models
+#from django.db.models import F
 from django_case_insensitive_field import CaseInsensitiveFieldMixin
 
 class LowerCharField(CaseInsensitiveFieldMixin, models.CharField):
@@ -32,3 +33,6 @@ class Attendance(models.Model):
 
     def __str__(self) -> str:
         return f"{self.dte_date} - {self.s_class} - {self.student}"
+    
+    class Meta:
+        ordering = ["s_class","dte_date"]
