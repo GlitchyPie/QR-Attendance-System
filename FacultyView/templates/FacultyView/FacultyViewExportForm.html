@@ -42,13 +42,13 @@
             const btn5 = document.getElementById("btn-export-date");
             const btn6 = document.getElementById("btn-view-date");
 
+            const classSelect = document.getElementById("select-export-class");
+            const picker = document.getElementById("export-date-picker");
+
             const c_year = "{{dte_year}}";
             const c_month = "{{dte_month}}";
             const c_day = "{{dte_day}}";
             picker.value = `${c_year.padStart(4,"0")}-${c_month.padStart(2,"0")}-${c_day.padStart(2,"0")}`;
-
-            const classSelect = document.getElementById("select-export-class");
-            const picker = document.getElementById("export-date-picker");
 
             function getPathPrefix(action){
                 const classId = classSelect.value;
