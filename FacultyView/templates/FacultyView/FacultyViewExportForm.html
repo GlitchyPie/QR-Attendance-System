@@ -40,6 +40,24 @@
             const btn5 = document.getElementById("btn-export-date");
             const btn6 = document.getElementById("btn-view-date");
 
+            {%if dte_year %}
+                const c_year = {{dte_year}};
+            {% else %}
+                const c_year = -1;
+            {% endif %}
+
+            {%if dte_month %}
+                const c_month = {{dte_month}};
+            {% else %}
+                const c_month = -1;
+            {% endif %}
+
+            {%if dte_day %}
+                const c_day = {{dte_day}};
+            {% else %}
+                const c_day = -1;
+            {% endif %}
+
             const classSelect = document.getElementById("select-export-class");
             const picker = document.getElementById("export-date-picker");
 
