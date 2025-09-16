@@ -40,26 +40,15 @@
             const btn5 = document.getElementById("btn-export-date");
             const btn6 = document.getElementById("btn-view-date");
 
-            {%if dte_year %}
-                const c_year = {{dte_year}};
-            {% else %}
-                const c_year = -1;
-            {% endif %}
-
-            {%if dte_month %}
-                const c_month = {{dte_month}};
-            {% else %}
-                const c_month = -1;
-            {% endif %}
-
-            {%if dte_day %}
-                const c_day = {{dte_day}};
-            {% else %}
-                const c_day = -1;
-            {% endif %}
-
+            const c_date = new Date();
+            const c_year = {% if dte_year %}{{dte_year}}{% else %}c_date.getFullYear(){% endif %};
+            const c_month = {% if dte_month %}{{dte_month}}{% else %}c_date.getMonth() + 1{% endif %};
+            const c_day = {% if dte_day %}{{dte_day}}{% else %}c_date.getDate(){% endif %};
+            
             const classSelect = document.getElementById("select-export-class");
             const picker = document.getElementById("export-date-picker");
+
+            picker.value = new Date(c_year, c_month, c_day);
 
             const rootPath = "/class/attendance/";
 
