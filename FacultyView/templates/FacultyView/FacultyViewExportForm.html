@@ -48,7 +48,7 @@
             const classSelect = document.getElementById("select-export-class");
             const picker = document.getElementById("export-date-picker");
 
-            picker.value = new Date(c_year, c_month, c_day);
+            picker.value = `${c_year}=${c_month}-${c_day}`;
 
             const rootPath = "/class/attendance/";
 
