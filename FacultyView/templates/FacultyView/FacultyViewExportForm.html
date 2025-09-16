@@ -40,12 +40,13 @@
             const btn5 = document.getElementById("btn-export-date");
             const btn6 = document.getElementById("btn-view-date");
 
+            const classSelect = document.getElementById("select-export-class");
             const picker = document.getElementById("export-date-picker");
 
             const rootPath = "/class/attendance/";
 
             function getPathPrefix(action){
-                const classId = picker.value;
+                const classId = classSelect.value;
                 let path = rootPath;
                 if(classId !== '*'){
                     path = `${path}${classId}/`;
