@@ -14,7 +14,9 @@
             <select id="select-export-class">
                 <option value="*">All</option>
                 {% for class in classes %}
-                    <option value="{{class.id}}">{{class.s_className}}</option>
+                    <option value="{{class.id}}"
+                    {% if class.s_className == classId %}selected{% endif %}
+                    >{{class.s_className}}</option>
                 {% endfor %}
             </select>
         </label>
