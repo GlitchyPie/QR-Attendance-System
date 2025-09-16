@@ -11,7 +11,6 @@ from django.urls import reverse
 from .models import Student, ClassName, Attendance
 import qrcode
 
-#TODO: This will need to be changed once in production in order to correctly serve the image....
 def qrgenerator(request,classId = -1):
     pth = reverse('student_entry_id',kwargs={'classId':classId})
     link = f"{request.scheme}://{request.META['HTTP_HOST']}{pth}"
