@@ -33,6 +33,8 @@
     </form>
     <script>
         document.addEventListener("DOMContentLoaded",()=>{
+            const rootPath = "/class/attendance/";
+
             const btn1 = document.getElementById("btn-export-today");
             const btn2 = document.getElementById("btn-export-yesterday");
             const btn3 = document.getElementById("btn-view-today");
@@ -40,18 +42,13 @@
             const btn5 = document.getElementById("btn-export-date");
             const btn6 = document.getElementById("btn-view-date");
 
-            
             const c_year = "{{dte_year}}";
             const c_month = "{{dte_month}}";
             const c_day = "{{dte_day}}";
-            const c_date = `${c_year.padStart(4,"0")}-${c_month.padStart(2,"0")}-${c_day.padStart(2,"0")}`;
+            picker.value = `${c_year.padStart(4,"0")}-${c_month.padStart(2,"0")}-${c_day.padStart(2,"0")}`;
 
             const classSelect = document.getElementById("select-export-class");
             const picker = document.getElementById("export-date-picker");
-
-            picker.value = c_date
-
-            const rootPath = "/class/attendance/";
 
             function getPathPrefix(action){
                 const classId = classSelect.value;
