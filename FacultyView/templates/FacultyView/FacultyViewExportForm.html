@@ -38,7 +38,7 @@
     </form>
     <script>
         document.addEventListener("DOMContentLoaded",()=>{
-            const rootPath = "/class/attendance/";
+            const rootPath = "{% url 'faculty_view_attendance_export_form' %}";
 
             const btn1 = document.getElementById("btn-export-today");
             const btn2 = document.getElementById("btn-export-yesterday");
