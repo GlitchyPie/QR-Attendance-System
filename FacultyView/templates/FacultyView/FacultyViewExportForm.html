@@ -56,12 +56,12 @@
             function goto_export(dte){
                 let path = getPathPrefix('export');
                 path = `${path}${dte.getFullYear()}/${dte.getMonth()}/${dte.getDate()}/`;
-                window.location = pth;
+                window.location = path;
             }
             function goto_view(dte){
                 let path = getPathPrefix('view');
                 path = `${path}${dte.getFullYear()}/${dte.getMonth()}/${dte.getDate()}/`;
-                window.location = pth;
+                window.location = path;
             }
 
             btn1.addEventListener('click',(event)=>{
