@@ -12,8 +12,8 @@ from .models import Student, ClassName, Attendance
 import qrcode
 
 def qrgenerator(request,classId = -1):
-    pth = reverse('student_entry_id',kwargs={'classId':classId})
-    link = f"{request.scheme}://{request.META['HTTP_HOST']}{pth}"
+    link = reverse('student_entry_id',kwargs={'classId':classId})
+    link = f"{request.scheme}://{request.META['HTTP_HOST']}{link}"
     def generate_qr_code(link,classId):
         qr = qrcode.QRCode(
             version=1,
@@ -57,6 +57,7 @@ def render_faculty_view_class(request,classId,className):
             "classId": classId,
         },
     )
+
 #=======================
 
 def faculty_view_ajax_present_id(request,classId):
