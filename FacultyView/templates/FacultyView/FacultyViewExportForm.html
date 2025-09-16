@@ -66,34 +66,37 @@
 
             btn1.addEventListener('click',(event)=>{
                 event.preventDefault();
-                goto_export(Date());
+                const D = new Date();
+                goto_export(D);
             });
             btn2.addEventListener('click',(event)=>{
                 event.preventDefault();
-                const D = Date();
+                const D = new Date();
                 D.setDate(D.getDate() - 1);
                 goto_export(D);
             });
 
             btn3.addEventListener('click',(event)=>{
                 event.preventDefault();
-                event.preventDefault();
-                goto_view(Date());
+                const D = new Date();
+                goto_view(D);
             });
             btn4.addEventListener('click',(event)=>{
                 event.preventDefault();
-                const D = Date();
+                const D = new Date();
                 D.setDate(D.getDate() - 1);
                 goto_view(D);
             });
 
             btn5.addEventListener('click',(event)=>{
                 event.preventDefault();
-                goto_export(Date(picker.value));
+                const D = new Date(picker.value)
+                goto_export(D);
             });
             btn6.addEventListener('click',(event)=>{
                 event.preventDefault();
-                goto_view(Date(picker.value));
+                const D = new Date(picker.value)
+                goto_view(D);
             });
 
         });
