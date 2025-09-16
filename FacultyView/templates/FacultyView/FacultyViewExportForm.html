@@ -13,17 +13,18 @@
         <label>Class:
             <select id="select-export-class">
                 <option value="*">All</option>
-                <option>Other...</option>
+                {% for class in classes %}
+                    <option value="{{class.id}}">{{class.s_className}}</option>
+                {% endfor %}
             </select>
-
         </label>
 
-        <label>Export:
+        <fieldset>Export:<br>
             <button id="btn-export-today">Today</button><button id="btn-export-yesterday">Yesterday</button>
-        </label>
-        <label>View:
+        </fieldset>
+        <fieldset>View:<br>
             <button id="btn-view-today">Today</button><button id="btn-view-yesterday">Yesterday</button>
-        </label>
+        </fieldset>
         <fieldset>
             <label>Date: <input type="date" id="export-date-picker"></label>
             <br>
@@ -33,20 +34,33 @@
     <script>
         document.addEventListener("DOMContentLoaded",()=>{
             const btn1 = document.getElementById("btn-export-today");
-            const btn3 = document.getElementById("btn-export-yesterday");
+            const btn2 = document.getElementById("btn-export-yesterday");
+            const btn3 = document.getElementById("btn-view-today");
             const btn4 = document.getElementById("btn-view-today");
-            const btn5 = document.getElementById("btn-view-today");
-            const btn6 = document.getElementById("btn-export-date");
-            const btn7 = document.getElementById("btn-view-date");
+            const btn5 = document.getElementById("btn-export-date");
+            const btn6 = document.getElementById("btn-view-date");
 
             const picker = document.getElementById("export-date-picker");
 
+            const rootPath = "/class/attendance/";
+
+            function getPathPrefix(action){
+                const classId = picker.value;
+                let path = rootPath;
+                if(classId !== '*'){
+                    path = `${path}${classId}/`;
+                }
+                path = `${path}${action}/`;
+                return path;
+            }
             function goto_export(dte){
-                const pth = `./${dte.getFullYear()}/${dte.getMonth()}/${dte.getDate()}/`
+                let path = getPathPrefix('export');
+                path = `${path}${dte.getFullYear()}/${dte.getMonth()}/${dte.getDate()}/`;
                 window.location = pth;
             }
             function goto_view(dte){
-                const pth = `../view/${dte.getFullYear()}/${dte.getMonth()}/${dte.getDate()}/`
+                let path = getPathPrefix('view');
+                path = `${path}${dte.getFullYear()}/${dte.getMonth()}/${dte.getDate()}/`;
                 window.location = pth;
             }
 
