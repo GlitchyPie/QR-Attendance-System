@@ -1,9 +1,23 @@
-{% extends "mainLayout.html" %}
+{% extends "FacultyView.html" %}
 {% load static %}
 
-{% block only_block %}
+{% block right_block %}
+
+    {% include "FacultyView/StudentList.html" %}
+
+{% endblock %}
+
+{% block right_block %}
     <form class="export-date-form">
         {% csrf_token %}
+        <label>Class:
+            <select id="select-export-class">
+                <option value="*">All</option>
+                <option>Other...</option>
+            </select>
+
+        </label>
+
         <label>Export:
             <button id="btn-export-today">Today</button><button id="btn-export-yesterday">Yesterday</button>
         </label>

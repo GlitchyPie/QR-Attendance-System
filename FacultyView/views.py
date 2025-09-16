@@ -38,13 +38,13 @@ def qrgenerator(request,classId = -1):
 
 def faculty_view_class_name(request,className):
     classId = ClassName.objects.filter(s_className__iexact=className)[0].id
-    return faculty_view_class(request, classId, className)
+    return render_faculty_view_class(request, classId, className)
 
 def faculty_view_class_id(request,classId):
     className = ClassName.objects.filter(id=classId)[0].s_className
-    return faculty_view_class(request,classId,className)
+    return render_faculty_view_class(request,classId,className)
 
-def faculty_view_class(request,classId,className):
+def render_faculty_view_class(request,classId,className):
     qrgenerator(request,classId)
 
     present = Attendance.objects.filter(dte_date__date=datetime.datetime.now(pytz.utc), s_class=classId)
@@ -59,18 +59,37 @@ def faculty_view_class(request,classId,className):
     )
 #=======================
 
-def faculty_view_ajax_present_name(request,className):
-    classId = ClassName.objects.filter(s_className__iexact=className)[0].id
-    return faculty_view_ajax_present(request, classId, className)
-
 def faculty_view_ajax_present_id(request,classId):
     className = ClassName.objects.filter(id=classId)[0].s_className
-    return faculty_view_ajax_present(request,classId,className)
+    return render_faculty_view_ajax_present_now(request,classId,className)
 
-def faculty_view_ajax_present(request,classId,className):
-    qrgenerator(request,classId)
+def faculty_view_ajax_present_name(request,className):
+    classId = ClassName.objects.filter(s_className__iexact=className)[0].id
+    return render_faculty_view_ajax_present_now(request, classId, className)
 
-    present = Attendance.objects.filter(dte_date__date=datetime.datetime.now(pytz.utc), s_class=classId)
+def faculty_view_ajax_present_dte_id(request, classId, year, month, day):
+    className = ClassName.objects.filter(id=classId)[0].s_className
+    return render_faculty_view_ajax_present(request, classId, className, year, month, day)
+
+def faculty_view_ajax_present_dte_name(request, className, year, month, day):
+    classId = ClassName.objects.filter(s_className__iexact=className)[0].id
+    return render_faculty_view_ajax_present(request, classId, className, year, month, day)
+
+#==========
+
+def render_faculty_view_ajax_present_now(request, classId, className):
+    return render_faculty_view_ajax_present_dte(request, classId, className, datetime.datetime.now(pytz.utc))
+
+def render_faculty_view_ajax_present_dte(request, classId, className,dte):
+    return render_faculty_view_ajax_present(request, classId, className, dte.year, dte.month, dte.day)
+
+def render_faculty_view_ajax_present(request, classId, className, year, month, day):
+    present = []
+    if(classId == None):
+        present = Attendance.objects.filter(dte_date__year=year, dte_date__month=month,dte_date__day=day)
+    else:
+        present = Attendance.objects.filter(dte_date__year=year, dte_date__month=month,dte_date__day=day, s_class=classId)
+
     return render(
         request,
         "FacultyView/StudentList.html",
@@ -83,40 +102,77 @@ def faculty_view_ajax_present(request,classId,className):
 
 #=======================
 
-def faculty_view_create_class(request):
-    if request.method == "GET" :
-        return HttpResponseBadRequest() #This should only accept POST requests
-    
-    className = request.POST["class_name"]
-    classNameEntry = ClassName(s_className=className)
-    classNameEntry.save()
-    return HttpResponseRedirect(reverse('faculty_view_class_id',kwargs={"classId":classNameEntry.id}))
+def faculty_view_attendance_export_form(request):
+    return render_faculty_view_attendance_export_form_A(request, None, None)
 
-def faculty_view(request):
-    classes = ClassName.objects.all()
+def faculty_view_attendance_export_form_id(request, classId):
+    className = ClassName.objects.filter(id=classId)[0].s_className
+    return render_faculty_view_attendance_export_form_A(request, classId, className)
+
+def faculty_view_attendance_export_form_name(request, className):
+    classId = ClassName.objects.filter(s_className__iexact=className)[0].id
+    return render_faculty_view_attendance_export_form_A(request, classId, className)
+
+def render_faculty_view_attendance_export_form_A(request, classId, className):
+    return render_faculty_view_attendance_export_form(request, classId, className, [], None, None, None)
+
+#==========
+
+def faculty_view_attendance_export_dte_id(request, classId, action, year, month, day):
+    className = ClassName.objects.filter(id=classId)[0].s_className
+    return render_faculty_view_attendance_export_dte(request, classId, className, action, year, month, day)
+
+def faculty_view_attendance_export_dte_name(request, className, action, year, month, day):
+    classId = ClassName.objects.filter(s_className__iexact=className)[0].id
+    return render_faculty_view_attendance_export_dte(request, classId, className, action, year, month, day)
+
+def faculty_view_attendance_export_dte_allClasses(request, action, year, month, day):
+    return render_faculty_view_attendance_export_dte(request, -1, None, action, year, month, day)
+
+#==========
+
+def render_faculty_view_attendance_export_dte(request, classId, className, action, year, month, day):
+    presentQuery = []
+
+    if classId != None:
+        presentQuery = Attendance.objects.all()
+
+        if classId >= 0:
+            presentQuery = presentQuery.filter(s_class=classId)
+
+        if year != None:
+            presentQuery = presentQuery.filter(dte_date__year=year)
+
+        if month != None:
+            presentQuery = presentQuery.filter(dte_date__month=month)
+
+        if day != None:
+            presentQuery = presentQuery.filter(dte_date__day=day)
+    #End if
+
+    match action:
+        case 'export':
+            return faculty_view_attendance_export_export(request, presentQuery)
+        case 'view':
+            return render_faculty_view_attendance_export_form(request, classId, className, presentQuery, year, month, day)
+        case _:
+            return HttpResponseBadRequest()
+
+def render_faculty_view_attendance_export_form(request, classId, className, present, year, month, day):
+    classes = ClassName.objects.all();
     return render(
         request,
-        "FacultyView/FacultyViewIndex.html",
+        "FacultyView/FacultyViewExportForm.html",
         {
-            "classes": classes
+            "classes":classes,
+            "classId":classId,
+            "className":className,
+            "present":present,
+            "dte_year":year,
+            "dte_month":month,
+            "dte_day":day,
         },
     )
-
-#=======================
-def faculty_view_attendance_export_form(request):
-    return render(
-        request,
-        "FacultyView/FacultyViewExport.html",
-        {},
-    )
-
-def faculty_view_attendance_export_id(request,action, classId, year, month, day):
-    className = ClassName.objects.filter(id=classId)[0].s_className
-    return faculty_view_attendance_export(request, action, classId, ClassName, year, month, day)
-
-def faculty_view_attendance_export_name(request,action, className, year, month, day):
-    classId = ClassName.objects.filter(s_className__iexact=className)[0].id
-    return faculty_view_attendance_export(request, action, classId, ClassName, year, month, day)
 
 def faculty_view_attendance_export_export(request, present_query):
     response = HttpResponse (content_type='text/csv')
@@ -140,17 +196,25 @@ def faculty_view_attendance_export_export(request, present_query):
 
     return response
 
-def faculty_view_attendance_export_view(request, present_query):
-    pass
+#=======================
+
+def faculty_view_create_class(request):
+    if request.method == "GET" :
+        return HttpResponseBadRequest() #This should only accept POST requests
     
-def faculty_view_attendance_export(request, action, classId, className, year, month, day):
-    present_query = Attendance.objects.filter(dte_date__year=year, dte_date__month=month, dte_date__day=day, s_class=classId)
-    match action:
-        case 'export':
-            return faculty_view_attendance_export_export(request, present_query)
-        
-        case 'view':
-            return faculty_view_attendance_export_view(request, present_query)
-        
-        case _:
-            return HttpResponseBadRequest()
+    className = request.POST["class_name"]
+    classNameEntry = ClassName(s_className=className)
+    classNameEntry.save()
+    return HttpResponseRedirect(reverse('faculty_view_class_id',kwargs={"classId":classNameEntry.id}))
+
+def faculty_view(request):
+    classes = ClassName.objects.all()
+    return render(
+        request,
+        "FacultyView/FacultyViewIndex.html",
+        {
+            "classes": classes
+        },
+    )
+
+#=======================
