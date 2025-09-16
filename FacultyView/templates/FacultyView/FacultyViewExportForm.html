@@ -15,7 +15,7 @@
                 <option value="*">All</option>
                 {% for class in classes %}
                     <option value="{{class.id}}"
-                    {% if class.s_classId == classId %}selected{% endif %}
+                    {% if class.id == classId %}selected{% endif %}
                     >{{class.s_className}}</option>
                 {% endfor %}
             </select>
