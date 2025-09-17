@@ -1,3 +1,6 @@
 qrcode
 django
 pillow
+pytz
+django-case-insensitive-field
+django-settings-export

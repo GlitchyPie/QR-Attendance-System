@@ -1,0 +1,8 @@
+{% extends "mainLayout.html" %}
+{% load static %}
+
+{%block main_block %}
+    <section class="block">
+    {% block only_block %}<h2>No Content</h2>{% endblock %}
+    </section>
+{% endblock %}
