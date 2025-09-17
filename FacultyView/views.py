@@ -104,18 +104,19 @@ def render_faculty_view_ajax_present(request, classId, className, year, month, d
 #=======================
 
 def faculty_view_attendance_export_form(request):
-    return render_faculty_view_attendance_export_form_A(request, None, None)
+    return render_faculty_view_attendance_export_form_now(request, None, None)
 
 def faculty_view_attendance_export_form_id(request, classId):
     className = ClassName.objects.filter(id=classId)[0].s_className
-    return render_faculty_view_attendance_export_form_A(request, classId, className)
+    return render_faculty_view_attendance_export_form_now(request, classId, className)
 
 def faculty_view_attendance_export_form_name(request, className):
     classId = ClassName.objects.filter(s_className__iexact=className)[0].id
-    return render_faculty_view_attendance_export_form_A(request, classId, className)
+    return render_faculty_view_attendance_export_form_now(request, classId, className)
 
-def render_faculty_view_attendance_export_form_A(request, classId, className):
-    return render_faculty_view_attendance_export_form(request, classId, className, [], None, None, None)
+def render_faculty_view_attendance_export_form_now(request, classId, className):
+    D = datetime.datetime.now(pytz.utc)
+    return render_faculty_view_attendance_export_dte(request, classId, className, 'view', D.year, D.month, D.day)
 
 #==========
 
