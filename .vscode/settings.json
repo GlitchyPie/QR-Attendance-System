@@ -5,5 +5,7 @@
   "emmet.includeLanguages": {
     "django-html": "html",
     "jinja-html": "html"
-  }
+  },
+  "python-envs.defaultEnvManager": "ms-python.python:system",
+  "python-envs.pythonProjects": []
 }
