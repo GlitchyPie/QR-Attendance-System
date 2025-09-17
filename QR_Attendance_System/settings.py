@@ -21,5 +21,6 @@ conffiles = glob.glob(os.path.join(os.path.dirname(__file__), 'settings', '*.con
 conffiles.sort()
 for f in conffiles:
     with open(f) as ff:
+        print(f)
         code = compile(ff.read(), f, 'exec')
         exec(code,globals(),locals())
