@@ -78,6 +78,9 @@ button {
   font-size: 16px;
   margin-top: 20px;
 }
+button.small{
+  font-size: smaller;
+}
 button:hover{
   background-color: #99aca2;
 }
