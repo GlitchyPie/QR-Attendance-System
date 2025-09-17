@@ -17,7 +17,7 @@ def qrgenerator(request,classId = -1):
     def generate_qr_code(link,classId):
         qr = qrcode.QRCode(
             version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_H,
+            error_correction=qrcode.ERROR_CORRECT_H,
             box_size=20,
             border=4,
         )
@@ -30,14 +30,14 @@ def qrgenerator(request,classId = -1):
         except FileExistsError:
             pass
         
-        img.save(f"{pth}/qrcode_{classId}.png")
+        img.save(f"{pth}/qrcode_{classId}.png") # pyright: ignore[reportArgumentType]
 
     generate_qr_code(link,classId)
 
 #=======================
 
 def faculty_view_class_name(request,className):
-    classId = ClassName.objects.filter(s_className__iexact=className)[0].id
+    classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
     return render_faculty_view_class(request, classId, className)
 
 def faculty_view_class_id(request,classId):
@@ -65,7 +65,7 @@ def faculty_view_ajax_present_id(request,classId):
     return render_faculty_view_ajax_present_now(request,classId,className)
 
 def faculty_view_ajax_present_name(request,className):
-    classId = ClassName.objects.filter(s_className__iexact=className)[0].id
+    classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
     return render_faculty_view_ajax_present_now(request, classId, className)
 
 def faculty_view_ajax_present_dte_id(request, classId, year, month, day):
@@ -73,7 +73,7 @@ def faculty_view_ajax_present_dte_id(request, classId, year, month, day):
     return render_faculty_view_ajax_present(request, classId, className, year, month, day)
 
 def faculty_view_ajax_present_dte_name(request, className, year, month, day):
-    classId = ClassName.objects.filter(s_className__iexact=className)[0].id
+    classId = ClassName.objects.filter(s_className__iexact=className)[0].id  # pyright: ignore[reportAttributeAccessIssue]
     return render_faculty_view_ajax_present(request, classId, className, year, month, day)
 
 #==========
@@ -111,7 +111,7 @@ def faculty_view_attendance_export_form_id(request, classId):
     return render_faculty_view_attendance_export_form_now(request, classId, className)
 
 def faculty_view_attendance_export_form_name(request, className):
-    classId = ClassName.objects.filter(s_className__iexact=className)[0].id
+    classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
     return render_faculty_view_attendance_export_form_now(request, classId, className)
 
 def render_faculty_view_attendance_export_form_now(request, classId, className):
@@ -125,7 +125,7 @@ def faculty_view_attendance_export_dte_id(request, classId, action, year, month,
     return render_faculty_view_attendance_export_dte(request, classId, className, action, year, month, day)
 
 def faculty_view_attendance_export_dte_name(request, className, action, year, month, day):
-    classId = ClassName.objects.filter(s_className__iexact=className)[0].id
+    classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
     return render_faculty_view_attendance_export_dte(request, classId, className, action, year, month, day)
 
 def faculty_view_attendance_export_dte_allClasses(request, action, year, month, day):
@@ -207,7 +207,7 @@ def faculty_view_create_class(request):
     className = request.POST["class_name"]
     classNameEntry = ClassName(s_className=className)
     classNameEntry.save()
-    return HttpResponseRedirect(reverse('faculty_view_class_id',kwargs={"classId":classNameEntry.id}))
+    return HttpResponseRedirect(reverse('faculty_view_class_id',kwargs={"classId":classNameEntry.id})) # pyright: ignore[reportAttributeAccessIssue]
 
 def faculty_view(request):
     classes = ClassName.objects.all()

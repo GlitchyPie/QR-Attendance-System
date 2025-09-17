@@ -1,6 +1,5 @@
 from datetime import datetime
 from django.db import models
-#from django.db.models import F
 from django_case_insensitive_field import CaseInsensitiveFieldMixin
 
 class LowerCharField(CaseInsensitiveFieldMixin, models.CharField):

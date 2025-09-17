@@ -8,7 +8,7 @@ from django.urls import reverse
 
 #=======================
 def student_entry_name(request, className):
-    classId = ClassName.objects.filter(s_className__iexact=className)[0].id
+    classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
     return student_entry(request,classId,className)
 
 def student_entry_id(request, classId):
@@ -25,7 +25,7 @@ def student_entry(request, classId, className):
 #=======================
 
 def submit_attendance_name(request,className):
-    classId = ClassName.objects.filter(s_className__iexact=className)[0].id
+    classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
     return submit_attendance(request,classId,className)
 
 def submit_attendance_id(request,classId):
