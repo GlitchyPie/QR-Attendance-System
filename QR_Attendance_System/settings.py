@@ -17,16 +17,9 @@ import glob
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-
 conffiles = glob.glob(os.path.join(os.path.dirname(__file__), 'settings', '*.conf.py'))
 conffiles.sort()
 for f in conffiles:
     with open(f) as ff:
         code = compile(ff.read(), f, 'exec')
         exec(code,globals(),locals())
-
-
-
-#==================================
-
