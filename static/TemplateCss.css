@@ -44,11 +44,16 @@ main>section {
   text-align: center;
   width: 30em;
   max-width: 99vw;
+
+  max-height: 99vh;
+  position: sticky;
+  top:5px;
+
+  overflow-y: auto;
 }
 
 .left_block {
   height: fit-content;
-  max-height: 100vh;
   display: grid;
   grid-template-rows: auto auto 1fr auto;
   grid-template-columns: auto;
@@ -56,9 +61,6 @@ main>section {
 
 .right_block {
   height: fit-content;
-  max-height: 100vh;
-  position: sticky;
-  top:5px;
 }
 
 footer {
@@ -90,10 +92,10 @@ button[disabled]{
   background-color: gray;
 }
 
-input[type="text"]{
+input,select{
 	font-size: 16px;
 	padding: 10px;
 	font-weight: bold;
 	border-radius: 5px;
-	border: 2px solid #8ab55e;
+  border: 2px solid #8ab55e;
 }
