@@ -6,7 +6,7 @@ urlpatterns = [
     path("class/<int:classId>/attendance/submit/",views.student_view_submit_attendance,name="student_view_submit_attendance_by_class_id"),
 
     path("class/<str:className>/attendance/entry/",views.student_view_name_entry,name="student_view_name_entry_by_class_name"),
-    path("class/<str:className>/attendance>/submit/",views.student_view_submit_attendance,name="student_view_submit_attendance_by_class_name"),
+    path("class/<str:className>/attendance/submit/",views.student_view_submit_attendance,name="student_view_submit_attendance_by_class_name"),
     
     path("attendance/submitted/<int:classId>", views.student_view_attendance_submitted, name="student_view_attendance_submitted_with_classId"),
     path("attendance/submitted/<str:className>", views.student_view_attendance_submitted, name="student_view_attendance_submitted_with_className"),
