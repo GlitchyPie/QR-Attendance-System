@@ -2,6 +2,7 @@ import datetime
 import pytz
 import csv
 import os
+import qrcode
 from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -9,16 +10,15 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponseBadRequest
 from django.urls import reverse
 from .models import Student, ClassName, Attendance
-import qrcode
 
-def qrgenerator(request,classId = -1):
-    link = reverse('student_entry_id',kwargs={'classId':classId})
+def qrgenerator(request,classId = -1,boxSize=20):
+    link = reverse('student_view_name_entry_by_class_id',kwargs={'classId':classId})
     link = f"{request.scheme}://{request.META['HTTP_HOST']}{link}"
-    def generate_qr_code(link,classId):
+    def generate_qr_code(link,classId,boxSize):
         qr = qrcode.QRCode(
             version=1,
             error_correction=qrcode.ERROR_CORRECT_H,
-            box_size=20,
+            box_size=boxSize,
             border=4,
         )
         qr.add_data(link)
@@ -30,22 +30,45 @@ def qrgenerator(request,classId = -1):
         except FileExistsError:
             pass
         
-        img.save(f"{pth}/qrcode_{classId}.png") # pyright: ignore[reportArgumentType]
+        img.save(f"{pth}/qrcode_{classId}_{boxSize}.png") # pyright: ignore[reportArgumentType]
 
-    generate_qr_code(link,classId)
+    generate_qr_code(link,classId,boxSize)
+    return f"{settings.MEDIA_URL}qrs/qrcode_{classId}_{boxSize}.png"
 
 #=======================
 
-def faculty_view_class_name(request,className):
-    classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
-    return render_faculty_view_class(request, classId, className)
+def faculty_view_delete_attendance(request, classId = None, className = None):
+    if request.method == "GET" :
+        return HttpResponseBadRequest() #This should only accept POST requests
+    
+    if((classId == None) and (className == None)):
+        return HttpResponseBadRequest()
+    elif(classId == None):
+        classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
+    else:
+        className = ClassName.objects.filter(id=classId)[0].s_className
 
-def faculty_view_class_id(request,classId):
-    className = ClassName.objects.filter(id=classId)[0].s_className
-    return render_faculty_view_class(request,classId,className)
+    d = datetime.datetime.now(pytz.utc)
+    eml = request.POST["student_email"].lower()
 
-def render_faculty_view_class(request,classId,className):
-    qrgenerator(request,classId)
+    attendanceQuery = Attendance.objects.filter(dte_date__date=d, student=eml, s_class=classId)
+
+    if attendanceQuery.exists():
+        attendanceQuery[0].delete()
+
+    return HttpResponseRedirect(reverse('faculty_view_by_class_id_today',kwargs={"classId":classId}))
+    
+#=======================
+
+def faculty_view_class(request, classId = None, className = None):
+    if((classId == None) and (className == None)):
+        return HttpResponseBadRequest()
+    elif(classId == None):
+        classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
+    else:
+        className = ClassName.objects.filter(id=classId)[0].s_className
+
+    qrSrc = qrgenerator(request,classId)
 
     present = Attendance.objects.filter(dte_date__date=datetime.datetime.now(pytz.utc), s_class=classId)
     return render(
@@ -55,41 +78,30 @@ def render_faculty_view_class(request,classId,className):
             "present": present,
             "className": className,
             "classId": classId,
+            "qrSrc": qrSrc,
         },
     )
 
 #=======================
 
-def faculty_view_ajax_present_id(request,classId):
-    className = ClassName.objects.filter(id=classId)[0].s_className
-    return render_faculty_view_ajax_present_now(request,classId,className)
-
-def faculty_view_ajax_present_name(request,className):
-    classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
-    return render_faculty_view_ajax_present_now(request, classId, className)
-
-def faculty_view_ajax_present_dte_id(request, classId, year, month, day):
-    className = ClassName.objects.filter(id=classId)[0].s_className
-    return render_faculty_view_ajax_present(request, classId, className, year, month, day)
-
-def faculty_view_ajax_present_dte_name(request, className, year, month, day):
-    classId = ClassName.objects.filter(s_className__iexact=className)[0].id  # pyright: ignore[reportAttributeAccessIssue]
-    return render_faculty_view_ajax_present(request, classId, className, year, month, day)
-
-#==========
-
-def render_faculty_view_ajax_present_now(request, classId, className):
-    return render_faculty_view_ajax_present_dte(request, classId, className, datetime.datetime.now(pytz.utc))
-
-def render_faculty_view_ajax_present_dte(request, classId, className,dte):
-    return render_faculty_view_ajax_present(request, classId, className, dte.year, dte.month, dte.day)
-
-def render_faculty_view_ajax_present(request, classId, className, year, month, day):
-    present = []
-    if(classId == None):
-        present = Attendance.objects.filter(dte_date__year=year, dte_date__month=month,dte_date__day=day)
+def faculty_view_present_list(request, classId = None, className = None, year = None, month = None, day = None):
+    if((classId == None) and (className == None)):
+        classId = None
+        className = "All"
+    elif(classId == None):
+        classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
     else:
+        className = ClassName.objects.filter(id=classId)[0].s_className
+
+    D = datetime.datetime.now(pytz.utc)
+    year = year or D.year
+    month = month or D.month
+    day = day or D.day
+
+    if(classId):
         present = Attendance.objects.filter(dte_date__year=year, dte_date__month=month,dte_date__day=day, s_class=classId)
+    else:
+        present = Attendance.objects.filter(dte_date__year=year, dte_date__month=month, dte_date__day=day)
 
     return render(
         request,
@@ -98,63 +110,41 @@ def render_faculty_view_ajax_present(request, classId, className, year, month, d
             "present": present,
             "className": className,
             "classId": classId,
+            "dte_year": year,
+            "dte_month": month,
+            "dte_day": day,
         },
     )
 
 #=======================
 
-def faculty_view_attendance_export_form(request):
-    return render_faculty_view_attendance_export_form_now(request, None, None)
+def faculty_view_attendance_export(request, classId = None, className = None, action = 'view', year = None, month = None, day = None):
+    if((classId == None) and (className == None)):
+        className = "All"
+    elif(classId == None):
+        classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
+    else:
+        className = ClassName.objects.filter(id=classId)[0].s_className
 
-def faculty_view_attendance_export_form_id(request, classId):
-    className = ClassName.objects.filter(id=classId)[0].s_className
-    return render_faculty_view_attendance_export_form_now(request, classId, className)
-
-def faculty_view_attendance_export_form_name(request, className):
-    classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
-    return render_faculty_view_attendance_export_form_now(request, classId, className)
-
-def render_faculty_view_attendance_export_form_now(request, classId, className):
     D = datetime.datetime.now(pytz.utc)
-    return render_faculty_view_attendance_export_dte(request, classId, className, 'view', D.year, D.month, D.day)
+    year = year or D.year
+    month = month or D.month
+    day = day or D.day
 
-#==========
+    presentQuery = Attendance.objects.all()
 
-def faculty_view_attendance_export_dte_id(request, classId, action, year, month, day):
-    className = ClassName.objects.filter(id=classId)[0].s_className
-    return render_faculty_view_attendance_export_dte(request, classId, className, action, year, month, day)
+    if classId:
+        presentQuery = presentQuery.filter(s_class=classId)
 
-def faculty_view_attendance_export_dte_name(request, className, action, year, month, day):
-    classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
-    return render_faculty_view_attendance_export_dte(request, classId, className, action, year, month, day)
+    presentQuery = presentQuery.filter(dte_date__year=year)
 
-def faculty_view_attendance_export_dte_allClasses(request, action, year, month, day):
-    return render_faculty_view_attendance_export_dte(request, -1, None, action, year, month, day)
+    presentQuery = presentQuery.filter(dte_date__month=month)
 
-#==========
-
-def render_faculty_view_attendance_export_dte(request, classId, className, action, year, month, day):
-    presentQuery = []
-
-    if classId != None:
-        presentQuery = Attendance.objects.all()
-
-        if classId >= 0:
-            presentQuery = presentQuery.filter(s_class=classId)
-
-        if year != None:
-            presentQuery = presentQuery.filter(dte_date__year=year)
-
-        if month != None:
-            presentQuery = presentQuery.filter(dte_date__month=month)
-
-        if day != None:
-            presentQuery = presentQuery.filter(dte_date__day=day)
-    #End if
+    presentQuery = presentQuery.filter(dte_date__day=day)
 
     match action:
         case 'export':
-            return faculty_view_attendance_export_export(request, presentQuery)
+            return render_faculty_view_attendance_export_CSV(request, presentQuery)
         case 'view':
             return render_faculty_view_attendance_export_form(request, classId, className, presentQuery, year, month, day)
         case _:
@@ -176,7 +166,7 @@ def render_faculty_view_attendance_export_form(request, classId, className, pres
         },
     )
 
-def faculty_view_attendance_export_export(request, present_query):
+def render_faculty_view_attendance_export_CSV(request, present_query):
     response = HttpResponse (content_type='text/csv')
     csvWriter = csv.writer(response)
 
@@ -207,7 +197,7 @@ def faculty_view_create_class(request):
     className = request.POST["class_name"]
     classNameEntry = ClassName(s_className=className)
     classNameEntry.save()
-    return HttpResponseRedirect(reverse('faculty_view_class_id',kwargs={"classId":classNameEntry.id})) # pyright: ignore[reportAttributeAccessIssue]
+    return HttpResponseRedirect(reverse('faculty_view_by_class_id_today',kwargs={"classId":classNameEntry.id})) # pyright: ignore[reportAttributeAccessIssue]
 
 def faculty_view(request):
     classes = ClassName.objects.all()

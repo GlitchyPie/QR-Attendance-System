@@ -2,14 +2,17 @@ from . import views
 from django.urls import path
 
 urlpatterns = [
-    path("class/<int:classId>/student_entry",views.student_entry_id,name="student_entry_id"),
-    path("class/<int:classId>/submit_attendance",views.submit_attendance_id,name="submit_attendance_id"),
+    path("class/<int:classId>/attendance/entry/",views.student_view_name_entry,name="student_view_name_entry_by_class_id"),
+    path("class/<int:classId>/attendance/submit/",views.student_view_submit_attendance,name="student_view_submit_attendance_by_class_id"),
 
-    path("class/<str:className>/student_entry",views.student_entry_name,name="student_entry_name"),
-    path("class/<str:className>/submit_attendance",views.submit_attendance_name,name="submit_attendance_name"),
+    path("class/<str:className>/attendance/entry/",views.student_view_name_entry,name="student_view_name_entry_by_class_name"),
+    path("class/<str:className>/attendance>/submit/",views.student_view_submit_attendance,name="student_view_submit_attendance_by_class_name"),
     
-    path("class/<int:classId>/delete_attendance",views.delete_attendance_id,name="delete_attendance_id"),
-
-    path("submitted", views.submitted, name="submitted"),
-    path("alreadysubmitted", views.already_submitted, name="already_submitted"),
+    path("attendance/submitted/<int:classId>", views.student_view_attendance_submitted, name="student_view_attendance_submitted_with_classId"),
+    path("attendance/submitted/<str:className>", views.student_view_attendance_submitted, name="student_view_attendance_submitted_with_className"),
+    path("attendance/submitted", views.student_view_attendance_submitted, name="student_view_attendance_submitted_with_classId"),
+    
+    path("attendance/already-submitted/<int:classId>", views.student_view_attendance_already_submitted, name="student_view_attendance_already_submitted_with_classId"),
+    path("attendance/already-submitted/<str:className>", views.student_view_attendance_already_submitted, name="student_view_attendance_already_submitted_with_className"),
+    path("attendance/already-submitted", views.student_view_attendance_already_submitted, name="student_view_attendance_already_submitted"),
 ]

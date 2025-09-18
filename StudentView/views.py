@@ -7,35 +7,35 @@ from django.http import HttpResponseBadRequest
 from django.urls import reverse
 
 #=======================
-def student_entry_name(request, className):
-    classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
-    return student_entry(request,classId,className)
 
-def student_entry_id(request, classId):
-    className = ClassName.objects.filter(id=classId)[0].s_className
-    return student_entry(request,classId,className)
+def student_view_name_entry(request, classId = None, className = None):
+    if((classId == None) and (className == None)):
+        return HttpResponseBadRequest()
+    elif(classId == None):
+        classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
+    else:
+        className = ClassName.objects.filter(id=classId)[0].s_className
 
-def student_entry(request, classId, className):
     return render(request, 
-                  "StudentView/StudentViewstudent_entry.html",
+                  "StudentView/StudentViewStudent_entry.html",
                   {
                       "classId":classId,
                       "className":className,
                   })
 #=======================
 
-def submit_attendance_name(request,className):
-    classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
-    return submit_attendance(request,classId,className)
-
-def submit_attendance_id(request,classId):
-    className = ClassName.objects.filter(id=classId)[0].s_className
-    return submit_attendance(request,classId,className)
-
-def submit_attendance(request,classId,className):
+def student_view_submit_attendance(request,classId = None, className = None):
     if request.method == "GET" :
         return HttpResponseBadRequest() #This should only accept POST requests
     
+    if((classId == None) and (className == None)):
+        return HttpResponseBadRequest()
+    elif(classId == None):
+        classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
+    else:
+        className = ClassName.objects.filter(id=classId)[0].s_className
+
+
     eml = request.POST["student_email"].lower()
     fname = request.POST["student_fname"]
     lname = request.POST["student_lname"]
@@ -59,32 +59,38 @@ def submit_attendance(request,classId,className):
     if attendanceQuery.exists() == False:
         attendanceOb = Attendance(dte_date=d,s_class=classOb,student=stuOb)
         attendanceOb.save()
-        return HttpResponseRedirect("/submitted")
+        return HttpResponseRedirect(reverse('student_view_attendance_submitted_with_classId',kwargs={"classId":classId}))
     else:
-        return HttpResponseRedirect("/alreadysubmitted")
-    
+        return HttpResponseRedirect(reverse('student_view_attendance_already_submitted_with_classId',kwargs={"classId":classId}))
 
 #=======================
 
-def delete_attendance_id(request, classId):
-    if request.method == "GET" :
-        return HttpResponseBadRequest() #This should only accept POST requests
-    
-    d = datetime.datetime.now(pytz.utc)
-    eml = request.POST["student_email"].lower()
+def student_view_attendance_submitted(request, classId=None, className=None):
+    if((classId == None) and (className == None)):
+        pass
+    elif(classId == None):
+        classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
+    else:
+        className = ClassName.objects.filter(id=classId)[0].s_className
 
-    attendanceQuery = Attendance.objects.filter(dte_date__date=d, student=eml, s_class=classId)
+    return render(request,
+                  "StudentView/Submitted.html",
+                  {
+                      "classId":classId,
+                      "className":className,
+                  })
 
-    if attendanceQuery.exists():
-        attendanceQuery[0].delete()
+def student_view_attendance_already_submitted(request, classId=None, className=None):
+    if((classId == None) and (className == None)):
+        pass
+    elif(classId == None):
+        classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
+    else:
+        className = ClassName.objects.filter(id=classId)[0].s_className
 
-    return HttpResponseRedirect(reverse('faculty_view_class_id',kwargs={"classId":classId}))
-    
-
-#=======================
-
-def submitted(request):
-    return render(request, "StudentView/Submitted.html")
-
-def already_submitted(request):
-    return render(request, "StudentView/AlreadySubmitted.html")
+    return render(request,
+                  "StudentView/AlreadySubmitted.html",
+                  {
+                      "classId":classId,
+                      "className":className,
+                  })

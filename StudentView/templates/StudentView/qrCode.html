@@ -1,0 +1,20 @@
+<h2>
+Connect to CAT_STUDENT and Scan the QR Code to Mark Attendance
+</h2>
+{% if qrSrc %}
+    <img
+        src="{{qrSrc}}"
+        alt="QR Code"
+        width="200"
+        height="200"
+    />
+    </a>
+
+    <p class="hint">
+        Please scan the QR code to mark your attendance.
+        <br>
+        <a target="_blank" href="{{qrSrc}}">Open QR code in new window</a>
+    </p>
+{% else %}       
+    <h4>No qr code provided</h4>
+{% endif %}  
