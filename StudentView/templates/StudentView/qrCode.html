@@ -3,17 +3,17 @@ Connect to CAT_STUDENT and Scan the QR Code to Mark Attendance
 </h2>
 {% if qrSrc %}
     <img
+        id="student-qr-code"
         src="{{qrSrc}}"
         alt="QR Code"
-        width="200"
-        height="200"
     />
     </a>
-
-    <p class="hint">
-        Please scan the QR code to mark your attendance.
-        <br>
-        <a target="_blank" href="{{qrSrc}}">Open QR code in new window</a>
+    <p class="hint">Please scan the QR code to mark your attendance.</p>
+    <p style="font-size: smaller;">
+        {% if classId %}
+            <a href="{% url 'student_view_qrCode' classId %}">Open QR code in new window</a> |
+        {% endif %}
+        <a target="_blank" href="{{qrSrc}}">Save QR Code</a>
     </p>
 {% else %}       
     <h4>No qr code provided</h4>
