@@ -15,4 +15,10 @@ urlpatterns = [
     path("attendance/already-submitted/<int:classId>", views.student_view_attendance_already_submitted, name="student_view_attendance_already_submitted_with_classId"),
     path("attendance/already-submitted/<str:className>", views.student_view_attendance_already_submitted, name="student_view_attendance_already_submitted_with_className"),
     path("attendance/already-submitted", views.student_view_attendance_already_submitted, name="student_view_attendance_already_submitted"),
+
+    path("class/<int:classId>/qr-code-<int:blockSize>/",views.student_view_bigQRcode,name="student_view_qrCode_with_blockSize"),
+    path("class/<int:classId>/qr-code/",views.student_view_bigQRcode,name="student_view_qrCode"),
+    
+    path("class/<str:className>/qr-code-<int:blockSize>/",views.student_view_bigQRcode,name="student_view_qrCode_with_blockSize"),
+    path("class/<str:className>/qr-code/",views.student_view_bigQRcode,name="student_view_qrCode")
 ]

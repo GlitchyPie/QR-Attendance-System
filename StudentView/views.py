@@ -2,6 +2,7 @@ import datetime
 import pytz
 from django.shortcuts import render
 from FacultyView.models import Student, ClassName, Attendance
+from FacultyView.views import qrgenerator
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseBadRequest
 from django.urls import reverse
@@ -62,6 +63,25 @@ def student_view_submit_attendance(request,classId = None, className = None):
         return HttpResponseRedirect(reverse('student_view_attendance_submitted_with_classId',kwargs={"classId":classId}))
     else:
         return HttpResponseRedirect(reverse('student_view_attendance_already_submitted_with_classId',kwargs={"classId":classId}))
+
+#=======================
+
+def student_view_bigQRcode(request, classId = None, className = None, blockSize = 20):
+    if((classId == None) and (className == None)):
+        return HttpResponseBadRequest()
+    elif(classId == None):
+        classId = ClassName.objects.filter(s_className__iexact=className)[0].id # pyright: ignore[reportAttributeAccessIssue]
+    else:
+        className = ClassName.objects.filter(id=classId)[0].s_className
+
+    qrSrc = qrgenerator(request, classId, blockSize)
+    return render(request,
+                  "StudentView/StudentViewQrCode.html",
+                  {
+                      "classId":classId,
+                      "className":className,
+                      "qrSrc":qrSrc,
+                  })
 
 #=======================
 
