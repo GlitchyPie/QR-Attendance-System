@@ -1,6 +1,6 @@
 {% load static %}
 
-<form class="attendance-student-form" method="POST" action="{% url 'student_view_submit_attendance_by_class_id' classId %}">
+<form class="attendance-student-form" method="POST" action="{% url 'student_view_submit_attendance' classId=classId %}">
     {% csrf_token %}
     <label for="student_entry_email">CAT email address:</label>
     <input type="text" name="student_email" id="student_entry_email">

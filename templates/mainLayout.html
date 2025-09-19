@@ -14,7 +14,10 @@
   <body>
     <header>
       <h1>{{settings.INSTITUTION_NAME}}</h1>
-      <h2>{% block header_title %}{% if className|length > 0 %}{{className}} | {% endif %}{{settings.PORTAL_TITLE}}{% endblock %}</h2>
+      <h2>{% block header_title %}
+          {% firstof class className as ttle %}
+          {% if ttle %}{{ttle}} | {% endif %}{{settings.PORTAL_TITLE}}
+        {% endblock %}</h2>
     </header>
     <main>
         {%block main_block %}
