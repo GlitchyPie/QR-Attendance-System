@@ -1,5 +1,6 @@
 import datetime
 import pytz
+from QR_Attendance_System.core import *
 from django.shortcuts import render
 from FacultyView.models import Student, ClassName, Attendance
 from django.http import HttpResponseRedirect
@@ -7,84 +8,109 @@ from django.http import HttpResponseBadRequest
 from django.urls import reverse
 
 #=======================
-def student_entry_name(request, className):
-    classId = ClassName.objects.filter(s_className__iexact=className)[0].id
-    return student_entry(request,classId,className)
 
-def student_entry_id(request, classId):
-    className = ClassName.objects.filter(id=classId)[0].s_className
-    return student_entry(request,classId,className)
+def student_view_name_entry(request, classId = None, className = None):
+    cls = getClass(classId,className)
+    if cls == None:
+        return HttpResponseBadRequest()
 
-def student_entry(request, classId, className):
+    className = cls.s_className
+    classId = cls.id  # pyright: ignore[reportAttributeAccessIssue]
+
     return render(request, 
-                  "StudentView/StudentViewstudent_entry.html",
+                  "StudentView/StudentViewStudent_entry.html",
                   {
                       "classId":classId,
                       "className":className,
+                      "class":cls,
                   })
+
 #=======================
 
-def submit_attendance_name(request,className):
-    classId = ClassName.objects.filter(s_className__iexact=className)[0].id
-    return submit_attendance(request,classId,className)
-
-def submit_attendance_id(request,classId):
-    className = ClassName.objects.filter(id=classId)[0].s_className
-    return submit_attendance(request,classId,className)
-
-def submit_attendance(request,classId,className):
-    if request.method == "GET" :
+def student_view_submit_attendance(request,classId = None, className = None):
+    if request.method != "POST" :
         return HttpResponseBadRequest() #This should only accept POST requests
     
+    cls = getClass(classId,className)
+    if cls == None:
+        return HttpResponseBadRequest()
+
+    className = cls.s_className
+    classId = cls.id  # pyright: ignore[reportAttributeAccessIssue]
+
     eml = request.POST["student_email"].lower()
     fname = request.POST["student_fname"]
     lname = request.POST["student_lname"]
 
     classOb = ClassName.objects.filter(id=classId)[0]
 
-    stuQuery = Student.objects.filter(s_eml=eml)
-    stuOb = None
-    if len(stuQuery) == 0:
-        stuOb = Student(s_eml=eml,s_fname=fname,s_lname=lname)
-        stuOb.save()
-    else:
-        stuOb = stuQuery[0]
+    stuOb = Student.objects.get_or_create(s_eml=eml, s_fname=fname, s_lname=lname)[0]
 
     d = datetime.datetime.now(pytz.utc)
     eml = stuOb.s_eml
     fname = stuOb.s_fname
     lname = stuOb.s_lname
     
-    attendanceQuery = Attendance.objects.filter(dte_date__date=d, student=eml, s_class=classId)
+    attendanceQuery = Attendance.objects.filter(dte_date__date=d, student=eml, className=classId)
     if attendanceQuery.exists() == False:
-        attendanceOb = Attendance(dte_date=d,s_class=classOb,student=stuOb)
+        attendanceOb = Attendance(dte_date=d,className=classOb,student=stuOb)
         attendanceOb.save()
-        return HttpResponseRedirect("/submitted")
+        return HttpResponseRedirect(reverse('student_view_attendance_submitted',kwargs={"classId":classId}))
     else:
-        return HttpResponseRedirect("/alreadysubmitted")
-    
+        return HttpResponseRedirect(reverse('student_view_attendance_already_submitted',kwargs={"classId":classId}))
 
 #=======================
 
-def delete_attendance_id(request, classId):
-    if request.method == "GET" :
-        return HttpResponseBadRequest() #This should only accept POST requests
-    
-    d = datetime.datetime.now(pytz.utc)
-    eml = request.POST["student_email"].lower()
+def student_view_bigQRcode(request, classId = None, className = None, blockSize = 20):
+    cls = getClass(classId,className)
+    if cls == None:
+        return HttpResponseBadRequest()
 
-    attendanceQuery = Attendance.objects.filter(dte_date__date=d, student=eml, s_class=classId)
+    className = cls.s_className
+    classId = cls.id  # pyright: ignore[reportAttributeAccessIssue]
 
-    if attendanceQuery.exists():
-        attendanceQuery[0].delete()
-
-    return HttpResponseRedirect(reverse('faculty_view_class_id',kwargs={"classId":classId}))
-    
+    qrSrc = qrgenerator(request, classId, blockSize)
+    return render(request,
+                  "StudentView/StudentViewQrCode.html",
+                  {
+                      "classId":classId,
+                      "className":className,
+                      "class":cls,
+                      "qrSrc":qrSrc,
+                  })
 
 #=======================
 
-def submitted(request):
-    return render(request, "StudentView/Submitted.html")
+def student_view_attendance_submitted(request, classId=None, className=None):
+    cls = getClass(classId,className)
+    if cls == None:
+        className = None
+        classId = None
+    else:
+        className = cls.s_className
+        classId = cls.id  # pyright: ignore[reportAttributeAccessIssue]
 
-def already_submitted(request):
-    return render(request, "StudentView/AlreadySubmitted.html")
+    return render(request,
+                  "StudentView/Submitted.html",
+                  {
+                      "classId":classId,
+                      "className":className,
+                      "class":cls,
+                  })
+
+def student_view_attendance_already_submitted(request, classId=None, className=None):
+    cls = getClass(classId,className)
+    if cls == None:
+        className = None
+        classId = None
+    else:
+        className = cls.s_className
+        classId = cls.id  # pyright: ignore[reportAttributeAccessIssue]
+
+    return render(request,
+                  "StudentView/AlreadySubmitted.html",
+                  {
+                      "classId":classId,
+                      "className":className,
+                      "class":cls,
+                  })

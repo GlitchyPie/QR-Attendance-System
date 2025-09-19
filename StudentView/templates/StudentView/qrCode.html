@@ -1,0 +1,21 @@
+<h2>
+Connect to {{settings.SITE_WIFI_SSD}} and Scan the QR Code to Mark Attendance
+</h2>
+{% if qrSrc %}
+    <img
+        id="student-qr-code"
+        src="{{qrSrc}}"
+        alt="QR Code"
+    />
+    </a>
+    <p class="hint">Please scan the QR code to mark your attendance.</p>
+    <p class="hint">VPNs may block access to this service.</p>
+    <p style="font-size: smaller;">
+        {% if classId %}
+            <a href="{% url 'student_view_qrCode' classId=classId %}">Open QR code in new window</a> |
+        {% endif %}
+        <a target="_blank" href="{{qrSrc}}">Save QR Code</a>
+    </p>
+{% else %}       
+    <h4>No qr code provided</h4>
+{% endif %}  

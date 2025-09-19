@@ -9,6 +9,8 @@ COPYRIGHT_APP_NAME = "QR Attendance System"
 COPYRIGHT_ORG_NAME = "Centre For Alternative Technology"
 COPYRIGHT_YEAR = datetime.now(pytz.utc).year
 
+SITE_WIFI_SSD = "CAT_STUDENT"
+
 SETTINGS_EXPORT = [
     'INSTITUTION_NAME',
     'PORTAL_TITLE',
@@ -16,4 +18,5 @@ SETTINGS_EXPORT = [
     'COPYRIGHT_APP_NAME',
     'COPYRIGHT_ORG_NAME',
     'COPYRIGHT_YEAR',
+    'SITE_WIFI_SSD'
 ]

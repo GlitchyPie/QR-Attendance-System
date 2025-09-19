@@ -2,26 +2,39 @@
 {% load static %}
 
 {% block left_block %}
-    <h3 class="present-list">Select your class</h3>
+    {% if modules %}
+        <h3 class="present-list">Select a module to view classes</h3>
+    {% elif classes %}
+        <h3 class="present-list">Select your class</h3>
+    {% endif %}
+
     <ul class="student-list">
 
-    {% for class in classes %}
-        <li class="student">
-            <a href="{% url 'faculty_view_class_id' class.id %}">
-                <button>{{class.s_className}}</button>
-            </a>
-            <a href="{% url 'faculty_view_attendance_export_form_id' class.id %}">
-                Historical View / Export
-            </a>
-        </li>
+        {% if modules %}
 
-    {% endfor %}
+            {% for module in modules %}
+                <li class="student">
+                    <a href="{% url 'faculty_view_module' module.id %}"><button>{{module.s_moduleName}}</button></a>
+                </li>
+            {% endfor %}
+
+        {% elif classes %}
+
+            {% for class in classes %}
+                <li class="student">
+                    <a href="{% url 'faculty_view_class' classId=class.id %}"><button>{{class.s_className}}</button></a>
+                    <a href="{% url 'faculty_view_attendance' classId=class.id %}"><button class="small">Export</button></a>
+                </li>
+            {% endfor %}
+
+        {% endif %}
 
         <li class="student">
-            <form method="POST" action="{% url 'faculty_view_create_class' %}">
-            {% csrf_token %}
-            <input type="text" name="class_name" id="class_name">
-            <button type="submit">+ Create</button>
+            <form id="form-create-class" method="POST" action="{% url 'faculty_view_create_class' %}">
+                {% csrf_token %}
+                <label for="module_name">Module:</label><input type="text" name="module_name" id="module_name" {% if moduleName %}value="{{moduleName}}" readonly{% endif %}>
+                <label for="class_name">Class:</label><input type="text" name="class_name" id="class_name">
+                <button type="submit">+ Create</button>
             </form>
         </li>
     </ul>
@@ -29,6 +42,6 @@
 
 {% block right_block %}
     <h4>Admin links...</h4>
-    <a href="{% url 'faculty_view_attendance_export_form' %}">Historical data view and export</a><br>
+    <a href="{% url 'faculty_view_attendance' %}">Historical data view and export</a><br>
     <a href="/admin/">Database admin</a><br>
 {% endblock %}

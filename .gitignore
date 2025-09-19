@@ -2,6 +2,7 @@
 *__pycache__
 *.sqlite3
 migrations/
+media/
 00-base.conf.py
 04-Internationalization.conf.py
 05-StaticFiles.conf.py

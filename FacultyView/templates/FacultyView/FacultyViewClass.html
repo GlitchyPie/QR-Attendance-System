@@ -4,78 +4,15 @@
 {% block left_block %}
     <h2>Present Students</h2>
     <h3>Present Count : {{ present|length }}</h3>
-    <form class="attendance-form" method="POST" action="{% url 'delete_attendance_id' classId %}">
+    <form class="attendance-form" method="POST" action="{% url 'Faculty_view_delete_attendance' classId=classId %}">
         {% csrf_token %}
-        <div id="student_list_container">{% include "FacultyView/StudentList.html" %}</div>
-        <script>
-            document.addEventListener("DOMContentLoaded",()=>{
-                const student_ul = document.getElementById('student_present_list');
-                const student_ul_container = document.getElementById('student_list_container');
-                let student_ul_html = clearWhiteSpace(student_ul_container.innerHTML);
-
-                function clearWhiteSpace(s){
-                    if(s === undefined){return s;}
-                    return s.replace(/\s+/g,"");
-                }
-
-                function formatDates(){
-                    const li_items = student_ul.children;
-                    const localeOpts = {
-                        hour:'2-digit',
-                        minute: '2-digit'
-                    }
-                    for (const li of li_items){
-                        const node_sname = li.getElementsByClassName("student-name")[0];
-                        const node_date = node_sname.getElementsByClassName('attendance-date')[0];
-                        const utcDateStr = node_date.dataset.isodate;
-                        const utcDate = new Date(utcDateStr); //Date.parse(utcDateStr);
-                        node_date.innerText = utcDate.toLocaleString("{{settings.LANGUAGE_CODE}}",localeOpts);
-                    }                    
-                }
-
-                function lookForUpdate(){
-                    const request = new XMLHttpRequest();
-                    request.addEventListener("load", XMLHttpRequestLoad);
-                    request.open("GET", "{% url 'faculty_view_ajax_present_id' classId %}");
-                    request.send();
-                }
-                
-                function XMLHttpRequestLoad(){
-                    const A = this.responseText;
-                    const B = clearWhiteSpace(A);
-                    if(student_ul_html != B){
-                        student_ul_html = B
-                        student_ul_container.innerHTML = A;
-                        formatDates();
-                    }
-                    setTimeout(lookForUpdate, 2000);
-                }
-                
-                setTimeout(lookForUpdate, 2000)
-
-                formatDates();
-            });
-        </script>
+        {% include "FacultyView/StudentList.html" %}
     </form>
     {% include "StudentView/nameForm.html" %}
 {% endblock %}
 
 {% block right_block %}
-    {% if classId %}
         <div class="attendance-card">
-            <h2>
-            Connect to CAT_STUDENT and Scan the QR Code to Mark Attendance
-            </h2>
-            <img
-                src="{% get_media_prefix %}qrs/qrcode_{{classId}}.png"
-                alt="QR Code"
-                width="200"
-                height="200"
-            />
-            </a>
-            <p class="hint">Please scan the QR code to mark your attendance.</p>
+            {% include "StudentView/qrCode.html" %}
         </div>
-    {% else %}
-        <h4>No class given</h4>
-    {% endif %}
 {% endblock %}

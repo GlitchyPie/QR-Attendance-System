@@ -2,14 +2,11 @@ from . import views
 from django.urls import path
 
 urlpatterns = [
-    path("class/<int:classId>/student_entry",views.student_entry_id,name="student_entry_id"),
-    path("class/<int:classId>/submit_attendance",views.submit_attendance_id,name="submit_attendance_id"),
-
-    path("class/<str:className>/student_entry",views.student_entry_name,name="student_entry_name"),
-    path("class/<str:className>/submit_attendance",views.submit_attendance_name,name="submit_attendance_name"),
+    path("attendance/class/<int:classId>/entry/",views.student_view_name_entry,name="student_view_enter_student"),
+    path("attendance/class/<int:classId>/submit/",views.student_view_submit_attendance,name="student_view_submit_attendance"),
+    path("attendance/class/<int:classId>/submitted/", views.student_view_attendance_submitted, name="student_view_attendance_submitted"),
+    path("attendance/class/<int:classId>/already-submitted/", views.student_view_attendance_already_submitted, name="student_view_attendance_already_submitted"),
     
-    path("class/<int:classId>/delete_attendance",views.delete_attendance_id,name="delete_attendance_id"),
-
-    path("submitted", views.submitted, name="submitted"),
-    path("alreadysubmitted", views.already_submitted, name="already_submitted"),
+    path("qr-code/blocksize-<int:blockSize>/class/<int:classId>/",views.student_view_bigQRcode,name="student_view_qrCode_with_blockSize"),
+    path("qr-code/class/<int:classId>/",views.student_view_bigQRcode,name="student_view_qrCode"),
 ]

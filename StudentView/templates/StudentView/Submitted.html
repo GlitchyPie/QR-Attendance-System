@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block only_block %}
-    <h2>Attendance submitted successfully.</h2>
+    <h2>Attendance {% if className %}for <span class="class-name">{{className}}</span> {% endif %}submitted successfully.</h2>
     <br>
     <h2>You may close this page.</h2>
 {% endblock %}

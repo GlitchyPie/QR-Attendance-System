@@ -8,108 +8,47 @@
 {% endblock %}
 
 {% block right_block %}
-    <form class="export-date-form">
+    <form class="export-date-form" id="export-date-form">
         {% csrf_token %}
-        <label>Class:
-            <select id="select-export-class">
+        <fieldset>
+            <label for="select-export-module">Module:</label>
+            <select id="select-export-module">
                 <option value="*">All</option>
+                {% for module in modules %}
+                    <option value="{{module.id}}"
+                        {% if module.id == moduleId %}selected{% endif %}
+                    >{{module.s_moduleName}}</option>
+                {% endfor %}
+            </select>        
+            <label for="select-export-class">Class:</label>
+            <select id="select-export-class">
+                <option data-classId="*" value="*">All</option>
                 {% for class in classes %}
-                    <option value="{{class.id}}"
-                    {% if class.id == classId %}selected{% endif %}
+                    {% ifchanged class.moduleName %}
+                        <option data-classId="-1" data-moduleId="-1" value="M{{class.moduleName.id}}" disabled>--{{class.moduleName.s_moduleName}}--</option>
+                    {% endifchanged %}
+                    <option data-moduleId="{{class.moduleName.id}}" value="{{class.id}}"
+                        {% if class.id == classId %}selected{% endif %}
                     >{{class.s_className}}</option>
                 {% endfor %}
             </select>
-        </label>
-
-        <fieldset>Today:<br>
-            <button id="btn-view-today">View</button>
-            <button id="btn-export-today">Export</button>
-        </fieldset>
-        <fieldset>Yesterday:<br>
-            <button id="btn-view-yesterday">View</button>
-            <button id="btn-export-yesterday">Export</button>
         </fieldset>
         <fieldset>
-            <label>Date: <input type="date" id="export-date-picker"></label>
+            <label>Date: <input type="date" id="export-date-picker" value="{{dte_year|stringformat:'04d'}}-{{dte_month|stringformat:'02d'}}-{{dte_day|stringformat:'02d'}}"></label>
             <br>
             <button id="btn-view-date">View</button>
             <button id="btn-export-date">Export</button>
+        </fieldset>     
+        <fieldset>
+            <legend>Today:</legend>
+            <button id="btn-view-today">View</button>
+            <button id="btn-export-today">Export</button>
+        </fieldset>
+        <fieldset>
+            <legend>Yesterday:</legend>
+            <button id="btn-view-yesterday">View</button>
+            <button id="btn-export-yesterday">Export</button>
         </fieldset>
     </form>
-    <script>
-        document.addEventListener("DOMContentLoaded",()=>{
-            const rootPath = "{% url 'faculty_view_attendance_export_form' %}";
-
-            const btn1 = document.getElementById("btn-export-today");
-            const btn2 = document.getElementById("btn-export-yesterday");
-            const btn3 = document.getElementById("btn-view-today");
-            const btn4 = document.getElementById("btn-view-yesterday");
-            const btn5 = document.getElementById("btn-export-date");
-            const btn6 = document.getElementById("btn-view-date");
-
-            const classSelect = document.getElementById("select-export-class");
-            const picker = document.getElementById("export-date-picker");
-
-            const c_year = "{{dte_year}}";
-            const c_month = "{{dte_month}}";
-            const c_day = "{{dte_day}}";
-            picker.value = `${c_year.padStart(4,"0")}-${c_month.padStart(2,"0")}-${c_day.padStart(2,"0")}`;
-
-            function getPathPrefix(action){
-                const classId = classSelect.value;
-                let path = rootPath;
-                if(classId !== '*'){
-                    path = `${path}${classId}/`;
-                }
-                path = `${path}${action}/`;
-                return path;
-            }
-            function goto_export(dte){
-                let path = getPathPrefix('export');
-                path = `${path}${dte.getFullYear()}/${dte.getMonth() + 1}/${dte.getDate()}/`;
-                window.location = path;
-            }
-            function goto_view(dte){
-                let path = getPathPrefix('view');
-                path = `${path}${dte.getFullYear()}/${dte.getMonth() + 1}/${dte.getDate()}/`;
-                window.location = path;
-            }
-
-            btn1.addEventListener('click',(event)=>{
-                event.preventDefault();
-                const D = new Date();
-                goto_export(D);
-            });
-            btn2.addEventListener('click',(event)=>{
-                event.preventDefault();
-                const D = new Date();
-                D.setDate(D.getDate() - 1);
-                goto_export(D);
-            });
-
-            btn3.addEventListener('click',(event)=>{
-                event.preventDefault();
-                const D = new Date();
-                goto_view(D);
-            });
-            btn4.addEventListener('click',(event)=>{
-                event.preventDefault();
-                const D = new Date();
-                D.setDate(D.getDate() - 1);
-                goto_view(D);
-            });
-
-            btn5.addEventListener('click',(event)=>{
-                event.preventDefault();
-                const D = new Date(picker.value)
-                goto_export(D);
-            });
-            btn6.addEventListener('click',(event)=>{
-                event.preventDefault();
-                const D = new Date(picker.value)
-                goto_view(D);
-            });
-
-        });
-    </script>
+    <script src="{% static 'FacultyView/ExportForm.js' %}"></script>
 {% endblock %}
