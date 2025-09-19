@@ -1,4 +1,5 @@
 # Application definition
+# type: ignore
 
 INSTALLED_APPS = [
     "django.contrib.admin",

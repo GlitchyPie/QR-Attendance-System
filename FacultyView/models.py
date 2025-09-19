@@ -19,19 +19,33 @@ class Student(models.Model):
     def __str__(self) -> str:
         return f"{self.s_eml} - {self.s_fname} {self.s_lname}"
 
-class ClassName(models.Model):
-    s_className = models.CharField(max_length=100)
+
+def get_default_module():
+    return ModuleName.objects.get_or_create(s_moduleName='Default Module')[0].id  # pyright: ignore[reportAttributeAccessIssue]
+
+class ModuleName(models.Model):
+    s_moduleName = models.CharField(max_length=100)
 
     def __str__(self) -> str:
-        return f"{self.s_className}"
+        return f"{self.s_moduleName}"
+
+class ClassName(models.Model):
+    s_className = models.CharField(max_length=100)
+    moduleName = models.ForeignKey(ModuleName, on_delete=models.RESTRICT,default=get_default_module)
+
+    def __str__(self) -> str:
+        return f"{self.moduleName} - {self.s_className}"
+    
+    class Meta:
+        ordering = ["moduleName__s_moduleName","s_className"]
 
 class Attendance(models.Model):
-    s_class = models.ForeignKey(ClassName, on_delete=models.RESTRICT)
+    className = models.ForeignKey(ClassName, on_delete=models.RESTRICT)
     dte_date = models.DateTimeField()
     student = models.ForeignKey(Student, on_delete=models.RESTRICT)
 
     def __str__(self) -> str:
-        return f"{self.dte_date} - {self.s_class} - {self.student}"
+        return f"{self.dte_date} - {self.className} - {self.student}"
     
     class Meta:
-        ordering = ["s_class","dte_date"]
+        ordering = ["className","dte_date"]
