@@ -52,7 +52,7 @@ def getClassAndModule(classId = None, className = None, moduleId = None, moduleN
         cls = ClassName.objects.filter(id=classId)[0]
         mod = cls.moduleName
     
-    elif(className): # For a given module name...
+    elif(className): # For a given class name...
         q = ClassName.objects.all()
         if(moduleId): # If we are given module details, use them to limit the search to classes in that module.
             q = q.filter(moduleName=moduleId)
