@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     const lookupPath = currentList.dataset.rootpath;
 
-    const h = document.getElementsByTagName('HTML')[0];
     const l = document.documentElement.lang??'en';
     const localeOpts = {
         hour:'2-digit',
@@ -23,7 +22,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         for (const li of li_items){
             const nodes_sname = li.getElementsByClassName("student-name");
             if(!!nodes_sname){
-                 const node_sname = nodes_sname[0];
+                const node_sname = nodes_sname[0];
                 if(!!node_sname){
                     const node_date = node_sname.getElementsByClassName('attendance-date')[0];
                     const utcDateStr = node_date.dataset.isodate;
