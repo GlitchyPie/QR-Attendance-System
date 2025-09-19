@@ -2,7 +2,6 @@ import datetime
 import pytz
 import csv
 from QR_Attendance_System.core import *
-from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -48,18 +47,16 @@ def faculty_view_delete_attendance(request, classId = None, className = None):
     if cls == None:
         return HttpResponseBadRequest()
     
-    className = cls.s_className
-    classId = cls.id  # pyright: ignore[reportAttributeAccessIssue]
+    #0 1 2 3 4 5 6 7 8 9
+    #r e c o r d _ 1 2 3
+    r = request.POST["attendance_record"][7:]
 
-    d = datetime.datetime.now(pytz.utc)
-    eml = request.POST["student_email"].lower()
-
-    attendanceQuery = Attendance.objects.filter(dte_date__date=d, student=eml, className=classId)
+    attendanceQuery = Attendance.objects.filter(id=r)
 
     if attendanceQuery.exists():
         attendanceQuery[0].delete()
 
-    return HttpResponseRedirect(reverse('faculty_view_class',kwargs={"classId":classId}))
+    return HttpResponseRedirect(reverse('faculty_view_class',kwargs={"classId":cls.id})) # pyright: ignore[reportAttributeAccessIssue]
     
 #=======================
 
@@ -83,7 +80,9 @@ def faculty_view(request, moduleId=None):
         },
     )
 
-def faculty_view_class(request, classId = None, className = None, moduleId=None, moduleName=None):
+def faculty_view_class(request,
+                       classId = None, className = None,
+                       moduleId=None, moduleName=None):
     cls,mod = getClassAndModule(classId, className,
                                 moduleId, moduleName)
     if cls == None:
@@ -169,8 +168,8 @@ def faculty_view_attendance_export(request,
             return HttpResponseBadRequest()
 
 def render_faculty_view_attendance_export_form(request, cls, mod, present, year, month, day):
-    classes = ClassName.objects.all();
-    modules = ModuleName.objects.all();
+    classes = ClassName.objects.all()
+    modules = ModuleName.objects.all()
     return render(
         request,
         "FacultyView/FacultyViewExportForm.html",
@@ -221,7 +220,7 @@ def render_faculty_view_attendance_export_CSV(request, present_query):
 #=======================
 
 def faculty_view_create_class(request):
-    if request.method == "GET" :
+    if request.method != "POST" :
         return HttpResponseBadRequest() #This should only accept POST requests
     
     className = request.POST["class_name"]
