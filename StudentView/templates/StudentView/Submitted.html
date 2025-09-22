@@ -4,9 +4,9 @@
 {% block only_block %}
     <h2>
         {% if "already" in request.path %}
-            Attendance already submitted{% if className %} for <span class="class-name">{{className}}</span> {% endif %}today.
+            Attendance already submitted {% if class %}for <span class="class-name">{{class}}</span> {% endif %}today.
         {% else %}
-            Attendance{% if className %} for <span class="class-name">{{className}}</span> {% endif %}submitted successfully.
+            Attendance {% if class %}for <span class="class-name">{{class}}</span> {% endif %}submitted successfully.
         {% endif %}
     </h2>
     <br>

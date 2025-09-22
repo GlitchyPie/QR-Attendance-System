@@ -1,17 +1,17 @@
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener('DOMContentLoaded',()=>{
             const naieveEmail = /^([a-z]+)\.(([a-z]+\.?)+)(?<!\.)(@student\.cat\.org\.uk$)?/i
-            const eml   = document.getElementById("student_entry_email");
-            const fname = document.getElementById("student_entry_fname");
-            const lname = document.getElementById("student_entry_lname");
-            const btn   = document.getElementById("submit_student_entry");
+            const eml   = document.getElementById('student_entry_email');
+            const fname = document.getElementById('student_entry_fname');
+            const lname = document.getElementById('student_entry_lname');
+            const btn   = document.getElementById('submit_student_entry');
 
             let fnameFocused = false;
             let lnameFocused = false;
 
-            fname.addEventListener("focus",(event)=>{
+            fname.addEventListener('focus',(event)=>{
                 fnameFocused = true;
             });
-            lname.addEventListener("focus",(event)=>{
+            lname.addEventListener('focus',(event)=>{
                 lnameFocused = true;
             });
 

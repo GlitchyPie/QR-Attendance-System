@@ -51,7 +51,7 @@
           {% if module %}
             {% url 'faculty_view' moduleId=module.id as faculty_view_class_index_url %}
             {% if not request.path == faculty_view_class_index_url %}
-              <li><a href="{{faculty_view_class_index_url}}" title="Class Index - {{module}}"><i class="fa-solid fa-indent"></i></a></li>
+              <li><a href="{{faculty_view_class_index_url}}" title="Faculty Class Index - {{module}}"><i class="fa-solid fa-indent"></i></a></li>
             {% endif %}
           {% endif %}
 

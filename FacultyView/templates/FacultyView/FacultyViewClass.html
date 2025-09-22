@@ -4,10 +4,7 @@
 {% block left_block %}
     <h2>Present Students</h2>
     <h3>Present Count : {{ present|length }}</h3>
-    <form class="attendance-form" method="POST" action="{% url 'faculty_view_delete_attendance' classId=class.id %}">
-        {% csrf_token %}
-        {% include "FacultyView/StudentList.html" %}
-    </form>
+    {% include "FacultyView/AttendanceList.html" %}
     {% include "StudentView/nameForm.html" %}
 {% endblock %}
 

@@ -6,6 +6,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseBadRequest
+from django.http import HttpResponseNotFound
 from django.urls import reverse
 from .models import Student, ClassName, Attendance, ModuleName
 
@@ -42,27 +43,23 @@ def attendance_query(cls : ClassName|None = None,
     
 #=======================
 
-def faculty_view_delete_attendance(request,
-                                   classId : int|None = None,
-                                   className : str|None = None):
+def faculty_view_delete_attendance(request):
     if request.method != 'POST' :
         return HttpResponseBadRequest() #This should only accept POST requests
     
-    cls = getClass(classId,className)
-    if cls == None:
-        return HttpResponseBadRequest()
-    
-    #0 1 2 3 4 5 6 7 8 9
-    #r e c o r d _ 1 2 3
-    r = request.POST['attendance_record'][7:]
+    r = request.POST['attendance_record']
 
     attendanceQuery = Attendance.objects.filter(id=r)
 
+    cls = None
     if attendanceQuery.exists():
-        attendanceQuery[0].delete()
-
-    return HttpResponseRedirect(reverse('faculty_view',kwargs={'classId':cls.id})) # pyright: ignore[reportAttributeAccessIssue]
-    
+        attendanceOb = attendanceQuery[0]
+        cls = attendanceOb.className
+        attendanceOb.delete()
+        return HttpResponseRedirect(reverse('faculty_view',kwargs={'classId':cls.id})) # pyright: ignore[reportAttributeAccessIssue]
+    else:
+        return HttpResponseNotFound()
+        
 #=======================
 
 def faculty_view(request,
@@ -141,7 +138,7 @@ def faculty_view_present_list(request,
     
     return render(
         request,
-        'FacultyView/StudentList.html',
+        'FacultyView/AttendanceList.html',
         {
                'present' : present,
                  'class' : cls,

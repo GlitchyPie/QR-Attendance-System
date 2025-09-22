@@ -12,7 +12,7 @@ attendanceUrls = [
     path('', include(attendanceUrlSuffixes)),
     path('class/<int:classId>/', include(attendanceUrlSuffixes)),
     path('module/<int:moduleId>/', include(attendanceUrlSuffixes)),
-    path('class/<int:classId>/entry/delete/',views.faculty_view_delete_attendance,name='faculty_view_delete_attendance'),
+    path('entry/delete/', views.faculty_view_delete_attendance, name='faculty_view_delete_attendance'),
 ]
 
 

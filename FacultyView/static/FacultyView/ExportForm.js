@@ -1,18 +1,18 @@
-document.addEventListener("DOMContentLoaded",()=>{
-    const btn_export_today = document.getElementById("btn-export-today");
-    const btn_export_yesterday = document.getElementById("btn-export-yesterday");
-    const btn_view_today = document.getElementById("btn-view-today");
-    const btn_view_yesterday = document.getElementById("btn-view-yesterday");
-    const btn_export_current = document.getElementById("btn-export-date");
-    const btn_view_current = document.getElementById("btn-view-date");
+document.addEventListener('DOMContentLoaded',()=>{
+    const btn_export_today = document.getElementById('btn-export-today');
+    const btn_export_yesterday = document.getElementById('btn-export-yesterday');
+    const btn_view_today = document.getElementById('btn-view-today');
+    const btn_view_yesterday = document.getElementById('btn-view-yesterday');
+    const btn_export_current = document.getElementById('btn-export-date');
+    const btn_view_current = document.getElementById('btn-view-date');
 
-    const moduleSelect = document.getElementById("select-export-module");
-    const classSelect = document.getElementById("select-export-class");
-    const picker = document.getElementById("export-date-picker");
+    const moduleSelect = document.getElementById('select-export-module');
+    const classSelect = document.getElementById('select-export-class');
+    const picker = document.getElementById('export-date-picker');
 
     function getPath(action, dte){
         function isValidDate(ob){
-            if(Object.prototype.toString.call(ob) === "[object Date]"){
+            if(Object.prototype.toString.call(ob) === '[object Date]'){
                 if(!isNaN(ob)){
                     return true
                 }
@@ -31,9 +31,9 @@ document.addEventListener("DOMContentLoaded",()=>{
         const moduleId = moduleSelect.value;
 
         let path = "/attendance/";
-        if(classId != "*"){
+        if(classId != '*'){
             path = `${path}class/${classId}/`;
-        }else if(moduleId != "*"){
+        }else if(moduleId != '*'){
             path = `${path}module/${moduleId}/`;
         }
 
@@ -48,22 +48,22 @@ document.addEventListener("DOMContentLoaded",()=>{
         window.location = getPath('view',dte);
     }
     function gotoModule(event){
-        classSelect.value = "*";
+        classSelect.value = '*';
         goto_view(new Date(picker.value))  
     }
     function updatClassPicker(event){
         const v = moduleSelect.value;
-        if(v == "*"){
+        if(v == '*'){
             for (const element of classSelect.children) {
-                element.style.display = "initial";
+                element.style.display = 'initial';
             }
         }else{
             for (const element of classSelect.children) {
-                if(element.value != "*"){
+                if(element.value != '*'){
                     if(element.dataset.moduleid != v){
-                        element.style.display = "none";
+                        element.style.display = 'none';
                     }else{
-                        element.style.display = "initial";
+                        element.style.display = 'initial';
                     }
                 }
             }
