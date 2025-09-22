@@ -1,10 +1,10 @@
 document.addEventListener("DOMContentLoaded",()=>{
-    const btn1 = document.getElementById("btn-export-today");
-    const btn2 = document.getElementById("btn-export-yesterday");
-    const btn3 = document.getElementById("btn-view-today");
-    const btn4 = document.getElementById("btn-view-yesterday");
-    const btn5 = document.getElementById("btn-export-date");
-    const btn6 = document.getElementById("btn-view-date");
+    const btn_export_today = document.getElementById("btn-export-today");
+    const btn_export_yesterday = document.getElementById("btn-export-yesterday");
+    const btn_view_today = document.getElementById("btn-view-today");
+    const btn_view_yesterday = document.getElementById("btn-view-yesterday");
+    const btn_export_current = document.getElementById("btn-export-date");
+    const btn_view_current = document.getElementById("btn-view-date");
 
     const moduleSelect = document.getElementById("select-export-module");
     const classSelect = document.getElementById("select-export-class");
@@ -17,7 +17,6 @@ document.addEventListener("DOMContentLoaded",()=>{
                     return true
                 }
             }
-
             return false;
         }
 
@@ -73,29 +72,29 @@ document.addEventListener("DOMContentLoaded",()=>{
 
     updatClassPicker();
 
-    btn1.addEventListener('click',(event)=>{
+    btn_export_today.addEventListener('click',(event)=>{
         event.preventDefault();
         goto_export();
     });
-    btn2.addEventListener('click',(event)=>{
+    btn_export_yesterday.addEventListener('click',(event)=>{
         event.preventDefault();
         goto_export(-1);
     });
 
-    btn3.addEventListener('click',(event)=>{
+    btn_view_today.addEventListener('click',(event)=>{
         event.preventDefault();
         goto_view();
     });
-    btn4.addEventListener('click',(event)=>{
+    btn_view_yesterday.addEventListener('click',(event)=>{
         event.preventDefault();
         goto_view(-1);
     });
 
-    btn5.addEventListener('click',(event)=>{
+    btn_export_current.addEventListener('click',(event)=>{
         event.preventDefault();
-        goto_export(-1);
+        goto_export(new Date(picker.value));
     });
-    btn6.addEventListener('click',(event)=>{
+    btn_view_current.addEventListener('click',(event)=>{
         event.preventDefault();
         goto_view(new Date(picker.value));
     });

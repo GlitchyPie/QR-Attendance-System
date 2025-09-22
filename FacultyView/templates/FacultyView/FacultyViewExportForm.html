@@ -14,22 +14,22 @@
             <label for="select-export-module">Module:</label>
             <select id="select-export-module">
                 <option value="*">All</option>
-                {% for module in modules %}
-                    <option value="{{module.id}}"
-                        {% if module.id == moduleId %}selected{% endif %}
-                    >{{module.s_moduleName}}</option>
+                {% for m in modules %}
+                    <option value="{{m.id}}"
+                        {% if m.id == module.id %}selected{% endif %}
+                    >{{m.s_moduleName}}</option>
                 {% endfor %}
             </select>        
             <label for="select-export-class">Class:</label>
             <select id="select-export-class">
                 <option data-classId="*" value="*">All</option>
-                {% for class in classes %}
-                    {% ifchanged class.moduleName %}
-                        <option data-classId="-1" data-moduleId="-1" value="M{{class.moduleName.id}}" disabled>--{{class.moduleName.s_moduleName}}--</option>
+                {% for c in classes %}
+                    {% ifchanged c.moduleName %}
+                        <option data-classId="-1" data-moduleId="-1" value="M{{c.moduleName.id}}" disabled>--{{c.moduleName.s_moduleName}}--</option>
                     {% endifchanged %}
-                    <option data-moduleId="{{class.moduleName.id}}" value="{{class.id}}"
-                        {% if class.id == classId %}selected{% endif %}
-                    >{{class.s_className}}</option>
+                    <option data-moduleId="{{c.moduleName.id}}" value="{{c.id}}"
+                        {% if c.id == class.id %}selected{% endif %}
+                    >{{c.s_className}}</option>
                 {% endfor %}
             </select>
         </fieldset>

@@ -4,7 +4,7 @@
 {% block left_block %}
     <h2>Present Students</h2>
     <h3>Present Count : {{ present|length }}</h3>
-    <form class="attendance-form" method="POST" action="{% url 'Faculty_view_delete_attendance' classId=classId %}">
+    <form class="attendance-form" method="POST" action="{% url 'faculty_view_delete_attendance' classId=class.id %}">
         {% csrf_token %}
         {% include "FacultyView/StudentList.html" %}
     </form>

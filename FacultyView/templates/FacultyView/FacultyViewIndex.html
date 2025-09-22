@@ -1,5 +1,6 @@
 {% extends "FacultyView/FacultyView.html" %}
 {% load static %}
+{% load jump_url %}
 
 {% block left_block %}
     {% if modules %}
@@ -12,18 +13,18 @@
 
         {% if modules %}
 
-            {% for module in modules %}
+            {% for m in modules %}
                 <li class="student">
-                    <a href="{% url 'faculty_view_module' module.id %}"><button>{{module.s_moduleName}}</button></a>
+                    <a href="{% url 'faculty_view' m.id %}"><button>{{m.s_moduleName}}</button></a>
                 </li>
             {% endfor %}
 
         {% elif classes %}
 
-            {% for class in classes %}
+            {% for c in classes %}
                 <li class="student">
-                    <a href="{% url 'faculty_view_class' classId=class.id %}"><button>{{class.s_className}}</button></a>
-                    <a href="{% url 'faculty_view_attendance' classId=class.id %}"><button class="small">Export</button></a>
+                    <a href="{% url 'faculty_view' classId=c.id %}"><button>{{c.s_className}}</button></a>
+                    <a href="{% url 'faculty_view_attendance' classId=c.id %}" title="Attendance History -  {{c}}"><button class="small"><i class="fa-solid fa-clock-rotate-left"></i></button></a>
                 </li>
             {% endfor %}
 
@@ -42,6 +43,6 @@
 
 {% block right_block %}
     <h4>Admin links...</h4>
-    <a href="{% url 'faculty_view_attendance' %}">Historical data view and export</a><br>
-    <a href="/admin/">Database admin</a><br>
+    <a href="{% jump_url 'faculty_view_attendance' %}"><i class="fa-solid fa-clock-rotate-left"></i>Historical data view and export</a><br>
+    <a href="/admin/"><i class="fa-solid fa-database"></i>Database admin</a><br>
 {% endblock %}

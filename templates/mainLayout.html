@@ -1,22 +1,28 @@
 {% load static %}
+{% load jump_url %}
+{% load default_page_title %}
+{% firstof class module title_part as title_part %}
+
 <!DOCTYPE html>
 <html lang="{{settings.LANGUAGE_CODE}}">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block page_title %}QR Attendance System{% endblock %}</title>
+    <title>
+      {% block page_title %}{% default_page_title %}{% endblock %}
+    </title>
     <link rel="stylesheet" href="{% static 'TemplateCss.css' %}" />
     {% block head %}{% endblock %}
     <link
         rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
     />
+    <!-- href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" -->
   <body>
     <header>
       <h1>{{settings.INSTITUTION_NAME}}</h1>
       <h2>{% block header_title %}
-          {% firstof class className as ttle %}
-          {% if ttle %}{{ttle}} | {% endif %}{{settings.PORTAL_TITLE}}
+          {% if title_part %}{{title_part}} | {% endif %}{{settings.PORTAL_TITLE}}
         {% endblock %}</h2>
     </header>
     <main>
@@ -27,7 +33,38 @@
         {% endblock %}
     </main>
     <footer>
-      {% block footer %}<p>&copy; {{settings.COPYRIGHT_APP_NAME}} {{settings.COPYRIGHT_YEAR}} - {{settings.COPYRIGHT_ORG_NAME}}</p>{% endblock %}
+      <div id="footer-menu-left">
+        <ul id="tool-menu">
+          <li><a href="{% url 'faculty_view' %}" title="Faculty Home - Module Index"><i class="fa-solid fa-house"></i></a></li>
+          
+          {% if class %}
+            {% url 'faculty_view' classId=class.id as faculty_view_class_url %}
+            {% url 'student_view_enter_student' classId=class.id as student_view_enter_student_url %}
+
+            {% if request.path == faculty_view_class_url %}
+              <li><a href="{{student_view_enter_student_url}}" title="Student View - {{class}}"><i class="fa-solid fa-users-line"></i></a></li>
+            {% else %}
+              <li><a href="{{faculty_view_class_url}}" title="Faculty View - {{class}}"><i class="fa-solid fa-clipboard-user"></i></a></li>
+            {% endif %}
+          {% endif %}
+
+          {% if module %}
+            {% url 'faculty_view' moduleId=module.id as faculty_view_class_index_url %}
+            {% if not request.path == faculty_view_class_index_url %}
+              <li><a href="{{faculty_view_class_index_url}}" title="Class Index - {{module}}"><i class="fa-solid fa-indent"></i></a></li>
+            {% endif %}
+          {% endif %}
+
+          {% jump_url 'faculty_view_attendance' as attendance_jump_url %}
+          {% if not attendance_jump_url == request.path %}
+            <li><a href="{{attendance_jump_url}}" title="Attendance History - {% if title_part %}{{title_part}}{% else %}All Classes - Today{% endif %}"><i class="fa-solid fa-clock-rotate-left"></i></a></li>
+          {% endif %}
+
+          <li><a href="/admin/" title="Database Admin"><i class="fa-solid fa-database"></i></a></li>
+        </ul>
+      </div>
+      {% block footer %}<p id="footer-notice">&copy; {{settings.COPYRIGHT_APP_NAME}} {{settings.COPYRIGHT_YEAR}} - {{settings.COPYRIGHT_ORG_NAME}}</p>{% endblock %}
+      <div id="footer-menu-right"></div>
     </footer>
   </body>
 </html>

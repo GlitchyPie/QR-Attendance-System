@@ -37,7 +37,7 @@ class ClassName(models.Model):
         return f"{self.moduleName} - {self.s_className}"
     
     class Meta:
-        ordering = ["moduleName__s_moduleName","s_className"]
+        ordering = ['moduleName__s_moduleName','s_className']
 
 class Attendance(models.Model):
     className = models.ForeignKey(ClassName, on_delete=models.RESTRICT)
@@ -48,4 +48,4 @@ class Attendance(models.Model):
         return f"{self.dte_date} - {self.className} - {self.student}"
     
     class Meta:
-        ordering = ["className","dte_date"]
+        ordering = ['className','dte_date']

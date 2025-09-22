@@ -1,25 +1,7 @@
 {% load static %}
-
+{% load jump_url %}
 <div id="student_list_container">
-    <ul class="student-list" id="student_present_list"
-        {% if classId %}
-            {% if dte_year and dte_month and dte_year %}
-                data-rootpath="{% url 'faculty_view_present_list' classId=classId year=dte_year month=dte_month day=dte_day %}"
-            {% else %}
-                data-rootpath="{% url 'faculty_view_present_list' classId=classId %}"
-            {% endif %}
-        {% elif moduleId %}
-            {% if dte_year and dte_month and dte_year %}
-                data-rootpath="{% url 'faculty_view_present_list' moduleId=moduleId year=dte_year month=dte_month day=dte_day %}"
-            {% else %}
-                data-rootpath="{% url 'faculty_view_present_list' moduleId=moduleId %}"
-            {% endif %}
-        {% elif dte_year and dte_month and dte_year %}
-            data-rootpath="{% url 'faculty_view_present_list' year=dte_year month=dte_month day=dte_day %}"
-        {% else %}
-            data-rootpath="{% url 'faculty_view_present_list' %}"
-        {% endif %}
-    >
+    <ul class="student-list" id="student_present_list" data-rootpath="{% jump_url 'faculty_view_present_list' %}">
         {% for attendance in present %}
             {% ifchanged attendance.className %}
                 {%if attendance.className.s_className != className %}
