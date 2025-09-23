@@ -31,7 +31,7 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
             const lname = FORM.querySelector('input[name="student_lname"]');
             const btn   = FORM.querySelector('button[name="submit_student"]');
            
-            let lookupTo;
+            let lookupTimeout;
 
             let fnameFocused = false;
             let lnameFocused = false;
@@ -57,7 +57,7 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
             }
 
             function lookupStudent(eml){
-                clearTimeout(lookupTo);
+                clearTimeout(lookupTimeout);
 
                 const xhr = new XMLHttpRequest();
                 xhr.addEventListener('load',studentLookedUp);
@@ -81,8 +81,8 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
                 if(lname.value.length === 0){
                     lnameFocused = false
                 }
-                if(lookupTo != undefined){
-                    clearTimeout(lookupTo);
+                if(lookupTimeout != undefined){
+                    clearTimeout(lookupTimeout);
                 }
                 if(eml.value == ''){
                     if(fnameFocused == false){
@@ -103,7 +103,7 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
                     btnEnable = regex[4]?.toLowerCase() === '@student.cat.org.uk'
 
                     if(btnEnable){
-                        lookupTo = setTimeout(()=>lookupStudent(eml.value),500);
+                        lookupTimeout = setTimeout(()=>lookupStudent(eml.value),500);
                     }
                 }else{
                     if(fnameFocused == false){
