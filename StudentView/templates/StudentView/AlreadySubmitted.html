@@ -1,8 +1,0 @@
-{% extends "StudentView/StudentView.html" %}
-{% load static %}
-
-{% block only_block %}
-    <h2>Attendance already submitted {% if className %}for <span class="class-name">{{className}}</span> {% endif %}today.</h2>
-    <br>
-    <h2>You may close this page.</h2>
-{% endblock %}

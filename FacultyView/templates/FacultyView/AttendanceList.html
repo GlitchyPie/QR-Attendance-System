@@ -1,0 +1,63 @@
+{% load static %}
+{% load jump_url %}
+{% load referer_path %}
+{% firstof request.GET.attendacelistid '' as attentdance_list_id %}
+<div id="student_list_container_{{attentdance_list_id}}" class="attendance-form"></div>
+    <ul class="student-list" id="student_present_list_{{attentdance_list_id}}"
+        data-querypath="{% jump_url 'faculty_view_present_list' %}?attendacelistid={{attentdance_list_id}}"
+        data-deletepath="{% url 'faculty_view_delete_attendance' %}"
+        data-refererpath="{{ request|referer_path }}"
+        data-csrftoken="{{csrf_token}}"
+    >
+        {% for attendance in present %}
+            {% ifchanged attendance.className %}
+                {% if class %}
+                    {%if attendance.className.s_className != class.s_className %}
+                        <li class="classTitle"><h4>{{ attendance.className }}</h4></li>
+                    {% endif %}
+                {% else %}
+                    <li class="classTitle"><h4>{{ attendance.className }}</h4></li>
+                {% endif %}
+            {% endifchanged %}
+            <li class="student" data-recordid="{{attendance.id}}">
+                <label class="student-label">
+                    <span class="student-name">
+                        <span class="attendance-date"
+                            data-UNIXtimestamp="{{ attendance.dte_date|date:'U' }}"
+                            data-ISODate="{{ attendance.dte_date|date:'c' }}">
+                            {{ attendance.dte_date|date:"H:i" }}
+                        </span> - {{ attendance.student.s_fname }} {{attendance.student.s_lname}}
+                    </span>
+                    <div class="delete-button-container" id="container_delete_record_{{attendance.id}}">
+                        <button
+                            id="btn_delete_record_{{attendance.id}}"
+                            class="delete-button icon"
+                            title="Delete Record"
+                        >
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                        <button
+                            id="btn_delete_record_{{attendance.id}}_yes"
+                            class="delete-button yes"
+                            value="{{attendance.id}}"
+                            title="Confirm Delete Record"
+                        >
+                            <i class="fa-solid fa-square-check"></i>
+                        </button>
+                        <button
+                            id="btn_delete_record_{{attendance.id}}_no"
+                            class="delete-button no"
+                            title="Cancel Delete Record"
+                        >
+                            <i class="fa-solid fa-square-xmark"></i>
+                        </button>
+                    </div>
+                </label>
+            </li>
+        {% endfor %}
+    </ul>
+    <script src="{% static 'FacultyView/ATTENDANCE_LIST.js' %}"></script>
+    <script>
+        ATTENDANCE_LIST.register('student_present_list_{{attentdance_list_id}}');
+    </script>
+</div>

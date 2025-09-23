@@ -3,52 +3,12 @@
 
 {% block left_block %}
 
-    {% include "FacultyView/StudentList.html" %}
+    {% include "FacultyView/AttendanceList.html" %}
 
 {% endblock %}
 
 {% block right_block %}
-    <form class="export-date-form" id="export-date-form">
-        {% csrf_token %}
-        <fieldset>
-            <label for="select-export-module">Module:</label>
-            <select id="select-export-module">
-                <option value="*">All</option>
-                {% for module in modules %}
-                    <option value="{{module.id}}"
-                        {% if module.id == moduleId %}selected{% endif %}
-                    >{{module.s_moduleName}}</option>
-                {% endfor %}
-            </select>        
-            <label for="select-export-class">Class:</label>
-            <select id="select-export-class">
-                <option data-classId="*" value="*">All</option>
-                {% for class in classes %}
-                    {% ifchanged class.moduleName %}
-                        <option data-classId="-1" data-moduleId="-1" value="M{{class.moduleName.id}}" disabled>--{{class.moduleName.s_moduleName}}--</option>
-                    {% endifchanged %}
-                    <option data-moduleId="{{class.moduleName.id}}" value="{{class.id}}"
-                        {% if class.id == classId %}selected{% endif %}
-                    >{{class.s_className}}</option>
-                {% endfor %}
-            </select>
-        </fieldset>
-        <fieldset>
-            <label>Date: <input type="date" id="export-date-picker" value="{{dte_year|stringformat:'04d'}}-{{dte_month|stringformat:'02d'}}-{{dte_day|stringformat:'02d'}}"></label>
-            <br>
-            <button id="btn-view-date">View</button>
-            <button id="btn-export-date">Export</button>
-        </fieldset>     
-        <fieldset>
-            <legend>Today:</legend>
-            <button id="btn-view-today">View</button>
-            <button id="btn-export-today">Export</button>
-        </fieldset>
-        <fieldset>
-            <legend>Yesterday:</legend>
-            <button id="btn-view-yesterday">View</button>
-            <button id="btn-export-yesterday">Export</button>
-        </fieldset>
-    </form>
-    <script src="{% static 'FacultyView/ExportForm.js' %}"></script>
+
+    {% include "FacultyView/ExportForm.html" %}
+
 {% endblock %}

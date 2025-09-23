@@ -1,41 +1,51 @@
 from . import views
 from django.urls import path, include
 
+attendanceUrlSuffixes=[
+    path('', views.faculty_view_attendance_export),
+    path('today/', views.faculty_view_attendance_export, name='faculty_view_attendance'),
+    path('today/<str:action>/', views.faculty_view_attendance_export, name='faculty_view_attendance'),
+    path('<int:year>/<int:month>/<int:day>/', views.faculty_view_attendance_export, name='faculty_view_attendance'),
+    path('<int:year>/<int:month>/<int:day>/<str:action>/', views.faculty_view_attendance_export, name='faculty_view_attendance'),
+]
 attendanceUrls = [
-    path("", views.faculty_view_attendance_export),
-    path("today/", views.faculty_view_attendance_export, name="faculty_view_attendance"),
-    path("today/<str:action>/", views.faculty_view_attendance_export, name="faculty_view_attendance"),
-    path("<int:year>/<int:month>/<int:day>/", views.faculty_view_attendance_export, name="faculty_view_attendance"),
-    path("<int:year>/<int:month>/<int:day>/<str:action>/", views.faculty_view_attendance_export, name="faculty_view_attendance"),
+    path('', include(attendanceUrlSuffixes)),
+    path('class/<int:classId>/', include(attendanceUrlSuffixes)),
+    path('module/<int:moduleId>/', include(attendanceUrlSuffixes)),
+    path('entry/delete/', views.faculty_view_delete_attendance, name='faculty_view_delete_attendance'),
+]
+
+
+presentListUrlSuffixess = [
+    path('', views.faculty_view_present_list),
+    path('today/', views.faculty_view_present_list, name='faculty_view_present_list'),
+    path('<int:year>/<int:month>/<int:day>/', views.faculty_view_present_list, name='faculty_view_present_list')
 ]
 presentListUrls = [
-    path("", views.faculty_view_present_list),
-    path("today/", views.faculty_view_present_list, name="faculty_view_present_list"),
-    path("<int:year>/<int:month>/<int:day>/", views.faculty_view_present_list, name="faculty_view_present_list")
+    path('', include(presentListUrlSuffixess)),
+    path('class/<int:classId>/',include(presentListUrlSuffixess)),
+    path('module/<int:moduleId>/',include(presentListUrlSuffixess)),
+]
+
+classUrls = [
+    path('create', views.faculty_view_create_class, name='faculty_view_create_class'),
+    path('<int:classId>/', views.faculty_view, name='faculty_view'),
+]
+
+modulePaths = [
+    path('<int:moduleId>/', views.faculty_view, name='faculty_view'),
+    path('<int:moduleId>/class/<str:className>/',views.faculty_view, name='faculty_view'),
+    path('<str:moduleName>/class/<str:className>/',views.faculty_view, name='faculty_view'),
 ]
 
 urlpatterns = [
-    path("", views.faculty_view, name="faculty_view"),
+    path('', views.faculty_view, name='faculty_view'),
     
-    #All classes
-    path("attendance/", include(attendanceUrls)),
-    #Specific class
-    path("attendance/class/<int:classId>/", include(attendanceUrls)),
-    #All classes in module
-    path("attendance/module/<int:moduleId>/", include(attendanceUrls)),
-    #'Special' case - Delete attendance record for specific 
-    path("attendance/class/<int:classId>/entry/delete/",views.faculty_view_delete_attendance,name="Faculty_view_delete_attendance"),
-    
-    
-    path("present-list/", include(presentListUrls)),
-    path("present-list/class/<int:classId>/", include(presentListUrls)),
-    path("present-list/module/<int:moduleId>/", include(presentListUrls)),
+    path('attendance/', include(attendanceUrls)),
 
-    path("class/create/", views.faculty_view_create_class, name="faculty_view_create_class"),
+    path('present-list/', include(presentListUrls)),
 
-    path("class/<int:classId>/", views.faculty_view_class, name="faculty_view_class"),
-    path("module/<int:moduleId>/", views.faculty_view, name="faculty_view_module"),
+    path('class/', include(classUrls)),
 
-    path("module/<int:moduleId>/class/<str:className>/",views.faculty_view_class, name="faculty_view_class_name"),
-    path("module/<str:moduleName>/class/<str:className>/",views.faculty_view_class, name="faculty_view_class_name"),
+    path('module/',include(modulePaths)),   
 ]

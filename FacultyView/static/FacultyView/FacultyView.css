@@ -11,7 +11,7 @@
 
 /* Add custom scrollbar styles to the form */
 .attendance-form {
-  max-height: 300px; /* Set a maximum height for the form */
+  height:100%;
   overflow-y: auto; /* Add vertical scroll when the content exceeds the height */
   scrollbar-width: thin; /* Create a thin scrollbar (on supported browsers) */
   scrollbar-color: #000000 transparent; /* Set the scrollbar color */
@@ -58,16 +58,23 @@
 
 /* Adjust the size of the delete button icon */
 .delete-button {
-  background-color: transparent;
+  background-color: unset;
+  color: var(--button-background-color);
   border: none;
-  padding: 0; /* Remove padding */
-  font-size: 14px; /* Adjust the font size to control the button size */
-  color: #2275f1;
+  padding: 0;
+  font-size: 17px; /* Adjust the font size to control the button size */
   cursor: pointer;
+  margin: 15px 5px 5px 5px;
 }
-
 .delete-button:hover {
-  color: #1d7ff0;
+  background-color: unset;
+  color: var(--button-hover-background-color);
+}
+.delete-button.yes {
+  display: none;
+}
+.delete-button.no {
+  display: none;
 }
 
 @media (max-width: 700px) {
@@ -82,7 +89,7 @@
   padding-top: 10px;
 }
 
-#form-create-class{
+.form-create-class{
   display: grid;
   grid-template-columns: max-content 1fr;
   align-items: center;
@@ -91,12 +98,12 @@
   gap:5px 0px;
 }
 
-#export-date-form>fieldset{
+.export-date-form>fieldset{
   margin-bottom: 5px;
   padding: 5px 2px 5px 2px;
 }
 
-#export-date-form>fieldset:nth-of-type(1){
+.export-date-form>fieldset:nth-of-type(1){
   display: grid;
   grid-template-columns: max-content 1fr;
   align-items: center;
