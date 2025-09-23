@@ -1,10 +1,11 @@
 import datetime
 import pytz
+import json
+from io import StringIO
 from QR_Attendance_System.core import *
 from django.shortcuts import render
 from FacultyView.models import Student, ClassName, Attendance
-from django.http import HttpResponseRedirect
-from django.http import HttpResponseBadRequest
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.urls import reverse
 from urllib.parse import urlencode
 
@@ -94,3 +95,18 @@ def student_view_attendance_submitted(request,
                       'module' : mod,
                   })
 
+#=======================
+
+def student_view_student_lookup(request):
+    if request.method != 'POST' :
+        return HttpResponseBadRequest() #This should only accept POST requests
+    
+    stu = None
+    eml :str = request.POST['student_email']
+
+    q = Student.objects.filter(s_eml__iexact=eml.lower())
+    if len(q) > 0:
+        stu = q[0]
+    
+    return JsonResponse({'student' : stu})
+    

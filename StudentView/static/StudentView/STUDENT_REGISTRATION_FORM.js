@@ -1,10 +1,14 @@
-document.addEventListener('DOMContentLoaded',()=>{
-            const naieveEmail = /^([a-z]+)\.(([a-z]+\.?)+)(?<!\.)(@student\.cat\.org\.uk$)?/i
-            const eml   = document.getElementById('student_entry_email');
-            const fname = document.getElementById('student_entry_fname');
-            const lname = document.getElementById('student_entry_lname');
-            const btn   = document.getElementById('submit_student_entry');
-
+var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
+    const naieveEmail = /^([a-z]+)\.(([a-z]+\.?)+)(?<!\.)(@student\.cat\.org\.uk$)?/i
+    function registerForm(formId){
+        document.addEventListener('DOMContentLoaded',()=>{
+            const FORM = document.getElementById(formId);
+            const csrf  = FORM.querySelector('input[name="csrfmiddlewaretoken"]');
+            const eml   = FORM.querySelector('input[name="student_email"]');
+            const fname = FORM.querySelector('input[name="student_fname"]');
+            const lname = FORM.querySelector('input[name="student_lname"]');
+            const btn   = FORM.querySelector('button[name="submit_student"]');
+           
             let fnameFocused = false;
             let lnameFocused = false;
 
@@ -29,6 +33,10 @@ document.addEventListener('DOMContentLoaded',()=>{
                 return t;
             }
 
+            function getNames(eml){
+
+            }
+
             function OnEmailChange(event){
                 const regex = naieveEmail.exec(eml.value);
                 let btnEnable = false;
@@ -48,6 +56,10 @@ document.addEventListener('DOMContentLoaded',()=>{
                     }
 
                     btnEnable = regex[4]?.toLowerCase() === '@student.cat.org.uk'
+
+                    if(btnEnable){
+                        getNames(eml.value)
+                    }
                 };
 
                 btn.disabled = (!btnEnable);
@@ -55,3 +67,9 @@ document.addEventListener('DOMContentLoaded',()=>{
             
             eml.addEventListener('input', OnEmailChange);
         });
+    }
+    return {
+        register:registerForm
+    }
+}())
+
