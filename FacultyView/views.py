@@ -242,6 +242,6 @@ def faculty_view_create_class(request):
     classOb = ClassName.objects.get_or_create(s_className__iexact=className, moduleName=moduleOb,
                                               defaults={'s_className':className})[0]
 
-    return HttpResponseRedirect(reverse('faculty_view_class',kwargs={'classId':classOb.id})) # pyright: ignore[reportAttributeAccessIssue]
+    return HttpResponseRedirect(reverse('faculty_view',kwargs={'classId':classOb.id})) # pyright: ignore[reportAttributeAccessIssue]
 
 #=======================
