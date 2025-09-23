@@ -47,11 +47,11 @@ def student_view_submit_attendance(request, classId : int|None = None, className
     fname = stuOb.s_fname
     lname = stuOb.s_lname
     
-    d = datetime.datetime.now(pytz.utc)
-    created = Attendance.objects.get_or_create(dte_date__date=d,
+    D = datetime.datetime.now(pytz.utc)
+    created = Attendance.objects.get_or_create(dte_date__date=D,
                                                student=stuOb,
                                                className=classOb,
-                                               defaults={'dte_date':d})[1]
+                                               defaults={'dte_date':D})[1]
     
     path = ''
     if created:
@@ -97,6 +97,13 @@ def student_view_attendance_submitted(request,
 
 #=======================
 
+def student_is_present(student : Student, cls : ClassName, year : int, month : int, day : int):
+    return Attendance.objects.filter(dte_date__year = year,
+                                     dte_date__month = month,
+                                     dte_date__day = day,
+                                     className = cls,
+                                     student = student).exists()
+
 def student_view_student_lookup(request):
     if request.method != 'POST' :
         return HttpResponseBadRequest() #This should only accept POST requests
@@ -104,9 +111,37 @@ def student_view_student_lookup(request):
     stu = None
     eml :str = request.POST['student_email']
 
+    cls = None
+    classId : int = int(request.POST.get('classId', -1))
+    if(classId > 0):
+        cls = getClass(classId = classId,
+                       className = None)
+
     q = Student.objects.filter(s_eml__iexact=eml.lower())
     if len(q) > 0:
         stu = q[0]
     
-    return JsonResponse({'student' : stu})
+    j = {'student' : {}}
+    if(stu):
+        isPresent = False
+        if(cls):
+            D = datetime.datetime.now(pytz.utc)
+            year = request.POST.get('year', None) or D.year
+            month = request.POST.get('month', None) or D.month
+            day = request.POST.get('day', None) or D.day 
+            isPresent = student_is_present(stu,cls,year,month,day) 
+
+        j['student'] = {
+            'found' : True,
+              'eml' : stu.s_eml,
+            'fname' : stu.s_fname,
+            'lname' : stu.s_lname,
+            'isPresent' : isPresent,
+        }
+    else:
+        j['student'] = {
+            'found': False,
+        }
+
+    return JsonResponse(j)
     
