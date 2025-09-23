@@ -1,58 +1,67 @@
 var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
     function registerList(listId){
+        
+        function clearWhiteSpace(s){
+            if(s === undefined){return '';}
+            return s.replace(/\s+/g,'');
+        }
+        function serializeForQuery(obj) {
+            var str = [];
+            for(var p in obj)
+                str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+            return str.join("&");
+        }
+
+        function formatDates(li){
+            const nodes_sname = li.getElementsByClassName('student-name');
+            if(!!nodes_sname){
+                const node_sname = nodes_sname[0];
+                if(!!node_sname){
+                    const node_date = node_sname.getElementsByClassName('attendance-date')[0];
+                    const utcDateStr = node_date.dataset.isodate;
+                    const utcDate = new Date(utcDateStr);
+            
+                    node_date.innerText = utcDate.toLocaleString(l,localeOpts);
+                }
+            }
+        }
+
+        function show_ConfirmDelete(event){
+            event.preventDefault()
+            const btn = this;
+            const container = btn.parentElement;
+            const btn_delete = container.getElementsByClassName('delete-button icon')[0]
+            const btn_yes = container.getElementsByClassName('delete-button yes')[0]
+            const btn_no = container.getElementsByClassName('delete-button no')[0]
+
+            btn_delete.style.display = 'none'
+            btn_yes.style.display = 'revert'
+            btn_no.style.display = 'revert'
+        }
+        function hide_ConfirmDelete(event){
+            event.preventDefault();
+            const btn = this;
+            const container = btn.parentElement;
+            const btn_delete = container.getElementsByClassName('delete-button icon')[0]
+            const btn_yes = container.getElementsByClassName('delete-button yes')[0]
+            const btn_no = container.getElementsByClassName('delete-button no')[0]
+            btn_delete.style.display = 'revert'
+            btn_yes.style.display = 'none'
+            btn_no.
+            style.display = 'none'
+        }
+        const localeOpts = {
+            hour:'2-digit',
+            minute: '2-digit'
+        }
+        let l;
+        document.addEventListener('DOMContentLoaded',()=>{l = document.documentElement.lang??'en';});
+
         document.addEventListener('DOMContentLoaded',()=>{
             let currentList = document.getElementById(listId);
             let previousResponseHtml = clearWhiteSpace(currentList.parentElement.innerHTML);
 
-            const l = document.documentElement.lang??'en';
-            const localeOpts = {
-                hour:'2-digit',
-                minute: '2-digit'
-            }
-
-            function clearWhiteSpace(s){
-                if(s === undefined){return '';}
-                return s.replace(/\s+/g,'');
-            }
-
-            function formatDates(li){
-                const nodes_sname = li.getElementsByClassName('student-name');
-                if(!!nodes_sname){
-                    const node_sname = nodes_sname[0];
-                    if(!!node_sname){
-                        const node_date = node_sname.getElementsByClassName('attendance-date')[0];
-                        const utcDateStr = node_date.dataset.isodate;
-                        const utcDate = new Date(utcDateStr);
-                
-                        node_date.innerText = utcDate.toLocaleString(l,localeOpts);
-                    }
-                }
-            }
-
-            function confirmDelete(event){
-                event.preventDefault()
-                const btn = this;
-                const container = btn.parentElement;
-                const btn_delete = container.getElementsByClassName('delete-button icon')[0]
-                const btn_yes = container.getElementsByClassName('delete-button yes')[0]
-                const btn_no = container.getElementsByClassName('delete-button no')[0]
-
-                btn_delete.style.display = 'none'
-                btn_yes.style.display = 'revert'
-                btn_no.style.display = 'revert'
-            }
-            function hideConfirmDelete(event){
-                event.preventDefault();
-                const btn = this;
-                const container = btn.parentElement;
-                const btn_delete = container.getElementsByClassName('delete-button icon')[0]
-                const btn_yes = container.getElementsByClassName('delete-button yes')[0]
-                const btn_no = container.getElementsByClassName('delete-button no')[0]
-                btn_delete.style.display = 'revert'
-                btn_yes.style.display = 'none'
-                btn_no.style.display = 'none'
-            }
-            function performDelete(event){
+            function post_delete(event){
                 event.preventDefault();
                 const btn = this;
                 const deletePath = currentList.dataset.deletepath;
@@ -63,28 +72,34 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
                 xhr.open('POST', deletePath, true);
                 // Send the proper header information along with the request
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhr.send(`attendance_record=${btn.value}&next=${encodeURIComponent(refererpath)}&csrfmiddlewaretoken=${encodeURIComponent(csrf)}`);
+                const queryString = serializeForQuery({
+                    'attendance_record':btn.value,
+                    'next':refererpath,
+                    'csrfmiddlewaretoken':csrf
+                });
+                xhr.send(queryString);
             }
+
             function applyDeleteFunctions(li){
                 const button_icon = li.getElementsByClassName('delete-button icon')[0];
                 const button_yes = li.getElementsByClassName('delete-button yes')[0];
                 const button_no = li.getElementsByClassName('delete-button no')[0];
 
                 if(!!button_icon){
-                    button_icon.addEventListener('click',confirmDelete);
+                    button_icon.addEventListener('click',show_ConfirmDelete);
                 }
                 if(!!button_yes){
-                    button_yes.addEventListener('click',performDelete);
+                    button_yes.addEventListener('click',post_delete);
                 }
                 if(!!button_no){
-                    button_no.addEventListener('click',hideConfirmDelete);
+                    button_no.addEventListener('click',hide_ConfirmDelete);
                 }
             }
             
             function mouseLeftListItem(event){
-                hideConfirmDelete.call(this.getElementsByTagName('BUTTON')[0], event);
+                hide_ConfirmDelete.call(this.getElementsByTagName('BUTTON')[0], event);
             }
-            function applyMouseLeaveFunction(li){
+            function applyMouseLeaveFunction(li){          
                 li.addEventListener('mouseleave',mouseLeftListItem);
             }
 
@@ -96,7 +111,6 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
                     applyMouseLeaveFunction(li);
                 }         
             }
-
 
             function lookForUpdate(){
                 const request = new XMLHttpRequest();
@@ -126,7 +140,6 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
                 }
                 setTimeout(lookForUpdate, 2000);
             }
-            
             
             setTimeout(lookForUpdate, 2000)
 
