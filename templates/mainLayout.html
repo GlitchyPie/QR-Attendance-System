@@ -11,12 +11,15 @@
     <title>
       {% block page_title %}{% default_page_title %}{% endblock %}
     </title>
+    <link rel="stylesheet" href="{% static 'grid.css' %}" />
     <link rel="stylesheet" href="{% static 'TemplateCss.css' %}" />
     {% block head %}{% endblock %}
+    <link rel="stylesheet" href="{% static 'print.css' %}" />
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
     />
+
     <!-- href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" -->
   <body>
     <header>

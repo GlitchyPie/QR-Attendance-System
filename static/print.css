@@ -1,0 +1,51 @@
+@media print{
+
+    /*
+    When printing, throw the grid layout out the window!
+    I think I have the same problem as this poster:
+    https://stackoverflow.com/questions/77080597/printed-firefox-page-breaks-with-css-grid-element-longer-than-one-printed-page
+    */
+    body{
+        display:block;
+        max-height: unset;
+        height:unset;
+    }
+
+    header{
+        break-after: avoid;
+    }
+
+    main{
+        break-before: avoid;
+        display: block;
+    }
+    
+    main > section:nth-child(1){
+        height: unset;
+        width:unset;
+        max-height: unset;
+        max-width: 98vw;
+
+        margin: auto;
+    } 
+
+    main > section:nth-child(2){
+        display: none;
+    }
+
+    footer{
+        display: none;
+    }
+    
+    .qr-links{
+        display:none;
+    }
+
+    .delete-button-container{
+        display:none;
+    }
+
+    .attendance-student-form{
+        display: none;
+    }
+}

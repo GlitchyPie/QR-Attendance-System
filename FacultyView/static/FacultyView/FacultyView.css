@@ -77,12 +77,6 @@
   display: none;
 }
 
-@media (max-width: 700px) {
-  main {
-    flex-direction: column;
-  }
-}
-
 .attendance-student-form {
   border-top: 2px solid gray;
   margin-top: 5px;
