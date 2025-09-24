@@ -22,6 +22,11 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
             return str.join("&");
         }
 
+        const HINT_EMPTY = ""
+        const HINT_REGISTERED = "<i class='fa-solid fa-ban'></i> Already Registered."
+        const HINT_VALIDATING = "<i class='fa-solid fa-hourglass-half'></i> Validating..."
+        const HINT_NEED_EMAIL = "<i class='fa-solid fa-square-envelope'></i> Please enter your full student email."
+
         document.addEventListener('DOMContentLoaded',()=>{
             const FORM = document.getElementById(formId);
             const csrf  = FORM.querySelector('input[name="csrfmiddlewaretoken"]');
@@ -31,6 +36,8 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
             const lname = FORM.querySelector('input[name="student_lname"]');
             const btn   = FORM.querySelector('button[name="submit_student"]');
            
+            const hint = btn.parentElement.querySelector('.registration-hint');
+
             let lookupTimeout;
 
             let fnameFocused = false;
@@ -54,6 +61,12 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
 
                     btn.disabled = false;
                 }
+
+                if(btn.disabled == true){
+                    hint.innerHTML = HINT_REGISTERED;
+                }else{
+                    hint.innerHTML = HINT_EMPTY
+                }
             }
 
             function lookupStudent(eml){
@@ -73,7 +86,7 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
 
             function OnEmailChange(event){
                 const regex = naieveEmail.exec(eml.value);
-                let btnEnable = false;
+                let haveEmail = false;
 
                 if(fname.value.length === 0){
                     fnameFocused = false;
@@ -100,9 +113,9 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
                         lname.value = regex[2].split('.').map((s)=>FirstToUpper(s)).join(' ');
                     }
 
-                    btnEnable = regex[4]?.toLowerCase() === '@student.cat.org.uk'
+                    haveEmail = regex[4]?.toLowerCase() === '@student.cat.org.uk'
 
-                    if(btnEnable){
+                    if(haveEmail){
                         lookupTimeout = setTimeout(()=>lookupStudent(eml.value),500);
                     }
                 }else{
@@ -114,10 +127,13 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
                     }
                 };
 
-                if(btnEnable == false){
+                if(haveEmail == false){
                     fname.readOnly = false;
                     lname.readOnly = false;
                     btn.disabled = true;
+                    hint.innerHTML = HINT_NEED_EMAIL;
+                }else{
+                    hint.innerHTML = HINT_VALIDATING;
                 }
             }
             

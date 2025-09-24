@@ -7,3 +7,12 @@
   align-items: center;
   font-weight: bold;
 }
+
+.registration-hint{
+  text-align: left;
+  border-radius: 3px;
+  padding:5px;
+  background-color: #ddd;
+  width:100%;
+  height: 100%;
+}

@@ -30,25 +30,29 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
             event.preventDefault()
             const btn = this;
             const container = btn.parentElement;
-            const btn_delete = container.getElementsByClassName('delete-button icon')[0]
-            const btn_yes = container.getElementsByClassName('delete-button yes')[0]
-            const btn_no = container.getElementsByClassName('delete-button no')[0]
+            if(!!container){
+                const btn_delete = container.getElementsByClassName('delete-button icon')[0]
+                const btn_yes = container.getElementsByClassName('delete-button yes')[0]
+                const btn_no = container.getElementsByClassName('delete-button no')[0]
 
-            btn_delete.style.display = 'none'
-            btn_yes.style.display = 'revert'
-            btn_no.style.display = 'revert'
+                btn_delete.style.display = 'none'
+                btn_yes.style.display = 'revert'
+                btn_no.style.display = 'revert'
+            }
         }
         function hide_ConfirmDelete(event){
             event.preventDefault();
             const btn = this;
             const container = btn.parentElement;
-            const btn_delete = container.getElementsByClassName('delete-button icon')[0]
-            const btn_yes = container.getElementsByClassName('delete-button yes')[0]
-            const btn_no = container.getElementsByClassName('delete-button no')[0]
-            btn_delete.style.display = 'revert'
-            btn_yes.style.display = 'none'
-            btn_no.
-            style.display = 'none'
+            if(!!container){
+                const btn_delete = container.getElementsByClassName('delete-button icon')[0]
+                const btn_yes = container.getElementsByClassName('delete-button yes')[0]
+                const btn_no = container.getElementsByClassName('delete-button no')[0]
+                btn_delete.style.display = 'revert'
+                btn_yes.style.display = 'none'
+                btn_no.
+                style.display = 'none'
+            }
         }
         const localeOpts = {
             hour:'2-digit',

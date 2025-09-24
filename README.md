@@ -1,5 +1,9 @@
 <div align="center">
 
+# TODO:
+Update this readme
+
+
 # QR Attendance System
 
 ![image](https://github.com/AzeemIdrisi/QR-Attendance-System/assets/112647789/dbc0c061-76d0-45bb-b5da-7f4373ffd073)
@@ -23,6 +27,9 @@
 The QR Code Attendance System is an efficient,fast and user-friendly tool for tracking attendance using QR codes. It utilizes HTML, CSS, and Django to create a web-based interface for marking attendance. This system is designed to work seamlessly when devices are connected to the __Same College Local Network__.
 
 The teacher/faculty can display the QR Code using classroom projector so that present students can scan and mark their attendance.
+
+### Icon Attribution
+[Attendance icons created by Vectors Tank - Flaticon](https://www.flaticon.com/free-icons/attendance)
 
 ## Features
 
@@ -156,3 +163,5 @@ We welcome contributions from the community! If you'd like to contribute to this
 Created by __Team Hokage__ during __Live The Code 2.0__ Hackathon.
 
 Contributors : [Mohd Azeem](https://github.com/AzeemIdrisi), [Dheeraj Jha](https://github.com/Dheerajjha451), [Shantanu Pant](https://github.com/Shanty34)
+
+
