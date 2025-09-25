@@ -1,69 +1,70 @@
 var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
-    function registerList(listId){
+
+    function clearWhiteSpace(s){
+        if(s === undefined){return '';}
+        return s.replace(/\s+/g,'');
+    }
+    function serializeForQuery(obj) {
+        var str = [];
+        for(var p in obj)
+            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+        return str.join("&");
+    }
+
+    function formatDates(li){
+        const nodes_sname = li.getElementsByClassName('student-name');
+        if(!!nodes_sname){
+            const node_sname = nodes_sname[0];
+            if(!!node_sname){
+                const node_date = node_sname.getElementsByClassName('attendance-date')[0];
+                const utcDateStr = node_date.dataset.isodate;
+                const utcDate = new Date(utcDateStr);
         
-        function clearWhiteSpace(s){
-            if(s === undefined){return '';}
-            return s.replace(/\s+/g,'');
-        }
-        function serializeForQuery(obj) {
-            var str = [];
-            for(var p in obj)
-                str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-            return str.join("&");
-        }
-
-        function formatDates(li){
-            const nodes_sname = li.getElementsByClassName('student-name');
-            if(!!nodes_sname){
-                const node_sname = nodes_sname[0];
-                if(!!node_sname){
-                    const node_date = node_sname.getElementsByClassName('attendance-date')[0];
-                    const utcDateStr = node_date.dataset.isodate;
-                    const utcDate = new Date(utcDateStr);
-            
-                    node_date.innerText = utcDate.toLocaleString(l,localeOpts);
-                }
+                node_date.innerText = utcDate.toLocaleString(l,localeOpts);
             }
         }
+    }
 
-        function show_ConfirmDelete(event){
-            event.preventDefault()
-            const btn = this;
-            const container = btn.parentElement;
-            if(!!container){
-                const btn_delete = container.getElementsByClassName('delete-button icon')[0]
-                const btn_yes = container.getElementsByClassName('delete-button yes')[0]
-                const btn_no = container.getElementsByClassName('delete-button no')[0]
+    function show_ConfirmDelete(event){
+        event.preventDefault()
+        const btn = this;
+        const container = btn.parentElement;
+        if(!!container){
+            const btn_delete = container.getElementsByClassName('delete-button icon')[0]
+            const btn_yes = container.getElementsByClassName('delete-button yes')[0]
+            const btn_no = container.getElementsByClassName('delete-button no')[0]
 
-                btn_delete.style.display = 'none'
-                btn_yes.style.display = 'revert'
-                btn_no.style.display = 'revert'
-            }
+            btn_delete.style.display = 'none'
+            btn_yes.style.display = 'revert'
+            btn_no.style.display = 'revert'
         }
-        function hide_ConfirmDelete(event){
-            event.preventDefault();
-            const btn = this;
-            const container = btn.parentElement;
-            if(!!container){
-                const btn_delete = container.getElementsByClassName('delete-button icon')[0]
-                const btn_yes = container.getElementsByClassName('delete-button yes')[0]
-                const btn_no = container.getElementsByClassName('delete-button no')[0]
-                btn_delete.style.display = 'revert'
-                btn_yes.style.display = 'none'
-                btn_no.
-                style.display = 'none'
-            }
+    }
+    function hide_ConfirmDelete(event){
+        event.preventDefault();
+        const btn = this;
+        const container = btn.parentElement;
+        if(!!container){
+            const btn_delete = container.getElementsByClassName('delete-button icon')[0]
+            const btn_yes = container.getElementsByClassName('delete-button yes')[0]
+            const btn_no = container.getElementsByClassName('delete-button no')[0]
+            btn_delete.style.display = 'revert'
+            btn_yes.style.display = 'none'
+            btn_no.
+            style.display = 'none'
         }
-        const localeOpts = {
-            hour:'2-digit',
-            minute: '2-digit'
-        }
-        let l;
-        document.addEventListener('DOMContentLoaded',()=>{l = document.documentElement.lang??'en';});
+    }
+    
+    const localeOpts = {
+        hour:'2-digit',
+        minute: '2-digit'
+    }
+    let l;
+    document.addEventListener('DOMContentLoaded',()=>{l = document.documentElement.lang??'en';});
 
+    function registerList(listId){
         document.addEventListener('DOMContentLoaded',()=>{
             let currentList = document.getElementById(listId);
-            let previousResponseHtml = clearWhiteSpace(currentList.parentElement.innerHTML);
+            let etag;
 
             function post_delete(event){
                 event.preventDefault();
@@ -118,11 +119,27 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
 
             function lookForUpdate(){
                 const request = new XMLHttpRequest();
-                request.addEventListener('load', XMLHttpRequestLoad);
+                //request.addEventListener('load', XMLHttpRequestLoad);
+                request.addEventListener('readystatechange',(event)=>XMLHttpRequestReadyStateChange(event,request));
                 request.open('GET', currentList.dataset.querypath, true);
+                if(!!etag){
+                    request.setRequestHeader('If-None-Match', etag);
+                }
                 request.send();
             }
             
+            function XMLHttpRequestReadyStateChange(event,xhr){
+                if(xhr.readyState === 4){
+                    if(xhr.status === 200){
+                        etag = xhr.getResponseHeader("ETag"); // save new ETag
+                        XMLHttpRequestLoad.call(xhr);
+                    }else if(xhr.status === 304){
+
+                    }
+                    setTimeout(lookForUpdate, 2000);
+                }
+            }
+
             function XMLHttpRequestLoad(){
                 const parser = new DOMParser();
                 const domDoc = parser.parseFromString(this.responseText, 'text/html');
@@ -133,16 +150,9 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
                 currentList.dataset.refererpath = newUL.dataset.refererpath;
                 currentList.dataset.csrftoken = newUL.dataset.csrftoken;
 
-                //Check if the list itself has changed in any way
-                const A = clearWhiteSpace(newUL.innerHTML);
-                const B = previousResponseHtml;
-                if(A != B){
-                    previousResponseHtml = A;
-                    processUL(newUL);
-                    currentList.replaceWith(newUL);
-                    currentList = newUL;
-                }
-                setTimeout(lookForUpdate, 2000);
+                processUL(newUL);
+                currentList.replaceWith(newUL);
+                currentList = newUL;
             }
             
             setTimeout(lookForUpdate, 2000)

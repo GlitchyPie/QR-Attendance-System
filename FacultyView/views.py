@@ -1,13 +1,17 @@
 import datetime
 import pytz
 import csv
+import json
+import hashlib
 from QR_Attendance_System.core import *
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotModified
 from django.urls import reverse
+from django.core.serializers.json import DjangoJSONEncoder
 from .models import Student, ClassName, Attendance, ModuleName
 
 def attendance_query(cls : ClassName|None = None,
@@ -136,7 +140,15 @@ def faculty_view_present_list(request,
                                        month=month,
                                        day=day)
     
-    return render(
+    vals = list(present.values())
+    j = json.dumps(vals, cls=DjangoJSONEncoder).encode()
+    etag = hashlib.md5(j, usedforsecurity=False).hexdigest()
+    
+    if_none_match = request.META.get("HTTP_IF_NONE_MATCH")
+    if if_none_match == etag:
+        return HttpResponseNotModified()
+
+    response = render(
         request,
         'FacultyView/AttendanceList.html',
         {
@@ -148,6 +160,8 @@ def faculty_view_present_list(request,
                'dte_day' : day,
         },
     )
+    response['ETag'] = etag
+    return response
 
 #=======================
 

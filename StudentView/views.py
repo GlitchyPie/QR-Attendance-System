@@ -7,6 +7,7 @@ from django.shortcuts import render
 from FacultyView.models import Student, ClassName, Attendance
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.urls import reverse
+from django.core.exceptions import ValidationError
 from urllib.parse import urlencode
 
 #=======================
@@ -24,41 +25,58 @@ def student_view_name_entry(request, classId : int|None = None, className : str|
                   })
 
 #=======================
-
-def student_view_submit_attendance(request, classId : int|None = None, className : str|None = None):
+def submit_attendance(request, classId : int|None = None, className : str|None = None):
     if request.method != 'POST' :
-        return HttpResponseBadRequest() #This should only accept POST requests
+        raise ValueError("Not a POST request")
     
     classOb = getClass(classId,className)
     if classOb == None:
-        return HttpResponseBadRequest()
+        raise ValueError("No class specified")
 
     eml = request.POST['student_email'].lower()
     fname = request.POST['student_fname']
     lname = request.POST['student_lname']
-    next = request.POST.get('next', None)
 
     stuOb = Student.objects.get_or_create(s_eml=eml, 
                                           defaults={'s_fname':fname, 
                                                     's_lname':lname
                                                     })[0]
-
+    
     eml = stuOb.s_eml
     fname = stuOb.s_fname
     lname = stuOb.s_lname
     
     D = datetime.datetime.now(pytz.utc)
-    created = Attendance.objects.get_or_create(dte_date__date=D,
-                                               student=stuOb,
-                                               className=classOb,
-                                               defaults={'dte_date':D})[1]
+    return Attendance.objects.get_or_create(dte_date__date=D,
+                                            student=stuOb,
+                                            className=classOb,
+                                            defaults={'dte_date':D})
     
+def student_view_submit_attendance_ajax(request, classId : int|None = None, className : str|None = None):
+    created = False
+    error = False
+    validationError = False
+    try:
+        created = submit_attendance(request, classId, className)[1]
+    except ValidationError:
+        error = True
+        validationError = True
+    except:
+        error = True
+        pass
+
+    return JsonResponse({'created':created, "error":error, "validationError":validationError})
+
+def student_view_submit_attendance(request, classId : int|None = None, className : str|None = None):
+    created = submit_attendance(request, classId, className)[1]
+
     path = ''
     if created:
         path = reverse('student_view_attendance_submitted',kwargs={'classId':classOb.id}) # type: ignore
     else:
         path = reverse('student_view_attendance_already_submitted',kwargs={'classId':classOb.id}) # type: ignore
 
+    next = request.POST.get('next', None)
     if next:
         path += '?'
         path += urlencode({'next':next})
