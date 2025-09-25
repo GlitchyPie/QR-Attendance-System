@@ -3,7 +3,7 @@
 
 {% block left_block %}
     <h2>Present Students</h2>
-    <h3>Present Count : {{ present|length }}</h3>
+    <h3>Present Count : <span class="attendance-list-count">{{ present|length }}</span></h3>
     {% include "FacultyView/AttendanceList.html" %}
     {% include "StudentView/studentRegistrationForm.html" %}
 {% endblock %}

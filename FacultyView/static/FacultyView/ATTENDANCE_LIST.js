@@ -1,9 +1,5 @@
 var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
 
-    function clearWhiteSpace(s){
-        if(s === undefined){return '';}
-        return s.replace(/\s+/g,'');
-    }
     function serializeForQuery(obj) {
         var str = [];
         for(var p in obj)
@@ -119,40 +115,39 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
 
             function lookForUpdate(){
                 const request = new XMLHttpRequest();
-                //request.addEventListener('load', XMLHttpRequestLoad);
-                request.addEventListener('readystatechange',(event)=>XMLHttpRequestReadyStateChange(event,request));
+                //request.addEventListener('load', lookForUpdateDoUpdate);
+                request.addEventListener('readystatechange',(event)=>lookForUpdateReadystateChange(event,request));
                 request.open('GET', currentList.dataset.querypath, true);
                 if(!!etag){
                     request.setRequestHeader('If-None-Match', etag);
                 }
                 request.send();
             }
-            
-            function XMLHttpRequestReadyStateChange(event,xhr){
+            function lookForUpdateReadystateChange(event,xhr){
                 if(xhr.readyState === 4){
                     if(xhr.status === 200){
                         etag = xhr.getResponseHeader("ETag"); // save new ETag
-                        XMLHttpRequestLoad.call(xhr);
+                        lookForUpdateDoUpdate.call(xhr);
                     }else if(xhr.status === 304){
 
                     }
                     setTimeout(lookForUpdate, 2000);
                 }
             }
-
-            function XMLHttpRequestLoad(){
+            function lookForUpdateDoUpdate(){
                 const parser = new DOMParser();
                 const domDoc = parser.parseFromString(this.responseText, 'text/html');
                 const ul = domDoc.getElementsByTagName("UL")[0]; //('student_present_list');
                 const newUL = ul.cloneNode(true);
-                
-                currentList.dataset.deletepath = newUL.dataset.deletepath;
-                currentList.dataset.refererpath = newUL.dataset.refererpath;
-                currentList.dataset.csrftoken = newUL.dataset.csrftoken;
 
                 processUL(newUL);
                 currentList.replaceWith(newUL);
                 currentList = newUL;
+
+                const alc = currentList.parentElement.querySelector('.attendance-list-count');
+                if(!!alc){
+                    alc.innerText = currentList.children.length;
+                }
             }
             
             setTimeout(lookForUpdate, 2000)
