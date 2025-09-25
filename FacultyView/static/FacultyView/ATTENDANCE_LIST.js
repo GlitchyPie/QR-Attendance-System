@@ -1,4 +1,10 @@
 var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
+    const localeOpts = {
+        hour:'2-digit',
+        minute: '2-digit'
+    }
+    let lang;
+    document.addEventListener('DOMContentLoaded',()=>{lang = document.documentElement.lang??'en';});
 
     function serializeForQuery(obj) {
         var str = [];
@@ -16,7 +22,7 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
                 const utcDateStr = node_date.dataset.isodate;
                 const utcDate = new Date(utcDateStr);
         
-                node_date.innerText = utcDate.toLocaleString(l,localeOpts);
+                node_date.innerText = utcDate.toLocaleString(lang,localeOpts);
             }
         }
     }
@@ -49,13 +55,6 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
             style.display = 'none'
         }
     }
-    
-    const localeOpts = {
-        hour:'2-digit',
-        minute: '2-digit'
-    }
-    let l;
-    document.addEventListener('DOMContentLoaded',()=>{l = document.documentElement.lang??'en';});
 
     function registerList(listId){
         document.addEventListener('DOMContentLoaded',()=>{
