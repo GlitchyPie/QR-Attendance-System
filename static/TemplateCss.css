@@ -64,11 +64,8 @@ main>section {
   max-width: 99vw;
   max-height: 100%;
   
-  /*position: sticky;*/
-  top:5px;
-
   overflow-y: auto;
-  grid-column: 2 / span 2;
+  overflow-x: hidden;
 }
 
 .left_block {

@@ -15,7 +15,8 @@
     <label for="submit_entry_student">Last Name:</label>
     <input type="text" name="student_lname">
 
-    <button type="submit" class="submit-button" name="submit_student" disabled>+ Register</button><span class="registration-hint"></span>
+    <button type="submit" class="submit-button" name="submit_student" disabled>+ Register</button>
+    <span class="registration-hint"></span>
     <script src="{% static 'StudentView/STUDENT_REGISTRATION_FORM.js' %}"></script>
     <script>
         STUDENT_REGISTRATION_FORM.register('student-registration-form_{{reg_form_id}}');
