@@ -54,7 +54,7 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
             let lnameFocused = false;
 
             function studentLookupReadyStateChange(event,xhr){
-                hint.innerHTML = HINT_SUBMITTING + ` (${xhr.readyState} / 4 | ${xhr.status})`;
+                hint.innerHTML = HINT_VALIDATING + ` (${xhr.readyState} / 4 | ${xhr.status})`;
                 if(xhr.readyState === 4){ 
                     if (xhr.status === 200){
                         studentLookupSuccessfull.call(xhr);
@@ -146,7 +146,7 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
             
 
             function registrationSubmittionReadyStateChange(event,xhr){
-                hint.innerHTML = HINT_VALIDATING + ` (${xhr.readyState} / 4 | ${xhr.status})`;
+                hint.innerHTML = HINT_SUBMITTING + ` (${xhr.readyState} / 4 | ${xhr.status})`;
                 if(xhr.readyState === 4) {
                     if(xhr.status === 200){
                         registrationSubmittelSuccessfull.call(xhr);
