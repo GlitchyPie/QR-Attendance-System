@@ -167,3 +167,11 @@ input:read-only{
   }
 }
 
+@media (max-height: 650px){
+  header *{
+    font-size: medium !important;
+  }
+  header {
+    padding: 5px;
+  }
+}

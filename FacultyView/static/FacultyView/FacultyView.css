@@ -72,7 +72,11 @@
 }
 
 .delete-button-container{
-  background-color: inherit;
+  background-color: #eee;
+  border-radius: 5px;
+
+  -webkit-box-shadow: inset 3px 3px 5px 2px #ddd;; 
+  box-shadow: inset 3px 3px 5px 2px #ddd;;
 }
 
 /* Adjust the size of the delete button icon */
