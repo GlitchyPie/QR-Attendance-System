@@ -120,6 +120,7 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
                 if(!!etag){
                     request.setRequestHeader('If-None-Match', etag);
                 }
+                request.setRequestHeader('X-list-count', currentList.children.length);
                 request.send();
             }
             function lookForUpdateReadystateChange(event,xhr){
