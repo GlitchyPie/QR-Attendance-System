@@ -9,26 +9,51 @@
         display:block;
         max-height: unset;
         height:unset;
+
+        margin:0;
+        padding:0;
     }
 
     header{
         break-after: avoid;
+        page-break-after: avoid;
+    }
+    main{
+        break-before: avoid;
+        break-after: auto;
+    }
+    section{
+        break-before: avoid;
+        break-after: avoid;
+        break-inside: auto;
+    }
+
+
+    header h1{
+        font-size: 25px;
+    }
+    header h2{
+        font-size: 20px;
     }
 
     main{
-        break-before: avoid;
-        display: block;
+        display: unset;
+        margin:auto;
+        padding:0;
     }
     
     main > section:nth-child(1){
+        display: unset;
+
         height: unset;
         width:unset;
+        max-width: unset;
         max-height: unset;
-        max-width: 98vw;
+        min-width: unset;
+        min-height: unset;
 
-        margin: auto;
-    } 
-
+        padding: 5px 2px 0 2px;
+    }
     main > section:nth-child(2){
         display: none;
     }
