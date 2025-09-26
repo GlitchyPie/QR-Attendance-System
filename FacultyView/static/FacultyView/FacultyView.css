@@ -1,15 +1,4 @@
 /* Faculty View */
-.attendance-card h2 {
-  font-size: 24px;
-  margin-bottom: 10px;
-}
-
-.hint {
-  font-size: 16px;
-  color: #666;
-}
-
-
 .attendance-student-form {
   border-top: 2px solid gray;
   margin-top: 5px;
