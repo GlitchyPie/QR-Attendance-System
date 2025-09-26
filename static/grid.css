@@ -58,10 +58,11 @@ footer{
 
 /*----*/
 
-@media (max-width: 800px) {
+@media (max-width: 60em) {
   main{
     grid-template-rows: auto auto;
     align-items:start;
+    gap: 2em 0px;
   }
   .left_block {
     grid-column: 2 / span 2;

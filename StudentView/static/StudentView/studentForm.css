@@ -1,6 +1,6 @@
 .attendance-student-form {
   display: grid;
-  grid-template-columns: max-content 1fr;
+  grid-template-columns: max-content minmax(0, 1fr);
   grid-auto-rows: auto;
   gap: 10px 5px;
   grid-auto-flow: row;
