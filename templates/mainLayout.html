@@ -59,7 +59,7 @@
           {% endif %}
 
           {% jump_url 'faculty_view_attendance' as attendance_jump_url %}
-          {% if not attendance_jump_url == request.path %}
+          {% if not request.path == attendance_jump_url %}
             <li><a href="{{attendance_jump_url}}" title="Attendance History - {% if title_part %}{{title_part}}{% else %}All Classes - Today{% endif %}"><i class="fa-solid fa-clock-rotate-left"></i></a></li>
           {% endif %}
 
