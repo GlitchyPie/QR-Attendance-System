@@ -2,6 +2,10 @@
 {% load static %}
 {% load jump_url %}
 
+{% block head %}
+  <link rel="stylesheet" href="{% static 'FacultyView/FacultyView_index.css' %}" />
+{% endblock %}
+
 {% block left_block %}
     {% if modules %}
         <h3 class="present-list">Select a module to view classes</h3>
@@ -9,12 +13,12 @@
         <h3 class="present-list">Select your class</h3>
     {% endif %}
 
-    <ul class="student-list">
+    <ul class="class-list">
 
         {% if modules %}
 
             {% for m in modules %}
-                <li class="student">
+                <li class="module">
                     <a href="{% url 'faculty_view' m.id %}"><button>{{m.s_moduleName}}</button></a>
                 </li>
             {% endfor %}
@@ -22,7 +26,7 @@
         {% elif classes %}
 
             {% for c in classes %}
-                <li class="student">
+                <li class="class">
                     <a href="{% url 'faculty_view' classId=c.id %}"><button>{{c.s_className}}</button></a>
                     <a href="{% url 'faculty_view_attendance' classId=c.id %}" title="Attendance History -  {{c}}"><button class="small"><i class="fa-solid fa-clock-rotate-left"></i></button></a>
                 </li>
@@ -30,7 +34,7 @@
 
         {% endif %}
 
-        <li class="student">
+        <li class="form">
             <form class="form-create-class" method="POST" action="{% url 'faculty_view_create_class' %}">
                 {% csrf_token %}
                 <label for="form-create-class_module_name">Module:</label><input type="text" name="module_name" id="form-create-class_module_name" {% if module %}value="{{module.s_moduleName}}" readonly{% endif %}>

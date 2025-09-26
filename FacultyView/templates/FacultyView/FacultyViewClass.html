@@ -1,6 +1,12 @@
 {% extends "FacultyView/FacultyView.html" %}
 {% load static %}
 
+{% block head %}
+  <link rel="stylesheet" href="{% static 'FacultyView/attendance_list.css' %}" />
+  <link rel="stylesheet" href="{% static 'StudentView/studentForm.css' %}" />
+  <link rel="stylesheet" href="{% static 'StudentView/qrCode.css' %}" />
+{% endblock %}
+
 {% block left_block %}
     <h2>Present Students</h2>
     <h3>Present Count : <span class="attendance-list-count">{{ present|length }}</span></h3>
