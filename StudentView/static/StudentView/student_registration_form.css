@@ -1,0 +1,18 @@
+.student-registration-form {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  grid-auto-rows: auto;
+  gap: 10px 5px;
+  grid-auto-flow: row;
+  align-items: center;
+  font-weight: bold;
+}
+
+.registration-hint{
+  text-align: left;
+  border-radius: 3px;
+  padding:5px;
+  background-color: #ddd;
+  width:100%;
+  height: 100%;
+}

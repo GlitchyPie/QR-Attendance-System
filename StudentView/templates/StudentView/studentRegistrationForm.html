@@ -1,7 +1,7 @@
 {% load static %}
 {% firstof request.GET.registrationformid '' as reg_form_id %}
 
-<form id="student-registration-form_{{reg_form_id}}" class="attendance-student-form" method="POST" action="{% url 'student_view_submit_attendance' classId=class.id %}">
+<form id="student-registration-form_{{reg_form_id}}" class="student-registration-form" method="POST" action="{% url 'student_view_submit_attendance' classId=class.id %}">
     {% csrf_token %}
     <input type="hidden" name="next" value="{{ request.path }}">
     <input type="hidden" name="classId" value="{% if class %}{{class.id}}{% else %}-1{% endif %}">
