@@ -59,4 +59,4 @@ class Attendance(models.Model):
         return f"{self.dte_date} - {self.className} - {self.student}"
     
     class Meta:
-        ordering = ['className','dte_date']
+        ordering = ['dte_date','className']
