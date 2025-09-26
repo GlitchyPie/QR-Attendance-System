@@ -57,7 +57,7 @@ footer{
 }
 
 /*----*/
-
+/* Put the two blocks into a single column once the screen gets too narrow*/
 @media (max-width: 60em) {
   main{
     grid-template-rows: auto auto;
