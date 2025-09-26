@@ -2,7 +2,7 @@
 {% load jump_url %}
 {% load referer_path %}
 {% firstof request.GET.attendacelistid '' as attentdance_list_id %}
-<div id="student_list_container_{{attentdance_list_id}}" class="attendance-form"></div>
+<div id="student_list_container_{{attentdance_list_id}}" class="-list-container"></div>
     <ul class="student-list" id="student_present_list_{{attentdance_list_id}}"
         data-querypath="{% jump_url 'faculty_view_present_list' %}?attendacelistid={{attentdance_list_id}}"
         data-deletepath="{% url 'faculty_view_delete_attendance' %}"
@@ -13,10 +13,10 @@
             {% ifchanged attendance.className %}
                 {% if class %}
                     {%if attendance.className.s_className != class.s_className %}
-                        <li class="classTitle"><h4>{{ attendance.className }}</h4></li>
+                        <li class="class-title"><h4>{{ attendance.className }}</h4></li>
                     {% endif %}
                 {% else %}
-                    <li class="classTitle"><h4>{{ attendance.className }}</h4></li>
+                    <li class="class-title"><h4>{{ attendance.className }}</h4></li>
                 {% endif %}
             {% endifchanged %}
             <li class="student" data-recordid="{{attendance.id}}">
@@ -25,7 +25,7 @@
                         <span class="attendance-date"
                             data-UNIXtimestamp="{{ attendance.dte_date|date:'U' }}"
                             data-ISODate="{{ attendance.dte_date|date:'c' }}">
-                            {{ attendance.dte_date|date:"H:i" }}
+                            {{ attendance.dte_date|date:"H:i" }}(utc)
                         </span> - {{ attendance.student.s_fname }} {{attendance.student.s_lname}}
                     </span>
                     <span class="student-email"><i class="fa-solid fa-square-envelope"></i>{{attendance.student.s_eml}}</span>
