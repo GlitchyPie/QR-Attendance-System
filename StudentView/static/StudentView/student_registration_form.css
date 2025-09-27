@@ -8,6 +8,10 @@
   font-weight: bold;
 }
 
+.student-registration-form label{
+  text-align: right;
+}
+
 .registration-hint{
   text-align: left;
   border-radius: 3px;
