@@ -10,6 +10,7 @@ def default_page_title(context):
     ttle0 = ''
     ttle1 = ''
     ttle2 = ''
+    ttle3 = ''
 
     r : str = context['request'].path
     m = resolve(r)
@@ -52,6 +53,9 @@ def default_page_title(context):
 
     ttle2 = settings.COPYRIGHT_APP_NAME
 
+    ttle3 = f"{context.get('dte_year', "####")}-{context.get('dte_month', "##")}-{context.get('dte_day',"##")}"
+
+    #=====
     ttle = ttle0
     
     if ttle != "":
@@ -65,6 +69,12 @@ def default_page_title(context):
             ttle += " - " + ttle2
     else:
         ttle += ttle2
+
+    if ttle != "":
+        if ttle3 != "####-##-##":
+            ttle += " [" + ttle3 + "]"
+    else:
+        ttle += ttle3
 
     return ttle
     
