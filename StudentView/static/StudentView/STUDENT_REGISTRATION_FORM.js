@@ -210,6 +210,8 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
             eml.addEventListener('input', validateEmailaddr);
 
             btn.addEventListener('click',submitRegistration);
+
+            validateEmailaddr(new Event('empty'));
         });
     }
     return {
