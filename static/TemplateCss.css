@@ -3,8 +3,8 @@
   --window-background-color: #f0f0f0;
   --window-color: #333;
 
-  --theme-background-color: #5a5a5a;
-  --theme-color: #eee;
+  --header-background-color: #5a5a5a;
+  --header-color: #eee;
 
   --button-background-color: #5d7f75;
   --button-color: #fff;
@@ -17,6 +17,12 @@
 
   --input-border-color: #8ab55e;
   --input-readonly-border-color: gray;
+
+  --scroll-thumb-color: #3a3a3a;
+  --scroll-track-color: #999;
+
+  --section-backgroud-color: #fff;
+  --section-color: #222;
 }
 
 * {
@@ -38,8 +44,8 @@ body {
 }
 
 header {
-  background-color: var(--theme-background-color);
-  color: var(--theme-color);
+  background-color: var(--header-background-color);
+  color: var(--header-color);
   padding: 20px;
   text-align: center;
 }
@@ -57,7 +63,9 @@ main {
 }
 
 main>section {
-  background-color: #fff;
+  background-color: var(--section-backgroud-color);
+  color: var(--section-color);
+
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -71,6 +79,20 @@ main>section {
   overflow-x: hidden;
 }
 
+main>section{
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb-color) var(--scroll-track-color);
+}
+main>section::-webkit-scrollbar{
+  width:8px;
+}
+main>section::-webkit-scrollbar-thumb{
+  background-color: var(--scroll-thumb-color);
+}
+main>section::-webkit-scrollbar-track{
+  background-color: var(--scroll-track-color);
+}
+
 .left_block {
   height: fit-content;
 }
@@ -80,8 +102,8 @@ main>section {
 }
 
 footer {
-  background-color: var(--theme-background-color);
-  color: var(--theme-color);
+  background-color: var(--header-background-color);
+  color: var(--header-color);
   text-align: center;
   padding: 10px;
 }
@@ -119,7 +141,7 @@ button.small{
 }
 button:hover{
   background-color: var(--button-hover-background-color);
-  color: var(--button-hover-color)
+  color: var(--button-hover-color);
 }
 button[disabled]{
   background-color: var(--button-disabled-background-color);
@@ -152,6 +174,7 @@ input:read-only{
   background-color: var(--button-hover-background-color);
   color: var(--button-hover-color);
   border: var(--button-hover-color);
+  box-shadow: inset 3px 3px 4px 0 rgba(127,127,127,0.5);
 }
 
 @media (max-width: 60em) {

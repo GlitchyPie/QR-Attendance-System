@@ -3,7 +3,8 @@
 {% load referer_path %}
 {% firstof request.GET.attendacelistid '' as attentdance_list_id %}
 <div id="student_list_container_{{attentdance_list_id}}" class="-list-container"></div>
-    <ul class="student-list" id="student_present_list_{{attentdance_list_id}}"
+    <ul class="student-list"
+        id="student_present_list_{{attentdance_list_id}}"
         data-querypath="{% jump_url 'faculty_view_present_list' %}?attendacelistid={{attentdance_list_id}}"
         data-deletepath="{% url 'faculty_view_delete_attendance' %}"
         data-refererpath="{{ request|referer_path }}"
@@ -13,10 +14,12 @@
             {% ifchanged attendance.className %}
                 {% if class %}
                     {%if attendance.className.s_className != class.s_className %}
-                        <li class="class-title"><h4>{{ attendance.className }}</h4></li>
+                        <li class="class-seperator"><hr></li>
+                        <li class="class-title"><h4><i class="fa-solid fa-building-columns"></i>{{ attendance.className }}</h4></li>
                     {% endif %}
                 {% else %}
-                    <li class="class-title"><h4>{{ attendance.className }}</h4></li>
+                    <li class="class-seperator"><hr></li>
+                    <li class="class-title"><h4><i class="fa-solid fa-building-columns"></i>{{ attendance.className }}</h4></li>
                 {% endif %}
             {% endifchanged %}
             <li class="student" data-recordid="{{attendance.id}}">

@@ -1,6 +1,7 @@
 .export-date-form > fieldset{
   margin-bottom: 5px;
   padding: 5px 2px 5px 2px;
+  border-radius: 5px;
 }
 
 .export-date-form > fieldset:nth-of-type(1){
