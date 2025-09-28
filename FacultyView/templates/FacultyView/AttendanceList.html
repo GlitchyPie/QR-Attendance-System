@@ -2,7 +2,7 @@
 {% load jump_url %}
 {% load referer_path %}
 {% firstof request.GET.attendacelistid '' as attentdance_list_id %}
-<div id="student_list_container_{{attentdance_list_id}}" class="-list-container"></div>
+<div id="student_list_container_{{attentdance_list_id}}" class="attendance-list-container">
     <ul class="student-list"
         id="student_present_list_{{attentdance_list_id}}"
         data-querypath="{% jump_url 'faculty_view_attendance' action='list-html' %}?attendacelistid={{attentdance_list_id}}"
