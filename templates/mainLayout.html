@@ -19,13 +19,12 @@
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
     />
-
-    <!-- href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" -->
+    
   <body>
     <header>
       <h1>{{settings.INSTITUTION_NAME}}</h1>
       <h2>{% block header_title %}
-          {% if title_part %}{{title_part}} | {% endif %}{{settings.PORTAL_TITLE}}
+          {% default_page_title userTitle=settings.PORTAL_TITLE %}
         {% endblock %}</h2>
     </header>
     <main>

@@ -7,7 +7,7 @@ from FacultyView.templatetags import export_date_type
 register = template.Library()
 
 @register.simple_tag(takes_context=True)
-def default_page_title(context):
+def default_page_title(context,userTitle : str|None = None):
     ttle0 = ''
     ttle1 = ''
     ttle2 = ''
@@ -50,7 +50,7 @@ def default_page_title(context):
     elif mod != None:
         ttle1 = mod.__str__()
 
-    ttle2 = settings.COPYRIGHT_APP_NAME
+    ttle2 = userTitle or settings.COPYRIGHT_APP_NAME
 
     isstd = export_date_type.export_date_type(context)
     match isstd:
