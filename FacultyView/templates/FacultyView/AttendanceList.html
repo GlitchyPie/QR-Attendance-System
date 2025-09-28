@@ -5,12 +5,15 @@
 <div id="student_list_container_{{attentdance_list_id}}" class="-list-container"></div>
     <ul class="student-list"
         id="student_present_list_{{attentdance_list_id}}"
-        data-querypath="{% jump_url 'faculty_view_present_list' %}?attendacelistid={{attentdance_list_id}}"
+        data-querypath="{% jump_url 'faculty_view_attendance' action='list-html' %}?attendacelistid={{attentdance_list_id}}"
         data-deletepath="{% url 'faculty_view_delete_attendance' %}"
         data-refererpath="{{ request|referer_path }}"
         data-csrftoken="{{csrf_token}}"
     >
         {% for attendance in present %}
+            {% ifchanged attendance.dte_date.date %}
+                <li class="date-seperator" data-ISODate="{{attendance.dte_date|date:'c'}}"><h4><i class="fa-solid fa-calendar"></i>{{attendance.dte_date|date:"Y-m-d"}}</h4></li>
+            {% endifchanged %}
             {% ifchanged attendance.className %}
                 {% if class %}
                     {%if attendance.className.s_className != class.s_className %}

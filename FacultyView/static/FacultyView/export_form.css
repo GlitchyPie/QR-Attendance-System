@@ -10,3 +10,13 @@
   align-items: center;
   gap:5px 5px;
 }
+
+.export-date-form input[name="export-date-year"]{
+  width:4.1rem;
+}
+.export-date-form input[name="export-date-month"]{
+  width:4rem;
+}
+.export-date-form input[name="export-date-day"]{
+  width:4rem;
+}

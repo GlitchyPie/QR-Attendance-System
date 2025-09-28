@@ -7,13 +7,13 @@
     <input type="hidden" name="classId" value="{% if class %}{{class.id}}{% else %}-1{% endif %}">
 
     <label for="student_entry_email">CAT email address:</label>
-    <input type="text" name="student_email">
+    <input type="text" name="student_email" autocomplete="email">
 
     <label for="student_entry_fname">First name:</label>
-    <input type="text" name="student_fname">
+    <input type="text" name="student_fname" autocomplete="given-name nickname">
 
     <label for="submit_entry_student">Last Name:</label>
-    <input type="text" name="student_lname">
+    <input type="text" name="student_lname" autocomplete="family-name">
 
     <button type="submit" class="submit-button" name="submit_student" disabled>+ Register</button>
     <span class="registration-hint"></span>

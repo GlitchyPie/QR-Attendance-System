@@ -28,7 +28,7 @@
             {% for c in classes %}
                 <li class="class">
                     <a href="{% url 'faculty_view' classId=c.id %}"><button>{{c.s_className}}</button></a>
-                    <a href="{% url 'faculty_view_attendance' classId=c.id %}" title="Attendance History -  {{c}}"><button class="small"><i class="fa-solid fa-clock-rotate-left"></i></button></a>
+                    <a href="{% url 'faculty_view_attendance' classId=c.id action='view' %}" title="Attendance History -  {{c}}"><button class="small"><i class="fa-solid fa-clock-rotate-left"></i></button></a>
                 </li>
             {% endfor %}
 
@@ -47,6 +47,6 @@
 
 {% block right_block %}
     <h4>Admin links...</h4>
-    <a href="{% jump_url 'faculty_view_attendance' %}"><i class="fa-solid fa-clock-rotate-left"></i>Historical data view and export</a><br>
+    <a href="{% jump_url 'faculty_view_attendance' action='view' %}"><i class="fa-solid fa-clock-rotate-left"></i>Historical data view and export</a><br>
     <a href="/admin/"><i class="fa-solid fa-database"></i>Database admin</a><br>
 {% endblock %}

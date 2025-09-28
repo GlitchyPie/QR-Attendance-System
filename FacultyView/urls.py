@@ -1,30 +1,34 @@
 from . import views
 from django.urls import path, include
+from django.views.generic.base import RedirectView
+
 
 attendanceUrlSuffixes=[
-    path('', views.faculty_view_attendance_export),
-    path('today/', views.faculty_view_attendance_export, name='faculty_view_attendance'),
-    path('today/<str:action>/', views.faculty_view_attendance_export, name='faculty_view_attendance'),
-    path('<int:year>/<int:month>/<int:day>/', views.faculty_view_attendance_export, name='faculty_view_attendance'),
-    path('<int:year>/<int:month>/<int:day>/<str:action>/', views.faculty_view_attendance_export, name='faculty_view_attendance'),
+    #Redirects==
+    path('', RedirectView.as_view(url='today/view/', permanent=False)),
+    path('today/', RedirectView.as_view(url='view/', permanent=False)),
+    path('<int:year>/', RedirectView.as_view(url='view/', permanent=False)),
+    path('<int:year>/<int:month>/', RedirectView.as_view(url='view/', permanent=False)),
+    path('<int:year>/<int:month>/<int:day>/', RedirectView.as_view(url='view/', permanent=False)),
+    
+    #Actual=====
+    path('today/<str:action>/', views.faculty_view_attendance_view_today, name='faculty_view_attendance'),
+    path('<int:year>/<str:action>/', views.faculty_view_attendance_view, name='faculty_view_attendance'),
+    path('<int:year>/<int:month>/<str:action>/', views.faculty_view_attendance_view, name='faculty_view_attendance'),
+    path('<int:year>/<int:month>/<int:day>/<str:action>/', views.faculty_view_attendance_view, name='faculty_view_attendance'),
+
+    path('from/<int:year_start>-<int:month_start>-<int:day_start>/<str:action>/', views.faculty_view_attendance_view, name='faculty_view_attendance'),
+    path('to/<int:year_end>-<int:month_end>-<int:day_end>/<str:action>/', views.faculty_view_attendance_view, name='faculty_view_attendance'),
+    path('from/<int:year_start>-<int:month_start>-<int:day_start>/to/<int:year_end>-<int:month_end>-<int:day_end>/<str:action>/', views.faculty_view_attendance_view, name='faculty_view_attendance'),
 ]
+
+
 attendanceUrls = [
     path('', include(attendanceUrlSuffixes)),
     path('class/<int:classId>/', include(attendanceUrlSuffixes)),
     path('module/<int:moduleId>/', include(attendanceUrlSuffixes)),
+
     path('entry/delete/', views.faculty_view_delete_attendance, name='faculty_view_delete_attendance'),
-]
-
-
-presentListUrlSuffixess = [
-    path('', views.faculty_view_present_list),
-    path('today/', views.faculty_view_present_list, name='faculty_view_present_list'),
-    path('<int:year>/<int:month>/<int:day>/', views.faculty_view_present_list, name='faculty_view_present_list')
-]
-presentListUrls = [
-    path('', include(presentListUrlSuffixess)),
-    path('class/<int:classId>/',include(presentListUrlSuffixess)),
-    path('module/<int:moduleId>/',include(presentListUrlSuffixess)),
 ]
 
 classUrls = [
@@ -42,8 +46,6 @@ urlpatterns = [
     path('', views.faculty_view, name='faculty_view'),
     
     path('attendance/', include(attendanceUrls)),
-
-    path('present-list/', include(presentListUrls)),
 
     path('class/', include(classUrls)),
 

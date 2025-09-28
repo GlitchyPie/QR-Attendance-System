@@ -12,9 +12,16 @@
 
 .class-title{
 }
-.class-seperator:first-child{
-  display: none;
+
+/*If only child with .date-seperataor */
+/*
+  https://stackoverflow.com/questions/49376742/select-the-only-child-having-the-class-using-css-sass
+*/
+.student-list:not(:has(.date-seperator ~ .date-seperator)) .date-seperator {
+  display:none
 }
+
+
 .class-seperator hr{
   width: 70%;
   color:var(--window-background-color);
@@ -87,5 +94,14 @@
   display: none;
 }
 .delete-button.no {
+  display: none;
+}
+
+.date-btn{
+  font-size: inherit;
+  font-weight: inherit;
+  padding:3px;
+}
+.date-btn span{
   display: none;
 }
