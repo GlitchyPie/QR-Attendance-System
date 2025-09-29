@@ -239,7 +239,9 @@ def faculty_view_attendance_view(request,
                                                                        'FacultyView/FacultyViewExportForm.html',
                                                                        context)
         case 'view-table':
-            response = HttpResponseNotFound()
+            response = render_faculty_view_attendance_related_template(request,
+                                                                       'FacultyView/FacultyViewAttendanceTable.html',
+                                                                       context)
         
         case 'list-html':
             response = render_faculty_view_attendance_related_template(request,

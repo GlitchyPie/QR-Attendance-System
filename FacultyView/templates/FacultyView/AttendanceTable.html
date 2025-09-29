@@ -1,0 +1,49 @@
+
+{% regroup present by date_only as attendance_grouped_by_date %}
+{% for date_group in attendance_grouped_by_date %}
+    {% regroup date_group.list by className as grouped_by_class %}
+    {% for class_group in grouped_by_class %}
+        <table class="attendance-table">
+            <thead>
+                <tr class="first-row">
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                </tr>
+                <tr>
+                    <th scope="rowgroup" colspan="5">{{ class_group.grouper }}</th>
+                    <th class="table-date" scope="rowgroup" colspan="3" data-ISODate="{{date_group.grouper|date:'c'}}">{{date_group.grouper|date:"Y-m-d"}}</th>
+                </tr>
+                <tr>
+                    <th scope="col" >Student Email</th>
+                    <th scope="col" >First Name</th>
+                    <th scope="col" >Last Name</th>
+                    <th scope="col" >Module</th>
+                    <th scope="col" >Class</th>
+                    <th scope="col" >Time</th>
+                    <th scope="col" >Module Id</th>
+                    <th scope="col" >Class Id</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attendance in class_group.list %}
+                    <tr>
+                        <td>{{ attendance.student.s_eml }}</td>
+                        <td>{{ attendance.student.s_fname }}</td>
+                        <td>{{ attendance.student.s_lname }}</td>
+                        <td>{{ attendance.className.moduleName.s_moduleName }}</td>
+                        <td>{{ attendance.className.s_className }}</td>
+                        <td data-ISODate="{{attendance.dte_date|date:'c'}}">{{ attendance.dte_date|date:'G:i (e)' }}</td>
+                        <td>{{ attendance.className.moduleName.id }}</td>
+                        <td>{{ attendance.className.id }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+{% endfor %}
