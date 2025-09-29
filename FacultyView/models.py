@@ -55,6 +55,10 @@ class Attendance(models.Model):
     dte_date = models.DateTimeField()
     student = models.ForeignKey(Student, on_delete=models.RESTRICT)
 
+    @property
+    def date_only(self):
+        return self.dte_date.date()
+    
     def __str__(self) -> str:
         return f"{self.dte_date} - {self.className} - {self.student}"
     
