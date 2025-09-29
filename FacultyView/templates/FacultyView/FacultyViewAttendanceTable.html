@@ -3,10 +3,14 @@
 
 {% block head %}
   <link rel="stylesheet" href="{% static 'FacultyView/FacultyView_attendanceTable.css' %}" />
+  <script src="{% static 'FacultyView/ATTENDANCE_TABLE.js' %}" ></script>
 {% endblock %}
 
 {%block main_block %}
     <section class="block">
         {% include "FacultyView/AttendanceTable.html" %}
     </section>
+    <script>
+      ATTENDANCE_TABLE.register();
+    </script>
 {% endblock %}
