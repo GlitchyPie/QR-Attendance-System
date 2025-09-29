@@ -59,7 +59,7 @@
 
           {% jump_url 'faculty_view_attendance' action='view' as attendance_jump_url %}
           {% if not request.path == attendance_jump_url %}
-            <li><a href="{{attendance_jump_url}}" title="Attendance History - {% if title_part %}{{title_part}}{% else %}All Classes - Today{% endif %}"><i class="fa-solid fa-clock-rotate-left"></i></a></li>
+            <li><a href="{{attendance_jump_url}}" title="Attendance History"><i class="fa-solid fa-clock-rotate-left"></i></a></li>
           {% endif %}
 
           <li><a href="/admin/" title="Database Admin"><i class="fa-solid fa-database"></i></a></li>
@@ -68,5 +68,7 @@
       {% block footer %}<p id="footer-notice">&copy; {{settings.COPYRIGHT_APP_NAME}} {{settings.COPYRIGHT_YEAR}} - {{settings.COPYRIGHT_ORG_NAME}}</p>{% endblock %}
       <div id="footer-menu-right"></div>
     </footer>
+    {% block other %}
+    {% endblock %}
   </body>
 </html>
