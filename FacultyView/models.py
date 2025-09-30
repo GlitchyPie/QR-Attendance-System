@@ -1,6 +1,7 @@
 from datetime import datetime
 from django.db import models
 from django_case_insensitive_field import CaseInsensitiveFieldMixin
+from django.core.validators import RegexValidator
 
 class LowerCharField(CaseInsensitiveFieldMixin, models.CharField):
     """[summary]
@@ -11,10 +12,20 @@ class LowerCharField(CaseInsensitiveFieldMixin, models.CharField):
     def __init__(self, *args, **kwargs):
         super(CaseInsensitiveFieldMixin, self).__init__(*args, **kwargs)
 
+
+s_eml_validator = RegexValidator(
+    regex=r"(?i)^([a-z]+)\.(([a-z]+\.?)+)(?<!\.)@student\.cat\.org\.uk$",
+    message="Value should be in the form <first name>.<last name>@student.cat.org.uk",
+)
 class Student(models.Model):
-    s_eml = LowerCharField(max_length=100, primary_key=True)
+    s_eml = LowerCharField(max_length=100, primary_key=True,validators=[s_eml_validator])
     s_fname = models.CharField(max_length=30)
     s_lname = models.CharField(max_length=30)
+
+    def save(self, *args, **kwargs):
+        # Run validation before saving
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"{self.s_eml} - {self.s_fname} {self.s_lname}"
@@ -44,8 +55,12 @@ class Attendance(models.Model):
     dte_date = models.DateTimeField()
     student = models.ForeignKey(Student, on_delete=models.RESTRICT)
 
+    @property
+    def date_only(self):
+        return self.dte_date.date()
+    
     def __str__(self) -> str:
         return f"{self.dte_date} - {self.className} - {self.student}"
     
     class Meta:
-        ordering = ['className','dte_date']
+        ordering = ['dte_date','className']

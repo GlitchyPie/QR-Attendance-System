@@ -1,42 +1,67 @@
 @media print{
-
-    /*
-    When printing, throw the grid layout out the window!
-    I think I have the same problem as this poster:
-    https://stackoverflow.com/questions/77080597/printed-firefox-page-breaks-with-css-grid-element-longer-than-one-printed-page
-    */
-    body{
-        display:block;
-        max-height: unset;
-        height:unset;
-    }
-
+    /* These may not actuially be needed */
     header{
         break-after: avoid;
+        page-break-after: avoid;
     }
-
     main{
         break-before: avoid;
-        display: block;
+        break-after: auto;
+    }
+    section{
+        break-before: avoid;
+        break-after: avoid;
+        break-inside: auto;
+    }
+
+    /*
+    When printing, throw the grid layouts out the window.
+    It particaully causes issues in FireFox
+    */
+    body, main, main > section:nth-child(1){
+        display: unset;
+    }
+
+    /*
+    Reset fixed body height and reset margins & padding
+    */
+    body{
+        max-height: unset;
+        height: unset;
+
+        margin:0;
+        padding:0;
+    }
+
+    /* Reset Main section margins */
+    main{
+        margin:auto;
+        padding:0;
     }
     
+    /* Reset the layout of the "left"/main block to fill the entire page */
     main > section:nth-child(1){
         height: unset;
         width:unset;
+        max-width: unset;
         max-height: unset;
-        max-width: 98vw;
+        min-width: unset;
+        min-height: unset;
 
-        margin: auto;
-    } 
+        padding: 5px 2px 0 2px;
+    }
 
+    /* Hide the right block, if any */
     main > section:nth-child(2){
         display: none;
     }
 
+    /* Hide the footer, we don't need it */
     footer{
         display: none;
     }
-    
+
+    /* Misc niggly bits it's nice to hide when printing */
     .qr-links{
         display:none;
     }
@@ -45,7 +70,7 @@
         display:none;
     }
 
-    .attendance-student-form{
+    .student-registration-form{
         display: none;
     }
 }

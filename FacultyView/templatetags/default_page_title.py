@@ -2,14 +2,16 @@ from django import template
 from django.conf import settings
 from django.urls import resolve
 from QR_Attendance_System.core import getClassAndModule
+from FacultyView.templatetags import export_date_type
 
 register = template.Library()
 
 @register.simple_tag(takes_context=True)
-def default_page_title(context):
+def default_page_title(context,userTitle : str|None = None):
     ttle0 = ''
     ttle1 = ''
     ttle2 = ''
+    ttle3 = ''
 
     r : str = context['request'].path
     m = resolve(r)
@@ -40,8 +42,6 @@ def default_page_title(context):
             ttle0 = "Create class"
         case 'faculty_view_delete_attendance':
             ttle0 = "Delete Attendance Record"
-        case 'faculty_view_present_list':
-            ttle0 = "AJAX - Present List"
         case '_':
             ttle0 = ""
 
@@ -50,8 +50,23 @@ def default_page_title(context):
     elif mod != None:
         ttle1 = mod.__str__()
 
-    ttle2 = settings.COPYRIGHT_APP_NAME
+    ttle2 = userTitle or settings.COPYRIGHT_APP_NAME
 
+    isstd = export_date_type.export_date_type(context)
+    match isstd:
+        case 1:
+            ttle3 = f"{context.get('dte_year')}-{context.get('dte_month')}-{context.get('dte_day')}"
+        case 2:
+            A = f"{context.get('dte_start_year', "####") or "####"}-{context.get('dte_start_month', "##") or "##"}-{context.get('dte_start_day',"##") or "##"}"
+            B = f"{context.get('dte_end_year', "####") or "####"}-{context.get('dte_end_month', "##") or "##"}-{context.get('dte_end_day',"##") or "##"}"
+            ttle3 = f"{A} <> {B}"
+        case 3:
+            ttle3 = f"{context.get('dte_year', "####") or "####"}-{context.get('dte_month', "##") or "##"}-{context.get('dte_day',"##") or "##"}"
+        case _:
+            pass
+    #--
+
+    #=====
     ttle = ttle0
     
     if ttle != "":
@@ -65,6 +80,12 @@ def default_page_title(context):
             ttle += " - " + ttle2
     else:
         ttle += ttle2
+
+    if ttle != "":
+        if ttle3 != "####-##-##":
+            ttle += " [" + ttle3 + "]"
+    else:
+        ttle += ttle3
 
     return ttle
     

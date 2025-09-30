@@ -3,14 +3,13 @@
 
 {% block head %}
   <link rel="stylesheet" href="{% static 'FacultyView/FacultyView.css' %}" />
-  <link rel="stylesheet" href="{% static 'StudentView/studentForm.css' %}" />
 {% endblock %}
 
 {% block main_block %}
-  <section class="block left_block marked-list">
+  <section class="block left_block">
     {% block left_block %}<h2>No content</h2>{% endblock %}
   </section>
-  <section class="block right_block attendance-container">
+  <section class="block right_block">
     {% block right_block %}<h2>No content</h2>{% endblock %}
   </section>
 {% endblock %}

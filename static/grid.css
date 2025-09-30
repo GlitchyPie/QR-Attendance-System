@@ -25,6 +25,9 @@ main{
   align-items: center;
 }
 
+main > section{
+  grid-column: 2 / span 2;
+}
 
 /*----*/
 .left_block{
@@ -54,11 +57,12 @@ footer{
 }
 
 /*----*/
-
-@media (max-width: 800px) {
+/* Put the two blocks into a single column once the screen gets too narrow*/
+@media (max-width: 60em) {
   main{
     grid-template-rows: auto auto;
     align-items:start;
+    gap: 2em 0px;
   }
   .left_block {
     grid-column: 2 / span 2;

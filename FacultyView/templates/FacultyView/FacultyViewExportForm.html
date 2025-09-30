@@ -1,9 +1,41 @@
 {% extends "FacultyView/FacultyView.html" %}
 {% load static %}
+{% load jump_url %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'FacultyView/attendance_list.css' %}" />
+  <link rel="stylesheet" href="{% static 'FacultyView/export_form.css' %}" />
+  <style>
+    .list-btn-container{
+      width:0;
+      height:0;
+      margin:0;
+      padding:0;
+      position: sticky;
+      top:0;
+      left:0;
+    }
+    .list-btn-container .table-btn{
+      position: absolute;
+      margin:0;
+      left:0;
+      top:0;
+      padding: 5px;
+    }
+  </style>
+{% endblock %}
 
 {% block left_block %}
+    <div class="list-btn-container">
+      <a title="Open as table in new window" target="_blank" href="{% jump_url 'faculty_view_attendance' action='view-table' %}">
+        <button class="table-btn">
+          <i class="fa-solid fa-table"></i>
+        </button>
+      </a>
+    </div>
 
     {% include "FacultyView/AttendanceList.html" %}
+
 
 {% endblock %}
 
@@ -12,3 +44,4 @@
     {% include "FacultyView/ExportForm.html" %}
 
 {% endblock %}
+

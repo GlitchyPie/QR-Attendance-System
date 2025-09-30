@@ -1,0 +1,105 @@
+.attendance-list-container{
+
+}
+
+.student-list {
+  list-style: none;
+  padding: 0;
+  margin: 0; /* Remove any margin for the list */
+}
+
+.class-title{
+}
+
+/*If only child with .date-seperataor */
+/*
+  https://stackoverflow.com/questions/49376742/select-the-only-child-having-the-class-using-css-sass
+*/
+.student-list:not(:has(.date-seperator ~ .date-seperator)) .date-seperator {
+  /*display:none*/
+}
+
+
+.class-seperator hr{
+  width: 70%;
+  color:var(--window-background-color);
+  margin: 0 auto 5px auto;
+}
+
+.student {
+  margin: 2%;
+}
+
+.student-label {
+  display: grid;
+  grid-template-columns: minmax(0,max-content) 1fr max-content;
+  align-items: center;
+  gap: 5px 5px;
+  justify-items: start;
+
+  cursor: pointer;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 4px 8px; /* Reduce padding to make the delete button smaller */
+  transition: background-color 0.3s ease;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+}
+.student-label *{
+  white-space:nowrap;
+}
+
+.student-name{
+  overflow:hidden;
+  max-width: 100%;
+}
+
+.attendance-date{
+
+}
+
+.student-email{
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.delete-button-container{
+  background-color: #eee;
+  border-radius: 5px;
+
+  -webkit-box-shadow: inset 3px 3px 5px 2px #ddd;; 
+  box-shadow: inset 3px 3px 5px 2px #ddd;;
+}
+
+/* Adjust the size of the delete button icon */
+.delete-button {
+  background-color: unset;
+  color: var(--button-background-color);
+  border: none;
+  padding: 0;
+  font-size: 17px; /* Adjust the font size to control the button size */
+  cursor: pointer;
+  margin: 15px 5px 5px 5px;
+}
+.delete-button:hover {
+  background-color: unset;
+  color: var(--button-hover-background-color);
+}
+.delete-button.yes {
+  display: none;
+}
+.delete-button.no {
+  display: none;
+}
+
+.date-btn{
+  font-size: inherit;
+  font-weight: inherit;
+  padding:3px;
+}
+.date-btn span{
+  display: none;
+}

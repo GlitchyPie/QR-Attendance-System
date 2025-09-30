@@ -1,0 +1,18 @@
+.class-list {
+  list-style: none;
+  padding: 0;
+  margin: 0; /* Remove any margin for the list */
+}
+
+.class, .module, .class-list.form {
+  margin: 2%;
+}
+
+.form-create-class{
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  align-items: center;
+  border-top: outset 2px gray;
+  padding-top: 10px;
+  gap:5px 0px;
+}
