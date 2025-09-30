@@ -100,7 +100,7 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
                 if(xhr.readyState === 4){
                     if(xhr.status === 200){
                         etag = xhr.getResponseHeader("ETag"); // save new ETag
-                        last_modified = new Date();
+                        last_modified = new Date(xhr.getResponseHeader('last-modified'));
                         lookForUpdateDoUpdate.call(xhr);
                     }else if(xhr.status === 304){
 
