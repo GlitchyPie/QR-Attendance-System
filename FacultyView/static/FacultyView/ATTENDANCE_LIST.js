@@ -118,7 +118,8 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
                 currentList.replaceWith(newUL);
                 currentList = newUL;
 
-                const alc = currentList.parentElement.querySelector('.attendance-list-count');
+                const alc = currentList.parentElement.querySelector('.attendance-list-count') ?? currentList.parentElement.parentElement.querySelector('.attendance-list-count');
+
                 if(!!alc){
                     alc.innerText = currentList.children.length;
                 }
