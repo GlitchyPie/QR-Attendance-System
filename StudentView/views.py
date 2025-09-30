@@ -20,7 +20,7 @@ def student_view_name_entry(request, classId : int|None = None, className : str|
         return HttpResponseBadRequest()
     
     return render(request, 
-                  'StudentView/StudentViewStudent_entry.html',
+                  'StudentView/view/RegistrationForm.html',
                   {
                        'class' : cls,
                       'module' : mod,
@@ -98,7 +98,7 @@ def student_view_bigQRcode(request,
 
     qrSrc = qrgenerator(request, classId, blockSize) # type: ignore
     return render(request,
-                  'StudentView/StudentViewQrCode.html',
+                  'StudentView/view/QRCode.html',
                   {
                        'class' : cls,
                       'module' : mod,
@@ -111,7 +111,7 @@ def student_view_attendance_submitted(request,
                                       classId : int|None = None, className : str|None = None):
     cls,mod = getClassAndModule(classId,className)
     return render(request,
-                  'StudentView/Submitted.html',
+                  'StudentView/view/AttendanceSubmitted.html',
                   {
                        'class' : cls,
                       'module' : mod,

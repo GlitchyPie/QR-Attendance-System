@@ -1,8 +1,8 @@
-{% extends "StudentView/StudentView.html" %}
+{% extends "StudentView/view/Base.html" %}
 {% load static %}
 
 {%block head %}
-    <link rel="stylesheet" href="{% static 'StudentView/qrCode.css' %}" />
+    <link rel="stylesheet" href="{% static 'StudentView/part/qrCode.css' %}" />
     <style>
         main > section{
             height:100% !important;
@@ -12,5 +12,5 @@
 {% endblock %}
 
 {% block only_block %}
-    {% include "StudentView/qrCode.html" %}
+    {% include "StudentView/part/QRCode.html" %}
 {% endblock %}

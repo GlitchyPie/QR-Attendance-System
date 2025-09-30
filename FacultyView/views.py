@@ -174,7 +174,7 @@ def render_faculty_view_module_index(request):
     modules = ModuleName.objects.all()
     return render(
         request,
-        'FacultyView/FacultyViewIndex.html',
+        'FacultyView/view/Index.html',
         {
             'modules' : modules
         },
@@ -187,7 +187,7 @@ def render_faculty_view_class_index(request, module : ModuleName|None):
     classes = ClassName.objects.filter(moduleName=module.id) # type: ignore
     return render(
         request,
-        'FacultyView/FacultyViewIndex.html',
+        'FacultyView/view/Index.html',
         {
             'classes' : classes,
             'module' : module,
@@ -205,7 +205,7 @@ def render_faculty_view_class(request, cls : ClassName|None):
 
     return render(
         request,
-        'FacultyView/FacultyViewClass.html',
+        'FacultyView/view/Class.html',
         {
               'present' : present,
                 'class' : cls,
@@ -304,16 +304,16 @@ def faculty_view_attendance_view(request,
             context['with_date_headers'] = True
             context['with_class_headers'] = True
             response = render_faculty_view_attendance_related_template(request,
-                                                                       'FacultyView/FacultyViewExportForm.html',
+                                                                       'FacultyView/view/ExportForm.html',
                                                                        context)
         case 'view-table':
             response = render_faculty_view_attendance_related_template(request,
-                                                                       'FacultyView/FacultyViewAttendanceTable.html',
+                                                                       'FacultyView/views/AttendanceTable.html',
                                                                        context)
         
         case 'list-html':
             response = render_faculty_view_attendance_related_template(request,
-                                                                       'FacultyView/AttendanceList.html',
+                                                                       'FacultyView/part/AttendanceList.html',
                                                                        context)
         case 'export-csv':
             response = render_faculty_view_attendance_view_CSV(request, presentQuery)
