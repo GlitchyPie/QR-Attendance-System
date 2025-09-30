@@ -16,7 +16,7 @@
   https://stackoverflow.com/questions/49376742/select-the-only-child-having-the-class-using-css-sass
 */
 .student-list:not(:has(.date-seperator ~ .date-seperator)) .date-seperator {
-  display:none
+  /*display:none*/
 }
 
 

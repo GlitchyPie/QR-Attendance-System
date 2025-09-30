@@ -7,6 +7,7 @@ import hashlib
 from enum import Enum
 from QR_Attendance_System.core import *
 from django.shortcuts import render
+from django.utils.http import parse_http_date, http_date
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseBadRequest
@@ -15,6 +16,49 @@ from django.http import HttpResponseNotModified
 from django.urls import reverse
 from django.core.serializers.json import DjangoJSONEncoder
 from .models import Student, ClassName, Attendance, ModuleName
+
+class LocalState:
+    last_attendance_modified_class : dict[int,datetime.datetime] = {
+            -1 : datetime.datetime.now(pytz.utc)
+        }
+    
+    last_attendance_modified_module : dict[int,datetime.datetime] = {
+            -1 : datetime.datetime.now(pytz.utc)
+        }
+    
+    def get_attendance_modified_class(self, cls : ClassName | None = None):
+        id = -1
+        if(cls):
+            id = cls.id # type: ignore
+        return self.last_attendance_modified_class.get(id, self.last_attendance_modified_class[-1])
+    
+    def set_attendance_modified_class(self, cls : ClassName, dte : datetime.datetime | None = None):
+        dte = dte or datetime.datetime.now(pytz.utc)
+        self.last_attendance_modified_class[-1] = dte
+        self.last_attendance_modified_class[cls.id] = dte # type: ignore
+        self.last_attendance_modified_class[cls.id] = dte # type: ignore
+        self.set_attendance_modified_module(cls.moduleName)
+
+    def get_attendance_modified_module(self, mod : ModuleName | None = None):
+        id = -1
+        if(mod):
+            id = mod.id # type: ignore
+        return self.last_attendance_modified_module.get(id, self.last_attendance_modified_module[-1])
+    
+    def set_attendance_modified_module(self, mod : ModuleName, dte : datetime.datetime | None = None):
+        dte = dte or datetime.datetime.now(pytz.utc)
+        self.last_attendance_modified_module[-1] = dte
+        self.last_attendance_modified_module[mod.id] = dte # type: ignore
+        self.last_attendance_modified_module[mod.id] = dte # type: ignore
+
+    def get_attendance_modified(self):
+        A = self.get_attendance_modified_class()
+        B = self.get_attendance_modified_module()
+        return max([A , B])
+    
+#End Class
+
+STATE = LocalState()
 
 def attendance_query(cls : ClassName|None = None,
                      mod : ModuleName|None = None, 
@@ -206,6 +250,19 @@ def faculty_view_attendance_view(request,
                                             year_start=year_start,month_start=month_start,day_start=day_start,
                                             year_end=year_end,month_end=month_end,day_end=day_end)
     
+    state_last_attendance_modified = STATE.get_attendance_modified()
+    if(cls):
+        state_last_attendance_modified = STATE.get_attendance_modified_class(cls)
+    elif(mod):
+        state_last_attendance_modified = STATE.get_attendance_modified_module(mod)
+
+    last_modified = request.META.get('HTTP_IF_MODIFIED_SINCE', None)
+    if(last_modified):
+        ts = parse_http_date(last_modified)
+        dt = datetime.datetime.fromtimestamp(ts,tz=pytz.utc)
+        if state_last_attendance_modified < dt:
+            return HttpResponseNotModified()
+
     vals = list(presentQuery.values())
     j = json.dumps(vals, cls=DjangoJSONEncoder).encode()
     etag = hashlib.md5(j, usedforsecurity=False).hexdigest()
@@ -213,6 +270,11 @@ def faculty_view_attendance_view(request,
     if_none_match = request.META.get("HTTP_IF_NONE_MATCH")
     if if_none_match == etag:
         return HttpResponseNotModified()
+
+    one_date_only = (year and month and day)
+
+    with_date_headers = (str(request.GET.get('with_date_headers', 'true')).lower() == "true")
+    with_class_headers = (str(request.GET.get('with_class_headers', 'true')).lower() == "true")
 
     context : dict[str, Any]= {
                'present' : presentQuery,
@@ -230,11 +292,17 @@ def faculty_view_attendance_view(request,
           'dte_end_year' : year_end,
          'dte_end_month' : month_end,
            'dte_end_day' : day_end,
+
+     'with_date_headers' : with_date_headers,
+    'with_class_headers' : with_class_headers,
     }
 
     response = None
     match action:
         case 'view':
+            #Force the with_date_headers to true for this view...
+            context['with_date_headers'] = True
+            context['with_class_headers'] = True
             response = render_faculty_view_attendance_related_template(request,
                                                                        'FacultyView/FacultyViewExportForm.html',
                                                                        context)
@@ -256,6 +324,7 @@ def faculty_view_attendance_view(request,
         case _:
             response = HttpResponseBadRequest()
 
+    response['Last-Modified'] = http_date(state_last_attendance_modified.timestamp())
     response['ETag'] = etag
     return response
 

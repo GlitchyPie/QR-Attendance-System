@@ -1,32 +1,4 @@
 var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
-    const localeOpts = {
-        hour:'2-digit',
-        minute: '2-digit'
-    }
-    let lang;
-    document.addEventListener('DOMContentLoaded',()=>{lang = document.documentElement.lang??'en';});
-
-    function serializeForQuery(obj) {
-        var str = [];
-        for(var p in obj)
-            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-        return str.join("&");
-    }
-
-    function formatDates(li){
-        const nodes_sname = li.getElementsByClassName('student-name');
-        if(!!nodes_sname){
-            const node_sname = nodes_sname[0];
-            if(!!node_sname){
-                const node_date = node_sname.getElementsByClassName('attendance-date')[0];
-                const utcDateStr = node_date.dataset.isodate;
-                const utcDate = new Date(utcDateStr);
-        
-                node_date.innerText = utcDate.toLocaleString(lang,localeOpts);
-            }
-        }
-    }
-
     function show_ConfirmDelete(event){
         event.preventDefault()
         const btn = this;
@@ -60,6 +32,7 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
         document.addEventListener('DOMContentLoaded',()=>{
             let currentList = document.getElementById(listId);
             let etag;
+            let last_modified = new Date();
 
             function post_delete(event){
                 event.preventDefault();
@@ -68,16 +41,14 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
                 const refererpath = currentList.dataset.refererpath;
                 const csrf = currentList.dataset.csrftoken;
 
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', deletePath, true);
-                // Send the proper header information along with the request
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                const queryString = serializeForQuery({
-                    'attendance_record':btn.value,
-                    'next':refererpath,
-                    'csrfmiddlewaretoken':csrf
-                });
-                xhr.send(queryString);
+                GLOBGOR.xhr.post(
+                    deletePath,
+                    {
+                        'attendance_record':btn.value,
+                        'next':refererpath,
+                        'csrfmiddlewaretoken':csrf
+                    }
+                )
             }
 
             function applyDeleteFunctions(li){
@@ -104,29 +75,32 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
             }
 
             function processUL(ul){
+                GLOBGOR.format.all(ul);
+
                 const li_items = ul.getElementsByTagName('LI');
                 for (const li of li_items){
-                    formatDates(li);
                     applyDeleteFunctions(li);
                     applyMouseLeaveFunction(li);
                 }         
             }
 
             function lookForUpdate(){
-                const request = new XMLHttpRequest();
-                //request.addEventListener('load', lookForUpdateDoUpdate);
-                request.addEventListener('readystatechange',(event)=>lookForUpdateReadystateChange(event,request));
-                request.open('GET', currentList.dataset.querypath, true);
-                if(!!etag){
-                    request.setRequestHeader('If-None-Match', etag);
-                }
-                request.setRequestHeader('X-list-count', currentList.children.length);
-                request.send();
+                GLOBGOR.xhr.get(
+                    currentList.dataset.querypath,
+                    undefined,
+                    lookForUpdateReadystateChange,
+                    {
+                        'If-None-Match' : etag,
+                         'X-list-count' : currentList.children.length,
+                        'If-Modified-Since' : last_modified.toUTCString(),
+                    }
+                )
             }
             function lookForUpdateReadystateChange(event,xhr){
                 if(xhr.readyState === 4){
                     if(xhr.status === 200){
                         etag = xhr.getResponseHeader("ETag"); // save new ETag
+                        last_modified = new Date();
                         lookForUpdateDoUpdate.call(xhr);
                     }else if(xhr.status === 304){
 
@@ -150,9 +124,8 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
                 }
             }
             
-            setTimeout(lookForUpdate, 2000)
-
             processUL(currentList);
+            setTimeout(lookForUpdate, 2000)
         });
     }
 

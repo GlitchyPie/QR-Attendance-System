@@ -1,5 +1,5 @@
 var ATTENDANCE_TABLE = ATTENDANCE_TABLE || (function(){
-    const localeOpts = {
+    const localOpts_time = {
         hour:'2-digit',
         minute: '2-digit'
     }
@@ -8,14 +8,7 @@ var ATTENDANCE_TABLE = ATTENDANCE_TABLE || (function(){
 
     function registerPage(){
         document.addEventListener('DOMContentLoaded',()=>{
-            const cells = document.querySelectorAll('table.attendance-table td[data-ISODate]');
-
-            for (const node_date of cells) {
-                const utcDateStr = node_date.dataset.isodate;
-                const utcDate = new Date(utcDateStr);
-                node_date.innerText = utcDate.toLocaleString(lang,localeOpts);
-            }
-
+            GLOBGOR.format.all();
         });
     }
 

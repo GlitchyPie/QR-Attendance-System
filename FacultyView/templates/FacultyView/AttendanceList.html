@@ -6,25 +6,30 @@
 <div id="student_list_container_{{attentdance_list_id}}" class="attendance-list-container">
     <ul class="student-list"
         id="student_present_list_{{attentdance_list_id}}"
-        data-querypath="{% jump_url 'faculty_view_attendance' action='list-html' %}?attendacelistid={{attentdance_list_id}}"
+        data-querypath="{% jump_url 'faculty_view_attendance' action='list-html' %}?attendacelistid={{attentdance_list_id}}&with_date_headers={{with_date_headers}}&with_class_headers={{with_class_headers}}"
         data-deletepath="{% url 'faculty_view_delete_attendance' %}"
         data-refererpath="{{ request|referer_path }}"
         data-csrftoken="{{csrf_token}}"
     >
         {% regroup present by date_only as attendance_grouped_by_date %}
         {% for group in attendance_grouped_by_date %}
-            <li class="date-seperator" data-ISODate="{{group.grouper|date:'c'}}"><h4><i class="fa-solid fa-calendar"></i>{{group.grouper|date:"Y-m-d"}}</h4></li>
+            {% if with_date_headers %}
+                <li class="date-seperator"><h4><i class="fa-solid fa-calendar"></i><span class="attendance-date" data-ISODate="{{group.grouper|date:'c'}}">{{group.grouper|date:"Y-m-d"}}</span></h4></li>
+            {% endif %}
+            
             {% regroup group.list by className as grouped_by_class %}
             {% for inner_group in grouped_by_class %}
-                <li class="class-seperator"><hr></li>
-                <li class="class-title"><h4><i class="fa-solid fa-building-columns"></i>{{ inner_group.grouper }}</h4></li>
+                {% if with_class_headers %}
+                    <li class="class-seperator"><hr></li>
+                    <li class="class-title"><h4><i class="fa-solid fa-building-columns"></i>{{ inner_group.grouper }}</h4></li>
+                {% endif %}
+
                 {% for attendance in inner_group.list %}
                     <li class="student" data-recordid="{{attendance.id}}">
                         <label class="student-label">
                             <span class="student-name">
-                                <span class="attendance-date"
-                                    data-UNIXtimestamp="{{ attendance.dte_date|date:'U' }}"
-                                    data-ISODate="{{ attendance.dte_date|date:'c' }}">
+                                <span class="attendance-time"
+                                      data-ISOTime="{{ attendance.dte_date|date:'c' }}">
                                     {{ attendance.dte_date|date:"H:i (e)" }}
                                 </span> - {{ attendance.student.s_fname }} {{attendance.student.s_lname}}
                             </span>
@@ -56,6 +61,7 @@
                         </label>
                     </li>
                 {% endfor %}
+
             {% endfor %}
         {% endfor %}
     </ul>

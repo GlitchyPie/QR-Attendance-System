@@ -10,6 +10,8 @@ from django.urls import reverse
 from django.core.exceptions import ValidationError
 from urllib.parse import urlencode
 
+from FacultyView.views import STATE as FacultyViewState
+
 #=======================
 
 def student_view_name_entry(request, classId : int|None = None, className : str|None = None):
@@ -32,6 +34,8 @@ def submit_attendance(request, classId : int|None = None, className : str|None =
     classOb = getClass(classId,className)
     if classOb == None:
         raise ValueError("No class specified")
+    
+    FacultyViewState.set_attendance_modified_class(classOb)
 
     eml = request.POST['student_email'].lower()
     fname = request.POST['student_fname']

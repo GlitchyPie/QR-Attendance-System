@@ -38,7 +38,7 @@
                         <td>{{ attendance.student.s_lname }}</td>
                         <td>{{ attendance.className.moduleName.s_moduleName }}</td>
                         <td>{{ attendance.className.s_className }}</td>
-                        <td data-ISODate="{{attendance.dte_date|date:'c'}}">{{ attendance.dte_date|date:'G:i (e)' }}</td>
+                        <td data-ISOTime="{{attendance.dte_date|date:'c'}}">{{ attendance.dte_date|date:'G:i (e)' }}</td>
                         <td>{{ attendance.className.moduleName.id }}</td>
                         <td>{{ attendance.className.id }}</td>
                     </tr>

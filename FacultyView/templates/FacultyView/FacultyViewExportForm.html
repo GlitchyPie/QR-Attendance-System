@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="{% static 'FacultyView/attendance_list.css' %}" />
   <link rel="stylesheet" href="{% static 'FacultyView/export_form.css' %}" />
   <style>
-    .table-btn-container{
+    .list-btn-container{
       width:0;
       height:0;
       margin:0;
@@ -15,7 +15,7 @@
       top:0;
       left:0;
     }
-    .table-btn-container .table-btn{
+    .list-btn-container .table-btn{
       position: absolute;
       margin:0;
       left:0;
@@ -26,7 +26,7 @@
 {% endblock %}
 
 {% block left_block %}
-    <div class="table-btn-container">
+    <div class="list-btn-container">
       <a title="Open as table in new window" target="_blank" href="{% jump_url 'faculty_view_attendance' action='view-table' %}">
         <button class="table-btn">
           <i class="fa-solid fa-table"></i>

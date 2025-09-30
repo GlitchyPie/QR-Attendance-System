@@ -25,17 +25,11 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
         }
         return t;
     }
-    function serializeForQuery(obj) {
-        var str = [];
-        for(var p in obj)
-            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-        return str.join("&");
-    }
 
     function registerForm(formId){
         document.addEventListener('DOMContentLoaded',()=>{
             const FORM = document.getElementById(formId);
-            const action = FORM.action + 'ajax/';
+            const submit_action = FORM.action + 'ajax/';
 
             const csrf  = FORM.querySelector('input[name="csrfmiddlewaretoken"]').value;
             const classId  = FORM.querySelector('input[name="classId"]').value;
@@ -91,16 +85,15 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
             function lookupStudent(eml){
                 clearTimeout(lookupTimeout);
 
-                const xhr = new XMLHttpRequest();
-                xhr.addEventListener('readystatechange',(event)=>studentLookupReadyStateChange(event,xhr));
-                xhr.open('POST', '/student/lookup/', true);
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                const queryString = serializeForQuery({
-                    'classId' : classId,
-                    'csrfmiddlewaretoken':csrf,
-                    'student_email':eml
-                });
-                xhr.send(queryString);
+                GLOBGOR.xhr.post(
+                    '/student/lookup/',
+                    {
+                        'classId' : classId,
+                        'csrfmiddlewaretoken':csrf,
+                        'student_email':eml
+                    },
+                    studentLookupReadyStateChange
+                );
             }
             function validateEmailaddr(event){
                 const regex = naieveEmail.exec(eml.value);
@@ -183,18 +176,17 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
                 fname.readOnly = true;
                 lname.readOnly = true;
 
-                const xhr = new XMLHttpRequest();
-                xhr.addEventListener('load',(event)=>registrationSubmittionReadyStateChange(event,xhr));
-                xhr.open('POST', action, true);
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                const queryString = serializeForQuery({
-                    'classId': classId,
-                    'csrfmiddlewaretoken':csrf,
-                    'student_email':eml.value,
-                    'student_fname':fname.value,
-                    'student_lname':lname.value
-                });
-                xhr.send(queryString);
+                GLOBGOR.xhr.post(
+                    submit_action,
+                    {
+                        'classId': classId,
+                        'csrfmiddlewaretoken':csrf,
+                        'student_email':eml.value,
+                        'student_fname':fname.value,
+                        'student_lname':lname.value
+                    },
+                    registrationSubmittionReadyStateChange
+                )
             }
 
             fname.addEventListener('focus',(event)=>{
