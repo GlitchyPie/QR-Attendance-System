@@ -37,6 +37,7 @@
         <li class="form">
             <form class="form-create-class" method="POST" action="{% url 'faculty_view_create_class' %}">
                 {% csrf_token %}
+                <input type="hidden" value="{{module.id}}" name="module_id">
                 <label for="form-create-class_module_name">Module:</label><input type="text" name="module_name" id="form-create-class_module_name" {% if module %}value="{{module.s_moduleName}}" readonly{% endif %}>
                 <label for="form-create-class_class_name">Class:</label><input type="text" name="class_name" id="form-create-class_class_name">
                 <button type="submit">+ Create</button>

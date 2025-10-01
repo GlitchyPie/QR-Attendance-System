@@ -17,124 +17,6 @@ from django.urls import reverse
 from django.core.serializers.json import DjangoJSONEncoder
 from .models import Student, ClassName, Attendance, ModuleName
 
-class LocalState:
-    last_attendance_modified_class : dict[int,datetime.datetime] = {
-            -1 : datetime.datetime.now(pytz.utc)
-        }
-    
-    last_attendance_modified_module : dict[int,datetime.datetime] = {
-            -1 : datetime.datetime.now(pytz.utc)
-        }
-    
-    def get_attendance_modified_class(self, cls : ClassName | None = None):
-        id = -1
-        if(cls):
-            id = cls.id # type: ignore
-        return self.last_attendance_modified_class.get(id, self.last_attendance_modified_class[-1])
-    
-    def set_attendance_modified_class(self, cls : ClassName, dte : datetime.datetime | None = None):
-        dte = dte or datetime.datetime.now(pytz.utc)
-        self.last_attendance_modified_class[-1] = dte
-        self.last_attendance_modified_class[cls.id] = dte # type: ignore
-        self.last_attendance_modified_class[cls.id] = dte # type: ignore
-        self.set_attendance_modified_module(cls.moduleName)
-
-    def get_attendance_modified_module(self, mod : ModuleName | None = None):
-        id = -1
-        if(mod):
-            id = mod.id # type: ignore
-        return self.last_attendance_modified_module.get(id, self.last_attendance_modified_module[-1])
-    
-    def set_attendance_modified_module(self, mod : ModuleName, dte : datetime.datetime | None = None):
-        dte = dte or datetime.datetime.now(pytz.utc)
-        self.last_attendance_modified_module[-1] = dte
-        self.last_attendance_modified_module[mod.id] = dte # type: ignore
-        self.last_attendance_modified_module[mod.id] = dte # type: ignore
-
-    def get_attendance_modified(self):
-        A = self.get_attendance_modified_class()
-        B = self.get_attendance_modified_module()
-        return max([A , B])
-    
-#End Class
-
-STATE = LocalState()
-
-def attendance_query(cls : ClassName|None = None,
-                     mod : ModuleName|None = None, 
-                     classId : int|None = None, className : str|None = None, 
-                     moduleId : int|None = None, moduleName : str|None = None, 
-                     dte : datetime.datetime|None = None,
-                     year : int|None = None,
-                     month : int|None = None,
-                     day : int|None = None,
-                     dte_start : datetime.datetime|None = None, dte_end : datetime.datetime|None = None,
-                     year_start : int|None = None,
-                     month_start : int|None = None,
-                     day_start : int|None = None,
-                     year_end : int|None = None,
-                     month_end : int|None = None,
-                     day_end : int|None = None,):
-
-    if((cls == None) and (mod == None)):
-        cls,mod = getClassAndModule(classId, className, moduleId, moduleName)
-    elif(cls):
-        mod = mod or cls.moduleName
-
-    present = Attendance.objects.all()
-    if(cls):
-        present = present.filter(className = cls) # pyright: ignore[reportAttributeAccessIssue]
-    elif(mod):
-        present = present.filter(className__moduleName = mod) # pyright: ignore[reportAttributeAccessIssue]
-
-    if dte:
-        year = dte.year
-        month = dte.month
-        day = dte.day
-
-    if dte_start:
-        year_start = dte_start.year
-        month_start = dte_start.month
-        day_end = dte_start.day
-    
-    if dte_end:
-        year_end = dte_end.year
-        month_end = dte_end.month
-        day_end = dte_end.day
-    
-    if((year_start or month_start or day_start) or (year_end or month_end or day_end)):
-        if(year_start):
-            present = present.filter(dte_date__year__gte=year_start)
-        
-        if(month_start):
-            present = present.filter(dte_date__month__gte=month_start)
-
-        if(day_start):
-            present = present.filter(dte_date__day__gte=day_start)
-        
-        if(year_end):
-            present = present.filter(dte_date__year__lte=year_end)
-        
-        if(month_end):
-            present = present.filter(dte_date__month__lte=month_end)
-
-        if(day_end):
-            present = present.filter(dte_date__day__lte=day_end)
-
-    else:
-        if(year):
-            present = present.filter(dte_date__year=year)
-
-        if(month):
-            present = present.filter(dte_date__month=month)
-
-        if(day):
-            present = present.filter(dte_date__day=day)
-
-    #--------
-
-    return (present, cls, mod)
-    
 #=======================
 
 def faculty_view_delete_attendance(request):
@@ -143,11 +25,10 @@ def faculty_view_delete_attendance(request):
     
     r = request.POST['attendance_record']
 
-    attendanceQuery = Attendance.objects.filter(id=r)
+    attendanceOb = Attendance.objects.filter(id=r).first()
 
     cls = None
-    if attendanceQuery.exists():
-        attendanceOb = attendanceQuery[0]
+    if attendanceOb:
         cls = attendanceOb.className
         attendanceOb.delete()
         return HttpResponseRedirect(reverse('faculty_view',kwargs={'classId':cls.id})) # pyright: ignore[reportAttributeAccessIssue]
@@ -373,9 +254,14 @@ def faculty_view_create_class(request):
     
     className = request.POST['class_name']
     moduleName = request.POST['module_name']
+    moduleId = request.POST.get('module_id',None)
     
-    moduleOb = ModuleName.objects.get_or_create(s_moduleName__iexact=moduleName,
-                                                defaults={'s_moduleName':moduleName})[0]
+    if moduleId == '':
+        moduleOb = ModuleName.objects.get_or_create(s_moduleName__iexact=moduleName,
+                                                    defaults={'s_moduleName':moduleName})[0]
+    else:
+        moduleOb = ModuleName.objects.filter(id=moduleId).first()
+
     classOb = ClassName.objects.get_or_create(s_className__iexact=className, moduleName=moduleOb,
                                               defaults={'s_className':className})[0]
 

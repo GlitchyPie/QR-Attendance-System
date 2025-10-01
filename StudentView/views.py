@@ -10,8 +10,6 @@ from django.urls import reverse
 from django.core.exceptions import ValidationError
 from urllib.parse import urlencode
 
-from FacultyView.views import STATE as FacultyViewState
-
 #=======================
 
 def student_view_name_entry(request, classId : int|None = None, className : str|None = None):
@@ -35,7 +33,7 @@ def submit_attendance(request, classId : int|None = None, className : str|None =
     if classOb == None:
         raise ValueError("No class specified")
     
-    FacultyViewState.set_attendance_modified_class(classOb)
+    STATE.set_attendance_modified_class(classOb)
 
     eml = request.POST['student_email'].lower()
     fname = request.POST['student_fname']
@@ -120,11 +118,7 @@ def student_view_attendance_submitted(request,
 #=======================
 
 def student_is_present(student : Student, cls : ClassName, year : int, month : int, day : int):
-    return Attendance.objects.filter(dte_date__year = year,
-                                     dte_date__month = month,
-                                     dte_date__day = day,
-                                     className = cls,
-                                     student = student).exists()
+    return attendance_query(cls=cls, year=year, month=month, day=day)[0].filter(student=student).exists()
 
 def student_view_student_lookup(request):
     if request.method != 'POST' :
@@ -139,9 +133,7 @@ def student_view_student_lookup(request):
         cls = getClass(classId = classId,
                        className = None)
 
-    q = Student.objects.filter(s_eml__iexact=eml.lower())
-    if len(q) > 0:
-        stu = q[0]
+    stu = Student.objects.filter(s_eml__iexact=eml.lower()).first()
     
     j = {'student' : {}}
     if(stu):
@@ -151,7 +143,7 @@ def student_view_student_lookup(request):
             year = request.POST.get('year', None) or D.year
             month = request.POST.get('month', None) or D.month
             day = request.POST.get('day', None) or D.day 
-            isPresent = student_is_present(stu,cls,year,month,day) 
+            isPresent = student_is_present(stu, cls, year, month, day)
 
         j['student'] = {
             'found' : True,
