@@ -1,6 +1,6 @@
 {% extends "FacultyView/view/Base.html" %}
 {% load static %}
-{% load jump_url %}
+{% load contextual_reverse %}
 
 {% block head %}
   <link rel="stylesheet" href="{% static 'FacultyView/view/index.css' %}" />
@@ -48,7 +48,7 @@
 
 {% block right_block %}
 
-    <a href="{% jump_url 'faculty_view_attendance' action='view' %}"><i class="fa-solid fa-clock-rotate-left"></i>Historical data view and export</a><br>
+    <a href="{% contextual_reverse 'faculty_view_attendance' action='view' %}"><i class="fa-solid fa-clock-rotate-left"></i>Historical data view and export</a><br>
     
     {% if request.user.is_staff %}
         <a href="/faculty/admin/"><i class="fa-solid fa-database"></i>Database admin</a><br>

@@ -1,12 +1,12 @@
 {% load static %}
-{% load jump_url %}
+{% load contextual_reverse %}
 {% load referer_path %}
 {% firstof request.GET.attendacelistid '' as attentdance_list_id %}
 
 <div id="student_list_container_{{attentdance_list_id}}" class="attendance-list-container">
     <ul class="student-list"
         id="student_present_list_{{attentdance_list_id}}"
-        data-querypath="{% jump_url 'faculty_view_attendance' action='list-html' %}?attendacelistid={{attentdance_list_id}}&with_date_headers={{with_date_headers}}&with_class_headers={{with_class_headers}}"
+        data-querypath="{% contextual_reverse 'faculty_view_attendance' action='list-html' %}?attendacelistid={{attentdance_list_id}}&with_date_headers={{with_date_headers}}&with_class_headers={{with_class_headers}}"
         data-deletepath="{% url 'faculty_view_delete_attendance' %}"
         data-refererpath="{{ request|referer_path }}"
         data-csrftoken="{{csrf_token}}"

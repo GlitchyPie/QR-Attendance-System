@@ -1,5 +1,5 @@
 {% load static %}
-{% load jump_url %}
+{% load contextual_reverse %}
 {% load default_page_title %}
 {% firstof class module title_part as title_part %}
 
@@ -66,7 +66,7 @@
               {% endif %}
             {% endif %}
 
-            {% jump_url 'faculty_view_attendance' action='view' as attendance_jump_url %}
+            {% contextual_reverse 'faculty_view_attendance' action='view' as attendance_jump_url %}
             {% if not request.path == attendance_jump_url %}
               <a href="{{attendance_jump_url}}" title="Attendance History"><i class="fa-solid fa-clock-rotate-left"></i></a>
             {% endif %}

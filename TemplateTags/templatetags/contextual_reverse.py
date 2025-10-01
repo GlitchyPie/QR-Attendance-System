@@ -4,7 +4,7 @@ from django.urls import reverse
 register = template.Library()
 
 @register.simple_tag(takes_context=True)
-def jump_url(context, url : str, **kwargs):
+def contextual_reverse(context, url : str, **kwargs):
     k = kwargs or {}
     if context.get('class', None) != None:
         k['classId'] = context['class'].id
