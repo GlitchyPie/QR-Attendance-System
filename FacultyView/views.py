@@ -13,16 +13,22 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseNotFound
 from django.http import HttpResponseNotModified
+from django.http import HttpResponseForbidden
 from django.urls import reverse
 from django.core.serializers.json import DjangoJSONEncoder
+from django.contrib.auth.decorators import login_required
 from .models import Student, ClassName, Attendance, ModuleName
 
 #=======================
 
+@login_required
 def faculty_view_delete_attendance(request):
     if request.method != 'POST' :
         return HttpResponseBadRequest() #This should only accept POST requests
     
+    if request.user.is_staff == False:
+        return HttpResponseForbidden()
+
     r = request.POST['attendance_record']
 
     attendanceOb = Attendance.objects.filter(id=r).first()
@@ -37,6 +43,7 @@ def faculty_view_delete_attendance(request):
         
 #=======================
 
+@login_required
 def faculty_view(request,
                  classId : int|None = None, className : str|None = None,
                  moduleId : int|None =None, moduleName : str|None =None):
@@ -96,6 +103,7 @@ def render_faculty_view_class(request, cls : ClassName|None):
     )
 
 #=======================
+@login_required
 def faculty_view_attendance_view_today(request,
                                        classId : int|None = None, className : str|None = None,
                                        moduleId : int|None = None, moduleName : str|None = None,
@@ -111,6 +119,7 @@ def faculty_view_attendance_view_today(request,
                                         action,
                                         y, m, d)
 
+@login_required
 def faculty_view_attendance_view(request,
                                  classId : int|None = None, className : str|None = None,
                                  moduleId : int|None = None, moduleName : str|None = None,
@@ -248,6 +257,7 @@ def render_faculty_view_attendance_view_CSV(request, present_query):
 
 #=======================
 
+@login_required
 def faculty_view_create_class(request):
     if request.method != 'POST' :
         return HttpResponseBadRequest() #This should only accept POST requests

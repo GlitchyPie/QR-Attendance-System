@@ -36,12 +36,9 @@ def default_page_title(context,userTitle : str|None = None):
             ttle0 = "Registration Submitted"
         case 'student_view_attendance_already_submitted':
             ttle0 = "Registration Already Submitted"
+        case 'login':
+            ttle0 = "Faculty Login"
 
-        #For completeness, but I don't think these will ever be used.
-        case 'faculty_view_create_class':
-            ttle0 = "Create class"
-        case 'faculty_view_delete_attendance':
-            ttle0 = "Delete Attendance Record"
         case '_':
             ttle0 = ""
 

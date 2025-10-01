@@ -1,0 +1,16 @@
+{% extends "GlobalBaseLayout.html" %}
+{% load static %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'registration/login.css' %}" />
+{% endblock %}
+
+{%block main_block %}
+    <section class="block">
+        <form method="POST" id="login-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Log in</button>
+        </form>
+    </section>
+{% endblock %}

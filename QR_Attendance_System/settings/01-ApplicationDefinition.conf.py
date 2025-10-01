@@ -44,3 +44,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'QR_Attendance_System.wsgi.application'
+
+LOGOUT_URL = '/faculty/logout/'
+LOGIN_URL = '/faculty/login/'
+LOGIN_REDIRECT_URL = '/'   # where to go after successful login
+LOGOUT_REDIRECT_URL = '/'  # where to go after logout

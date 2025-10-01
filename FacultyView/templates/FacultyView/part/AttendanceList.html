@@ -35,28 +35,30 @@
                             </span>
                             <span class="student-email"><i class="fa-solid fa-square-envelope"></i>{{attendance.student.s_eml}}</span>
                             <div class="delete-button-container" id="container_delete_record_{{attendance.id}}">
-                                <button
-                                    id="btn_delete_record_{{attendance.id}}"
-                                    class="delete-button icon"
-                                    title="Delete Record"
-                                >
-                                    <i class="fa-regular fa-trash-can"></i>
-                                </button>
-                                <button
-                                    id="btn_delete_record_{{attendance.id}}_yes"
-                                    class="delete-button yes"
-                                    value="{{attendance.id}}"
-                                    title="Confirm Delete Record"
-                                >
-                                    <i class="fa-solid fa-square-check"></i>
-                                </button>
-                                <button
-                                    id="btn_delete_record_{{attendance.id}}_no"
-                                    class="delete-button no"
-                                    title="Cancel Delete Record"
-                                >
-                                    <i class="fa-solid fa-square-xmark"></i>
-                                </button>
+                                {% if request.user.is_staff %}
+                                    <button
+                                        id="btn_delete_record_{{attendance.id}}"
+                                        class="delete-button icon"
+                                        title="Delete Record"
+                                    >
+                                        <i class="fa-regular fa-trash-can"></i>
+                                    </button>
+                                    <button
+                                        id="btn_delete_record_{{attendance.id}}_yes"
+                                        class="delete-button yes"
+                                        value="{{attendance.id}}"
+                                        title="Confirm Delete Record"
+                                    >
+                                        <i class="fa-solid fa-square-check"></i>
+                                    </button>
+                                    <button
+                                        id="btn_delete_record_{{attendance.id}}_no"
+                                        class="delete-button no"
+                                        title="Cancel Delete Record"
+                                    >
+                                        <i class="fa-solid fa-square-xmark"></i>
+                                    </button>
+                                {% endif %}
                             </div>
                         </label>
                     </li>

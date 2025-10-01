@@ -47,7 +47,10 @@
 {% endblock %}
 
 {% block right_block %}
-    <h4>Admin links...</h4>
+
     <a href="{% jump_url 'faculty_view_attendance' action='view' %}"><i class="fa-solid fa-clock-rotate-left"></i>Historical data view and export</a><br>
-    <a href="/admin/"><i class="fa-solid fa-database"></i>Database admin</a><br>
+    
+    {% if request.user.is_staff %}
+        <a href="/faculty/admin/"><i class="fa-solid fa-database"></i>Database admin</a><br>
+    {% endif %}
 {% endblock %}

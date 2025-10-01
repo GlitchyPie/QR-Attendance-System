@@ -116,13 +116,7 @@ footer>*:nth-child(2){
 footer>*:nth-child(3){
   text-align: right;
 }
-#footer-menu-left ul{
-  list-style: none;
-}
-#footer-menu-left ul>li{
-  float:left;
-  margin: 0 2px 0 2px;
-}
+
 button {
   background-color: var(--button-background-color);
   color: var(--button-color);
@@ -175,6 +169,22 @@ input:read-only{
   color: var(--button-hover-color);
   border: var(--button-hover-color);
   box-shadow: inset 3px 3px 4px 0 rgba(127,127,127,0.5);
+}
+#tool-menu form{
+  display: inline;
+}
+#tool-menu form button{
+  padding: 5px;
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  font-family: inherit;
+}
+
+.user-name{
+  border-radius: 5px;
+  border: 1px solid var(--header-color);
+  padding:5px;
 }
 
 @media (max-width: 60em) {

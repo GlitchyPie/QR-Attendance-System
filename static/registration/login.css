@@ -1,0 +1,21 @@
+#login-form p{
+    margin-top: 2px;
+    margin-bottom: 3px;
+}
+
+.errorlist{
+    border: 1px solid red;
+    border-radius: 5px;
+    text-align: left;
+    list-style: none;
+    background-color: var(--window-background-color);
+    color: var(--window-color);
+    margin-bottom:10px;
+}
+
+.errorlist li{
+    margin: 3px;
+    border-radius: 5px;
+    padding: 2px;
+    border: 1px solid var(--section-backgroud-color);
+}

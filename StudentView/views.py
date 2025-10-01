@@ -1,7 +1,5 @@
 import datetime
 import pytz
-import json
-from io import StringIO
 from QR_Attendance_System.core import *
 from django.shortcuts import render
 from FacultyView.models import Student, ClassName, Attendance

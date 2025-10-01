@@ -22,10 +22,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.templatetags.static import static as static_file
 from django.views.generic.base import RedirectView
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     re_path(r"(^|/)favicon.ico$", RedirectView.as_view(url=static_file('favicon.ico'), permanent=False)),
-    path('admin/', admin.site.urls),
+
+    path('faculty/admin/', admin.site.urls),
+    path('faculty/login/', auth_views.LoginView.as_view(), name="login"),
+    path('faculty/logout/', auth_views.LogoutView.as_view(), name="logout"),
+
     path('', include('FacultyView.urls')),
     path('', include('StudentView.urls')),
 ]
