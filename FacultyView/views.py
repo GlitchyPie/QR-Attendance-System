@@ -134,6 +134,8 @@ def faculty_view_attendance_view(request,
                                  month_end : int|None = None,
                                  day_end : int|None = None):
 
+
+
     presentQuery,cls,mod = attendance_query(classId=classId, className=className,
                                             moduleId=moduleId, moduleName=moduleName,
                                             year=year, month=month, day=day,
@@ -196,6 +198,7 @@ def faculty_view_attendance_view(request,
             response = render_faculty_view_attendance_related_template(request,
                                                                        'FacultyView/view/ExportForm.html',
                                                                        context)
+            
         case 'view-table':
             response = render_faculty_view_attendance_related_template(request,
                                                                        'FacultyView/views/AttendanceTable.html',
@@ -214,6 +217,7 @@ def faculty_view_attendance_view(request,
         case _:
             response = HttpResponseBadRequest()
 
+    response['cache-control'] = 'max-age=2, must-revalidate'
     response['Last-Modified'] = http_date(state_last_attendance_modified.timestamp())
     response['ETag'] = etag
     return response
