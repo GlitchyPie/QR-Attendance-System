@@ -2,7 +2,7 @@ from django import template
 from django.conf import settings
 from django.urls import resolve
 from QR_Attendance_System.core import getClassAndModule
-from FacultyView.templatetags import export_date_type
+from TemplateTags.templatetags import export_date_type
 
 register = template.Library()
 
