@@ -4,7 +4,7 @@ import qrcode
 import os
 from django.urls import reverse
 from django.conf import settings
-from FacultyView.models import Attendance, ClassName, ModuleName
+from FacultyView.models import Attendance, ClassName, ModuleName, Student
 
 class LocalState:
     last_attendance_modified_class : dict[int,datetime.datetime] = {
@@ -138,7 +138,8 @@ def attendance_query(cls : ClassName|None = None,
                      day_start : int|None = None,
                      year_end : int|None = None,
                      month_end : int|None = None,
-                     day_end : int|None = None,):
+                     day_end : int|None = None,
+                     student : Student | None = None,):
 
     if((cls == None) and (mod == None)):
         cls,mod = getClassAndModule(classId, className, moduleId, moduleName)
@@ -196,6 +197,9 @@ def attendance_query(cls : ClassName|None = None,
             present = present.filter(dte_date__day=day)
 
     #--------
+
+    if(student):
+        present = present.filter(student=student)
 
     return (present, cls, mod)
     

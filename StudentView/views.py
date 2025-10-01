@@ -116,7 +116,7 @@ def student_view_attendance_submitted(request,
 #=======================
 
 def student_is_present(student : Student, cls : ClassName, year : int, month : int, day : int):
-    return attendance_query(cls=cls, year=year, month=month, day=day)[0].filter(student=student).exists()
+    return attendance_query(cls=cls, year=year, month=month, day=day, student=student)[0].exists()
 
 def student_view_student_lookup(request):
     if request.method != 'POST' :
