@@ -5,6 +5,7 @@ import os
 from django.urls import reverse
 from django.conf import settings
 from FacultyView.models import Attendance, ClassName, ModuleName, Student
+from django.db.models.functions import TruncDate, TruncTime
 
 class LocalState:
     last_attendance_modified_class : dict[int,datetime.datetime] = {
@@ -200,6 +201,11 @@ def attendance_query(cls : ClassName|None = None,
 
     if(student):
         present = present.filter(student=student)
+
+    present = present.annotate(
+            dte_date_date=TruncDate('dte_date'),
+            dte_date_time=TruncTime('dte_date')
+        ).order_by('dte_date_date','className','dte_date_time')
 
     return (present, cls, mod)
     
