@@ -205,7 +205,7 @@ def attendance_query(cls : ClassName|None = None,
     present = present.annotate(
             dte_date_date=TruncDate('dte_date'),
             dte_date_time=TruncTime('dte_date')
-        ).order_by('dte_date_date','className','dte_date_time')
+        ).order_by('dte_date_date', 'className__moduleName__s_moduleName', 'className__s_className', 'dte_date_time')
 
     return (present, cls, mod)
     

@@ -13,15 +13,16 @@ var EXPORT_FORM = (function(){
         document.addEventListener('DOMContentLoaded',()=>{
             const FORM = document.getElementById(formId);
             
-            const btn_view_current = FORM.querySelector('button[name="btn-view-date"]');
-            const btn_export_current = FORM.querySelector('button[name="btn-export-date"]');
-            
-            const btn_view_today = FORM.querySelector('button[name="btn-view-today"]');
-            const btn_view_yesterday = FORM.querySelector('button[name="btn-view-yesterday"]');
-            
-            const btn_export_today = FORM.querySelector('button[name="btn-export-today"]');
-            const btn_export_yesterday = FORM.querySelector('button[name="btn-export-yesterday"]');
-            
+            const export_dlg_containter = FORM.querySelector('.export-selection-container');
+            const export_dlg = export_dlg_containter.querySelector('.export-selection-dlg');
+            const cancel_export_btn = export_dlg.querySelector('button[name="btn-cancel-export"]');
+
+            const file_name = export_dlg.querySelector('input[name="export-filename"]');
+            const dlg_header = export_dlg.querySelector('.export-selection-dlg-header h4');
+
+            const export_btns = FORM.querySelectorAll('button[name="btn-export"]');
+            const view_btns = FORM.querySelectorAll('button[name="btn-view"]');
+
             const dateSelectorFieldSet = FORM.querySelector('.fs-date');
             const fieldsetSelectorBtns = dateSelectorFieldSet.querySelectorAll('button[data-isstd]');
             const fieldsetSelectorDivs = dateSelectorFieldSet.querySelectorAll('div[data-isstd]');
@@ -37,77 +38,144 @@ var EXPORT_FORM = (function(){
             const input_date_year = FORM.querySelector('input[name="export-date-year"]');
             const input_date_month = FORM.querySelector('input[name="export-date-month"]');
             const input_date_day = FORM.querySelector('input[name="export-date-day"]');
-            
-            function getPath(action, dte){
+
+            function GenerateViewAndExportInfo(dte = undefined){
                 let today = (dte === 0);
 
                 const classId = classSelect.value;
                 const moduleId = moduleSelect.value;
 
-                let path = "/attendance/";
+                let file_name = "Attendance Report";
+                let title_prefix = '';
+                let title_date = '';
+
+                let path = '/attendance/';
+
                 if(classId != '*'){
                     path = `${path}class/${classId}/`;
+                    const t = classSelect.querySelector(`[value="${classId}"]`).textContent;
+                    title_prefix = t
+                    file_name = `${file_name}-${t}`;
                 }else if(moduleId != '*'){
                     path = `${path}module/${moduleId}/`;
+                    const t = moduleSelect.querySelector(`[value="${classId}"]`).textContent;
+                    title_prefix = t;
+                    file_name = `${file_name}-${t}`;
+                }else{
+                    title_prefix = "All"
+                    file_name = `${file_name}-All`;
                 }
 
-                if(today){
-                    path = `${path}today/`;
-
-                }else if(Number.isInteger(dte)){
-                    const D = new Date();
-                    D.setDate(D.getDate() + dte);
-                    path = `${path}${D.getFullYear()}/${D.getMonth() + 1}/${D.getDate()}/`
-
-                }else{
+                if(dte === undefined){ //Use current selection
                     const isStd = dateSelectorFieldSet.dataset.isstd;
                     switch(isStd){
                         case '1': //Single date
+                            const N = new Date();
                             const D = new Date(datepicker.value);
                             if(!isValidDate(D)){throw Error('Invalid date selected in date picker');}
-                            path = `${path}${D.getFullYear()}/${D.getMonth() + 1}/${D.getDate()}/`
+
+                            path = `${path}${D.getFullYear()}/${D.getMonth() + 1}/${D.getDate()}/`;
+                            
+                            title_date = D.toLocaleDateString();
+                            file_name = `${file_name}-${D.getFullYear()}-${D.getMonth() + 1}-${D.getDate()}`;
                             break;
                         
                         case '2': //Date range
-                            const S = new Date(datepicker_range_start.value);
-                            const E = new Date(datepicker_range_end.value);
+                            let S = new Date(datepicker_range_start.value);
+                            let E = new Date(datepicker_range_end.value);
+                            let ttle_S = ""
+                            let tlte_E = ""
+                            let fnS = ""
+                            let fnE = ""
                             if(isValidDate(S)){
                                 path = `${path}from/${S.getFullYear()}-${S.getMonth() + 1}-${S.getDate()}/`
+                                ttle_S = S.toLocaleDateString();
+                                fnS = `${S.getFullYear()}-${S.getMonth() + 1}-${S.getDate()}`;
+                            } else {
+                                ttle_S = "####";
+                                fnS = "####";
+                                S = false;
                             }
                             if(isValidDate(E)){
                                 path = `${path}to/${E.getFullYear()}-${E.getMonth() + 1}-${E.getDate()}/`
+                                tlte_E = S.toLocaleDateString();
+                                fnE = `${E.getFullYear()}-${E.getMonth() + 1}-${E.getDate()}`;
+                            } else {
+                                tlte_E = "####";
+                                fnE = "####";
+                                E = false;
                             }
+                            if((S === false) && (E === false)){throw Error("No dates selected for range");}
+
+                            file_name = `${file_name}-${fnS}_${fnE}`;
+                            title_date = `${ttle_S} <> ${tlte_E}`;
                             break;
                         
                         case '3': //Misc manual date
                             const y = parseInt(input_date_year.value);
                             const m = parseInt(input_date_month.value);
                             const d = parseInt(input_date_day.value);
+                            title_date = `${y}-`
                             if(!isNaN(y)){
                                 path = `${path}${y}/`;
                                 if(!isNaN(m)){
                                     path = `${path}${m}/`;
+                                    title_date = `${title_date}${m}-`
                                     if(!isNaN(d)){
                                         path = `${path}${d}/`;
+                                        title_date = `${title_date}${d}`
+                                    }else{
+                                        title_date = `${title_date}##`
                                     }
+                                }else{
+                                    title_date = `${title_date}##-##`;
                                 }
+                                file_name = `${file_name}-${title_date}`;
+                            }else{
+                                throw Error("At least year required.")
                             }
                             break;
-
                         default:
                             throw Error(`Unknown isStd "${isStd}"`)
                     }
+
+                } else {
+                    if(Number.isInteger(dte)){ //days from today
+                        const O = dte;
+                        dte = new Date();
+                        dte.setDate(dte.getDate() + O);
+                    }
+                    if(!isValidDate(dte)){ // Is a date
+                        throw Error("Invalid value provided to GenerateViewAndExportInfo.");
+                    }else if(today){
+                        path = `${path}today/`;
+                    }else{
+                        path = `${path}${dte.getFullYear()}/${dte.getMonth() + 1}/${dte.getDate()}/`;
+                    }
+                    title_date = dte.toLocaleDateString();
+                    file_name = `${file_name}-${dte.getFullYear()}-${dte.getMonth()}-${dte.getDate()}`;
                 }
 
-                path = `${path}${action}/`;
-
-                return path;
+                return{
+                    'title_prefix' : title_prefix,
+                      'title_date' : title_date,
+                       'view_path' : `${path}view/`,
+                            'path' : path,
+                       'file_name' : file_name,
+                }
+                
             }
-            function goto_export(dte){
-                window.location = getPath('export-csv',dte);
+
+
+            function goto_export(dte, format='csv'){
+                window.location = getPath(`export-${format}`, 
+                                          dte,{
+                                            'file_name':file_name.value
+                                          });
             }
             function goto_view(dte){
-                window.location = getPath('view',dte);
+                const path = GenerateViewAndExportInfo(dte).view_path
+                window.location = path;
             }
             function updateClassPicker(event){
                 const v = moduleSelect.value;
@@ -165,35 +233,70 @@ var EXPORT_FORM = (function(){
                 select_date_fieldset(elm.dataset.isstd);
             }
 
+
+            function update_dlg_heading_and_file_name(){
+                const context = export_dlg.export_context;
+                dlg_header.textContent = `${context.title_prefix} - [${context.title_date}]`;
+                file_name.value = context.file_name
+            }
+            function displayExportDialog(dte){
+                export_dlg.export_context = GenerateViewAndExportInfo(dte);
+                update_dlg_heading_and_file_name();
+                export_dlg_containter.style.display = 'grid';
+            }
+            function view_btn_click(event, btn){
+                try{
+                    event.preventDefault();
+                    const V = `${btn.value}`;
+                    const I = parseInt(V);
+
+                    if(btn.value == 'C'){
+                        goto_view(undefined);
+                    }else if(!isNaN(I)){
+                        goto_view(I);
+                    } else {
+                        throw Error(`Invalid button value "${V}".`);
+                    }                    
+                }catch (error){
+                    console.log(error);
+                    alert(error);
+                }
+
+            }
+            function export_btn_click(event, btn){
+                event.preventDefault();
+                const V = `${btn.value}`;
+                const I = parseInt(V);
+
+                if(btn.value == 'C'){
+                    displayExportDialog(undefined);
+                }else if(!isNaN(I)){
+                    displayExportDialog(I);
+                } else if(V.length >= 3){
+                    const q = GLOBGOR.urls.serializeQuery({
+                        'file_name' : file_name.value,
+                    })
+                    window.location = `${export_dlg.export_context.path}export-${V}/?${q}`
+                } else {
+                    throw Error(`Invalid button value "${V}".`);
+                }
+            }
+            function export_cancel_click(event){
+                event.preventDefault();
+                export_dlg_containter.style.display = 'none';
+            }
+
             updateClassPicker();
             select_date_fieldset(dateSelectorFieldSet.dataset.isstd);
 
-            btn_export_today.addEventListener('click',(event)=>{
-                event.preventDefault();
-                goto_export(0);
-            });
-            btn_export_yesterday.addEventListener('click',(event)=>{
-                event.preventDefault();
-                goto_export(-1);
-            });
-
-            btn_view_today.addEventListener('click',(event)=>{
-                event.preventDefault();
-                goto_view(0);
-            });
-            btn_view_yesterday.addEventListener('click',(event)=>{
-                event.preventDefault();
-                goto_view(-1);
-            });
-
-            btn_export_current.addEventListener('click',(event)=>{
-                event.preventDefault();
-                goto_export();
-            });
-            btn_view_current.addEventListener('click',(event)=>{
-                event.preventDefault();
-                goto_view();
-            });
+            //---- Export and view buttons ----//
+            for (const view_btn of view_btns) {
+                view_btn.addEventListener('click',(event)=>view_btn_click(event, view_btn));
+            }
+            for (const export_btn of export_btns) {
+                export_btn.addEventListener('click',(event)=>export_btn_click(event,export_btn));                
+            }
+            cancel_export_btn.addEventListener('click',export_cancel_click);
 
             for (const element of fieldsetSelectorBtns) {
                 element.addEventListener('mouseenter',(event)=>fieldSetBtn_mouseEnter(event,element));

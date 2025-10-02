@@ -15,14 +15,14 @@ var GLOBGOR = GLOBGOR || (function(){
         if((!!elem.dataset) && (!!elem.dataset.isotime)){
             const utcDateStr = elem.dataset.isotime;
             const utcDate = new Date(utcDateStr);
-            elem.innerText = utcDate.toLocaleString(lang, localeOpts_times);
+            elem.textContent = utcDate.toLocaleString(lang, localeOpts_times);
         }
     }
     function format_date(elem){
         if((!!elem.dataset) && (!!elem.dataset.isodate)){
             const utcDateStr = elem.dataset.isodate;
             const utcDate = new Date(utcDateStr);
-            elem.innerText = utcDate.toLocaleString(lang, localeOpts_YMD);
+            elem.textContent = utcDate.toLocaleString(lang, localeOpts_YMD);
         }
     }
     function format_opt(elem){
@@ -30,9 +30,9 @@ var GLOBGOR = GLOBGOR || (function(){
             const utcDateStr = elem.dataset.isoopt;
             const utcDate = new Date(utcDateStr);
             if(!!elem.dataset.localeopts){
-                elem.innerText = utcDate.toLocaleString(lang, elem.dataset.localeopts);
+                elem.textContent = utcDate.toLocaleString(lang, elem.dataset.localeopts);
             }else{
-                elem.innerText = utcDate.toLocaleString(lang);
+                elem.textContent = utcDate.toLocaleString(lang);
             }
         }
     }
@@ -47,9 +47,11 @@ var GLOBGOR = GLOBGOR || (function(){
     }
 
     function serializeForQuery(obj) {
+        if(!(!!obj)){return ''}
+
         var str = [];
         for(var p in obj){
-            if(!!obj){
+            if(!!p){
                 str.push(`${encodeURIComponent(p)}=${encodeURIComponent(obj[p])}`);
             }else{
                 str.push(`${encodeURIComponent(p)}=`);

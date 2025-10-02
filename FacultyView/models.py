@@ -59,6 +59,10 @@ class Attendance(models.Model):
     def date_only(self):
         return self.dte_date.date()
     
+    @property
+    def time_only(self):
+        return self.dte_date.time()
+    
     def __str__(self) -> str:
         return f"{self.dte_date} - {self.className} - {self.student}"
     

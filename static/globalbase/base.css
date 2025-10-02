@@ -77,12 +77,11 @@ main>section {
   
   overflow-y: auto;
   overflow-x: hidden;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb-color) var(--scroll-track-color);  
 }
 
-main>section{
-  scrollbar-width: thin;
-  scrollbar-color: var(--scroll-thumb-color) var(--scroll-track-color);
-}
 main>section::-webkit-scrollbar{
   width:8px;
 }

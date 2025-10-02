@@ -88,20 +88,33 @@
             </label>
         </div>
         <br>
-        <button name="btn-view-date">View</button>
-        <button name="btn-export-date">Export</button>
+        <button name="btn-view" value="C">View</button>
+        <button name="btn-export" value="C">Export</button>
     </fieldset>
     <fieldset>
         <legend>Today:</legend>
-        <button name="btn-view-today">View</button>
-        <button name="btn-export-today">Export</button>
+        <button name="btn-view" value="0">View</button>
+        <button name="btn-export" value="0">Export</button>
     </fieldset>
     <fieldset>
         <legend>Yesterday:</legend>
-        <button name="btn-view-yesterday">View</button>
-        <button name="btn-export-yesterday">Export</button>
+        <button name="btn-view" value="-1">View</button>
+        <button name="btn-export" value="-1">Export</button>
     </fieldset>
+    <div class="export-selection-container" style="display:None">
+      <div class="export-selection-dlg">
+        <header class="export-selection-dlg-header"><h3>Export format</h3><h4></h4></header>
+        <main class="export-selection-dlg-main">
+            <label>Filename:<input type="text" name="export-filename"></label><br>
+            <button name="btn-export" value="csv"><i class="fa-solid fa-file-csv"></i> CSV</button>
+            <button name="btn-export" value="xlsx"><i class="fa-solid fa-file-excel"></i> XLSX</button>
+            <button name="btn-export" value="json"><i class="fa-solid fa-file-lines"></i> JSON</button>
+        </main>
+        <footer class="export-selection-dlg-footer"><button name="btn-cancel-export">Cancel</button></footer>
+      </div>
+    </div>
 </form>
+
 <script src="{% static 'FacultyView/part/EXPORT_FORM.js' %}"></script>
 <script>
     EXPORT_FORM.register('export-date-form_{{export_form_id}}');

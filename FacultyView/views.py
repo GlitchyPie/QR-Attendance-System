@@ -4,16 +4,24 @@ import pytz
 import csv
 import json
 import hashlib
-from enum import Enum
+import xlsxwriter
+from .DRF_Serializers import AttendanceSerializer
+#from xlsxwriter.utility import xl_rowcol_to_cell
 from QR_Attendance_System.core import *
+from io import BytesIO
+from itertools import groupby
+#from operator import attrgetter
 from django.shortcuts import render
 from django.utils.http import parse_http_date, http_date
+from django.core import serializers as djserializers
 from django.http import HttpResponse
+from django.http import FileResponse
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseNotFound
 from django.http import HttpResponseNotModified
 from django.http import HttpResponseForbidden
+from django.http import JsonResponse
 from django.urls import reverse
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required
@@ -156,8 +164,8 @@ def faculty_view_attendance_view(request,
             return HttpResponseNotModified()
 
     vals = list(presentQuery.values())
-    j = json.dumps(vals, cls=DjangoJSONEncoder).encode()
-    etag = hashlib.md5(j, usedforsecurity=False).hexdigest()
+    str_json = json.dumps(vals, cls=DjangoJSONEncoder).encode()
+    etag = hashlib.md5(str_json, usedforsecurity=False).hexdigest()
     
     if_none_match = request.META.get("HTTP_IF_NONE_MATCH")
     if if_none_match == etag:
@@ -201,7 +209,7 @@ def faculty_view_attendance_view(request,
             
         case 'view-table':
             response = render_faculty_view_attendance_related_template(request,
-                                                                       'FacultyView/views/AttendanceTable.html',
+                                                                       'FacultyView/view/AttendanceTable.html',
                                                                        context)
         
         case 'list-html':
@@ -211,11 +219,14 @@ def faculty_view_attendance_view(request,
         case 'export-csv':
             response = render_faculty_view_attendance_view_CSV(request, presentQuery)
         
+        case 'export-xlsx':
+            response = render_faculty_view_attendance_view_xlsx(request, presentQuery)
+
         case 'export-json':
-            response = HttpResponseNotFound()
-        
+            response = render_faculty_view_attendance_json(request, presentQuery)
+
         case _:
-            response = HttpResponseBadRequest()
+            response = HttpResponseNotFound()
 
     response['cache-control'] = 'max-age=2, must-revalidate'
     response['Last-Modified'] = http_date(state_last_attendance_modified.timestamp())
@@ -225,7 +236,6 @@ def faculty_view_attendance_view(request,
 def render_faculty_view_attendance_related_template(request,
                                                     templateName : str, 
                                                     context : dict[str, Any]):
-
     context['classes'] = ClassName.objects.all()
     context['modules'] = ModuleName.objects.all()
 
@@ -241,7 +251,7 @@ def render_faculty_view_attendance_view_CSV(request, present_query):
         'Last Name',
         'Module',
         'Class',
-        'Date / Time',
+        'Date / Time (ISO)',
         'Module ID',
         'Class ID',
     ])
@@ -257,8 +267,75 @@ def render_faculty_view_attendance_view_CSV(request, present_query):
             entry.className.id,
         ])
 
+    fn = request.GET.get('file_name',None) or "Attendance Report.csv"
+    response["Content-Disposition"] = f"attachment; filename=\"{fn}\""
     return response
 
+def render_faculty_view_attendance_view_xlsx(request, attendance_query):
+    headers = [
+        'Student Email',
+        'First Name',
+        'Last Name',
+        'Module',
+        'Class',
+        'Date / Time (ISO)',
+        'Time (Local)',
+        'Module ID',
+        'Class ID',
+    ]
+
+    output = BytesIO()
+    workbook = xlsxwriter.Workbook(output,{'use_future_functions':False})
+
+    fmt1 = workbook.add_format()
+    fmt1.set_num_format('hh:mm')
+    
+    for k, grp in groupby(attendance_query, key=lambda d: d.dte_date.date()):
+        worksheet = workbook.add_worksheet(k.isoformat())
+        worksheet.write_row(0,0,headers)
+        r = 1
+        for entry in grp:
+            entry_posix = entry.dte_date.timestamp()
+            excel_serial = (entry_posix / 86400) + 25569
+            worksheet.write_row(r,0,[
+                entry.student.s_eml, #0
+                entry.student.s_fname, #1
+                entry.student.s_lname, #2
+                entry.className.moduleName.s_moduleName, #3
+                entry.className.s_className, #4
+                entry.dte_date.isoformat(), #5
+                0, #6
+                entry.className.moduleName.id, #7
+                entry.className.id,#8
+            ])
+            formula = (
+                        "=_xlfn.LET("
+                       f"_xlpm.α,{excel_serial},"
+                        "_xlpm.φ, WORKDAY.INTL(DATE(YEAR(_xlpm.α),4,1),-1,\"1111110\"),"
+                        "_xlpm.ε, WORKDAY.INTL(DATE(YEAR(_xlpm.α),11,1),-1,\"1111110\"),"
+                        "_xlpm.α+((_xlpm.α>=_xlpm.φ+1/24)*(_xlpm.α<_xlpm.ε+1/24))/24"
+                        ")"
+                       )
+            worksheet.write_formula(r, 6, formula, fmt1)
+            r+=1
+
+    workbook.close()
+
+    output.seek(0)
+    fn = request.GET.get('file_name',None) or "Attendance Report.xlsx"
+    response = FileResponse(output, as_attachment=True, 
+                            filename=fn,
+                            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                            )
+
+    return response
+
+def render_faculty_view_attendance_json(request, attendance_query):
+    fn = request.GET.get('file_name',None) or "Attendance Report.json"
+    serializer = AttendanceSerializer(attendance_query, many=True)
+    response = JsonResponse(serializer.data, safe=False)
+    response["Content-Disposition"] = f"attachment; filename=\"{fn}\""
+    return response
 #=======================
 
 @login_required

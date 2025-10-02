@@ -10,7 +10,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'FacultyView',
     'StudentView',
-    'TemplateTags'
+    'TemplateTags',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

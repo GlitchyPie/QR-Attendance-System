@@ -121,7 +121,7 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
                 const alc = currentList.parentElement.querySelector('.attendance-list-count') ?? currentList.parentElement.parentElement.querySelector('.attendance-list-count');
 
                 if(!!alc){
-                    alc.innerText = currentList.children.length;
+                    alc.textContent = currentList.children.length;
                 }
             }
             

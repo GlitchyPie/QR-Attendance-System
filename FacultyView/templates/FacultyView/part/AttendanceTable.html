@@ -1,4 +1,5 @@
 
+{% load static %}
 {% regroup present by date_only as attendance_grouped_by_date %}
 {% for date_group in attendance_grouped_by_date %}
     {% regroup date_group.list by className as grouped_by_class %}
