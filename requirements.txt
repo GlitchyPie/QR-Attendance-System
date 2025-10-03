@@ -2,5 +2,7 @@ qrcode
 django
 pillow
 pytz
+XlsxWriter
 django-case-insensitive-field
 django-settings-export
+djangorestframework

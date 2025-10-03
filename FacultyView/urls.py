@@ -2,7 +2,6 @@ from . import views
 from django.urls import path, include
 from django.views.generic.base import RedirectView
 
-
 attendanceUrlSuffixes=[
     #Redirects==
     path('', RedirectView.as_view(url='today/view/', permanent=False)),
@@ -49,5 +48,5 @@ urlpatterns = [
 
     path('class/', include(classUrls)),
 
-    path('module/',include(modulePaths)),   
+    path('module/',include(modulePaths)),
 ]

@@ -1,0 +1,15 @@
+{% extends "GlobalBaseLayout.html" %}
+{% load static %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'FacultyView/view/base.css' %}" />
+{% endblock %}
+
+{% block main_block %}
+  <section class="block left_block">
+    {% block left_block %}<h2>No content</h2>{% endblock %}
+  </section>
+  <section class="block right_block">
+    {% block right_block %}<h2>No content</h2>{% endblock %}
+  </section>
+{% endblock %}

@@ -1,153 +1,47 @@
 import datetime
-from typing import Any
 import pytz
 import csv
 import json
 import hashlib
-from enum import Enum
+import xlsxwriter
+from typing import Any
+from .DRF_Serializers import AttendanceSerializer
 from QR_Attendance_System.core import *
+from io import BytesIO
+from itertools import groupby
 from django.shortcuts import render
 from django.utils.http import parse_http_date, http_date
+from django.core import serializers as djserializers
 from django.http import HttpResponse
+from django.http import FileResponse
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseNotFound
 from django.http import HttpResponseNotModified
+from django.http import HttpResponseForbidden
+from django.http import JsonResponse
 from django.urls import reverse
 from django.core.serializers.json import DjangoJSONEncoder
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from .models import Student, ClassName, Attendance, ModuleName
 
-class LocalState:
-    last_attendance_modified_class : dict[int,datetime.datetime] = {
-            -1 : datetime.datetime.now(pytz.utc)
-        }
-    
-    last_attendance_modified_module : dict[int,datetime.datetime] = {
-            -1 : datetime.datetime.now(pytz.utc)
-        }
-    
-    def get_attendance_modified_class(self, cls : ClassName | None = None):
-        id = -1
-        if(cls):
-            id = cls.id # type: ignore
-        return self.last_attendance_modified_class.get(id, self.last_attendance_modified_class[-1])
-    
-    def set_attendance_modified_class(self, cls : ClassName, dte : datetime.datetime | None = None):
-        dte = dte or datetime.datetime.now(pytz.utc)
-        self.last_attendance_modified_class[-1] = dte
-        self.last_attendance_modified_class[cls.id] = dte # type: ignore
-        self.last_attendance_modified_class[cls.id] = dte # type: ignore
-        self.set_attendance_modified_module(cls.moduleName)
-
-    def get_attendance_modified_module(self, mod : ModuleName | None = None):
-        id = -1
-        if(mod):
-            id = mod.id # type: ignore
-        return self.last_attendance_modified_module.get(id, self.last_attendance_modified_module[-1])
-    
-    def set_attendance_modified_module(self, mod : ModuleName, dte : datetime.datetime | None = None):
-        dte = dte or datetime.datetime.now(pytz.utc)
-        self.last_attendance_modified_module[-1] = dte
-        self.last_attendance_modified_module[mod.id] = dte # type: ignore
-        self.last_attendance_modified_module[mod.id] = dte # type: ignore
-
-    def get_attendance_modified(self):
-        A = self.get_attendance_modified_class()
-        B = self.get_attendance_modified_module()
-        return max([A , B])
-    
-#End Class
-
-STATE = LocalState()
-
-def attendance_query(cls : ClassName|None = None,
-                     mod : ModuleName|None = None, 
-                     classId : int|None = None, className : str|None = None, 
-                     moduleId : int|None = None, moduleName : str|None = None, 
-                     dte : datetime.datetime|None = None,
-                     year : int|None = None,
-                     month : int|None = None,
-                     day : int|None = None,
-                     dte_start : datetime.datetime|None = None, dte_end : datetime.datetime|None = None,
-                     year_start : int|None = None,
-                     month_start : int|None = None,
-                     day_start : int|None = None,
-                     year_end : int|None = None,
-                     month_end : int|None = None,
-                     day_end : int|None = None,):
-
-    if((cls == None) and (mod == None)):
-        cls,mod = getClassAndModule(classId, className, moduleId, moduleName)
-    elif(cls):
-        mod = mod or cls.moduleName
-
-    present = Attendance.objects.all()
-    if(cls):
-        present = present.filter(className = cls) # pyright: ignore[reportAttributeAccessIssue]
-    elif(mod):
-        present = present.filter(className__moduleName = mod) # pyright: ignore[reportAttributeAccessIssue]
-
-    if dte:
-        year = dte.year
-        month = dte.month
-        day = dte.day
-
-    if dte_start:
-        year_start = dte_start.year
-        month_start = dte_start.month
-        day_end = dte_start.day
-    
-    if dte_end:
-        year_end = dte_end.year
-        month_end = dte_end.month
-        day_end = dte_end.day
-    
-    if((year_start or month_start or day_start) or (year_end or month_end or day_end)):
-        if(year_start):
-            present = present.filter(dte_date__year__gte=year_start)
-        
-        if(month_start):
-            present = present.filter(dte_date__month__gte=month_start)
-
-        if(day_start):
-            present = present.filter(dte_date__day__gte=day_start)
-        
-        if(year_end):
-            present = present.filter(dte_date__year__lte=year_end)
-        
-        if(month_end):
-            present = present.filter(dte_date__month__lte=month_end)
-
-        if(day_end):
-            present = present.filter(dte_date__day__lte=day_end)
-
-    else:
-        if(year):
-            present = present.filter(dte_date__year=year)
-
-        if(month):
-            present = present.filter(dte_date__month=month)
-
-        if(day):
-            present = present.filter(dte_date__day=day)
-
-    #--------
-
-    return (present, cls, mod)
-    
 #=======================
 
+@login_required
 def faculty_view_delete_attendance(request):
     if request.method != 'POST' :
         return HttpResponseBadRequest() #This should only accept POST requests
     
+    if request.user.is_staff == False:
+        return HttpResponseForbidden()
+
     r = request.POST['attendance_record']
 
-    attendanceQuery = Attendance.objects.filter(id=r)
+    attendanceOb = Attendance.objects.filter(id=r).first()
 
     cls = None
-    if attendanceQuery.exists():
-        attendanceOb = attendanceQuery[0]
+    if attendanceOb:
         cls = attendanceOb.className
         attendanceOb.delete()
         return HttpResponseRedirect(reverse('faculty_view',kwargs={'classId':cls.id})) # pyright: ignore[reportAttributeAccessIssue]
@@ -156,10 +50,13 @@ def faculty_view_delete_attendance(request):
         
 #=======================
 
+@login_required
 def faculty_view(request,
                  classId : int|None = None, className : str|None = None,
                  moduleId : int|None =None, moduleName : str|None =None):
     
+    request.session.set_expiry(settings.SESSION_COOKIE_AGE)
+
     cls,mod = getClassAndModule(classId, className,
                                 moduleId, moduleName)
     
@@ -174,7 +71,7 @@ def render_faculty_view_module_index(request):
     modules = ModuleName.objects.all()
     return render(
         request,
-        'FacultyView/FacultyViewIndex.html',
+        'FacultyView/view/Index.html',
         {
             'modules' : modules
         },
@@ -187,7 +84,7 @@ def render_faculty_view_class_index(request, module : ModuleName|None):
     classes = ClassName.objects.filter(moduleName=module.id) # type: ignore
     return render(
         request,
-        'FacultyView/FacultyViewIndex.html',
+        'FacultyView/view/Index.html',
         {
             'classes' : classes,
             'module' : module,
@@ -205,7 +102,7 @@ def render_faculty_view_class(request, cls : ClassName|None):
 
     return render(
         request,
-        'FacultyView/FacultyViewClass.html',
+        'FacultyView/view/Class.html',
         {
               'present' : present,
                 'class' : cls,
@@ -215,6 +112,7 @@ def render_faculty_view_class(request, cls : ClassName|None):
     )
 
 #=======================
+@login_required
 def faculty_view_attendance_view_today(request,
                                        classId : int|None = None, className : str|None = None,
                                        moduleId : int|None = None, moduleName : str|None = None,
@@ -230,6 +128,7 @@ def faculty_view_attendance_view_today(request,
                                         action,
                                         y, m, d)
 
+@login_required
 def faculty_view_attendance_view(request,
                                  classId : int|None = None, className : str|None = None,
                                  moduleId : int|None = None, moduleName : str|None = None,
@@ -244,18 +143,24 @@ def faculty_view_attendance_view(request,
                                  month_end : int|None = None,
                                  day_end : int|None = None):
 
-    presentQuery,cls,mod = attendance_query(classId=classId, className=className,
+
+    #Query our attendance register...
+    query,cls,mod = attendance_query(classId=classId, className=className,
                                             moduleId=moduleId, moduleName=moduleName,
                                             year=year, month=month, day=day,
                                             year_start=year_start,month_start=month_start,day_start=day_start,
                                             year_end=year_end,month_end=month_end,day_end=day_end)
     
+    #Most recently modified
     state_last_attendance_modified = STATE.get_attendance_modified()
+
+    #If we have a class or a module specified we can use the more specific update time
     if(cls):
         state_last_attendance_modified = STATE.get_attendance_modified_class(cls)
     elif(mod):
         state_last_attendance_modified = STATE.get_attendance_modified_module(mod)
 
+    #Compare our last modified date to that provided by the server
     last_modified = request.META.get('HTTP_IF_MODIFIED_SINCE', None)
     if(last_modified):
         ts = parse_http_date(last_modified)
@@ -263,21 +168,24 @@ def faculty_view_attendance_view(request,
         if state_last_attendance_modified < dt:
             return HttpResponseNotModified()
 
-    vals = list(presentQuery.values())
-    j = json.dumps(vals, cls=DjangoJSONEncoder).encode()
-    etag = hashlib.md5(j, usedforsecurity=False).hexdigest()
+    #Generate a json representation of the query and generate a hash
+    vals = list(query.values())
+    str_json = json.dumps(vals, cls=DjangoJSONEncoder).encode()
+    etag = hashlib.md5(str_json, usedforsecurity=False).hexdigest()
     
+    #Compare that hash to the etag provided by the server
     if_none_match = request.META.get("HTTP_IF_NONE_MATCH")
     if if_none_match == etag:
         return HttpResponseNotModified()
 
-    one_date_only = (year and month and day)
 
+    #Should we generate a view with date and clas headers
+    #Usually true for the attendance view, false for the class view
     with_date_headers = (str(request.GET.get('with_date_headers', 'true')).lower() == "true")
     with_class_headers = (str(request.GET.get('with_class_headers', 'true')).lower() == "true")
 
     context : dict[str, Any]= {
-               'present' : presentQuery,
+               'present' : query,
                  'class' : cls,
                 'module' : mod,
 
@@ -299,45 +207,55 @@ def faculty_view_attendance_view(request,
 
     response = None
     match action:
-        case 'view':
+        case 'view': #view the attendance list next to the export form
+            request.session.set_expiry(settings.SESSION_COOKIE_AGE)
+
             #Force the with_date_headers to true for this view...
             context['with_date_headers'] = True
             context['with_class_headers'] = True
-            response = render_faculty_view_attendance_related_template(request,
-                                                                       'FacultyView/FacultyViewExportForm.html',
+            response = render_attendance_template_with_context(request,
+                                                                       'FacultyView/view/ExportForm.html',
                                                                        context)
-        case 'view-table':
-            response = render_faculty_view_attendance_related_template(request,
-                                                                       'FacultyView/FacultyViewAttendanceTable.html',
-                                                                       context)
-        
-        case 'list-html':
-            response = render_faculty_view_attendance_related_template(request,
-                                                                       'FacultyView/AttendanceList.html',
-                                                                       context)
-        case 'export-csv':
-            response = render_faculty_view_attendance_view_CSV(request, presentQuery)
-        
-        case 'export-json':
-            response = HttpResponseNotFound()
-        
-        case _:
-            response = HttpResponseBadRequest()
+            
+            
+        case 'view-table': #A plain HTML table view
+            request.session.set_expiry(settings.SESSION_COOKIE_AGE)
 
+            response = render_attendance_template_with_context(request,
+                                                                       'FacultyView/view/AttendanceTable.html',
+                                                                       context)
+        
+        case 'list-html': #Just the <ul> list - used for AJAX polling
+            response = render_attendance_template_with_context(request,
+                                                                       'FacultyView/part/AttendanceList.html',
+                                                                       context)
+            
+        case 'export-csv': #Export as a CSV
+            response = render_attendance_query_csv(request, query)
+        
+        case 'export-xlsx': #Export as an Excel workbook
+            response = render_attendance_query_xlsx(request, query)
+
+        case 'export-json': #Export as json
+            response = render_attendance_query_json(request, query)
+
+        case _:
+            response = HttpResponseNotFound()
+
+    response['cache-control'] = 'max-age=2, must-revalidate'
     response['Last-Modified'] = http_date(state_last_attendance_modified.timestamp())
     response['ETag'] = etag
     return response
 
-def render_faculty_view_attendance_related_template(request,
-                                                    templateName : str, 
-                                                    context : dict[str, Any]):
-
+def render_attendance_template_with_context(request,
+                                            templateName : str, 
+                                            context : dict[str, Any]):
     context['classes'] = ClassName.objects.all()
     context['modules'] = ModuleName.objects.all()
 
     return render(request, templateName, context)
 
-def render_faculty_view_attendance_view_CSV(request, present_query):
+def render_attendance_query_csv(request, attendance_query):
     response = HttpResponse (content_type='text/csv')
     csvWriter = csv.writer(response)
 
@@ -347,11 +265,11 @@ def render_faculty_view_attendance_view_CSV(request, present_query):
         'Last Name',
         'Module',
         'Class',
-        'Date / Time',
+        'Date / Time (ISO)',
         'Module ID',
         'Class ID',
     ])
-    for entry in present_query:
+    for entry in attendance_query:
         csvWriter.writerow([
             entry.student.s_eml,
             entry.student.s_fname,
@@ -363,19 +281,92 @@ def render_faculty_view_attendance_view_CSV(request, present_query):
             entry.className.id,
         ])
 
+    fn = request.GET.get('file_name',None) or "Attendance Report.csv"
+    response["Content-Disposition"] = f"attachment; filename=\"{fn}\""
     return response
 
+def render_attendance_query_xlsx(request, attendance_query):
+    headers = [
+        'Student Email',
+        'First Name',
+        'Last Name',
+        'Module',
+        'Class',
+        'Date / Time (ISO)',
+        'Time (Local)',
+        'Module ID',
+        'Class ID',
+    ]
+
+    output = BytesIO()
+    workbook = xlsxwriter.Workbook(output,{'use_future_functions':False})
+
+    fmt1 = workbook.add_format()
+    fmt1.set_num_format('hh:mm')
+    
+    for k, grp in groupby(attendance_query, key=lambda d: d.dte_date.date()):
+        worksheet = workbook.add_worksheet(k.isoformat())
+        worksheet.write_row(0,0,headers)
+        r = 1
+        for entry in grp:
+            entry_posix = entry.dte_date.timestamp()
+            excel_serial = (entry_posix / 86400) + 25569
+            worksheet.write_row(r,0,[
+                entry.student.s_eml, #0
+                entry.student.s_fname, #1
+                entry.student.s_lname, #2
+                entry.className.moduleName.s_moduleName, #3
+                entry.className.s_className, #4
+                entry.dte_date.isoformat(), #5
+                0, #6
+                entry.className.moduleName.id, #7
+                entry.className.id,#8
+            ])
+            formula = (
+                        "=_xlfn.LET("
+                       f"_xlpm.α,{excel_serial},"
+                        "_xlpm.φ, WORKDAY.INTL(DATE(YEAR(_xlpm.α),4,1),-1,\"1111110\"),"
+                        "_xlpm.ε, WORKDAY.INTL(DATE(YEAR(_xlpm.α),11,1),-1,\"1111110\"),"
+                        "_xlpm.α+((_xlpm.α>=_xlpm.φ+1/24)*(_xlpm.α<_xlpm.ε+1/24))/24"
+                        ")"
+                       )
+            worksheet.write_formula(r, 6, formula, fmt1)
+            r+=1
+
+    workbook.close()
+
+    output.seek(0)
+    fn = request.GET.get('file_name',None) or "Attendance Report.xlsx"
+    response = FileResponse(output, as_attachment=True, 
+                            filename=fn,
+                            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                            )
+
+    return response
+
+def render_attendance_query_json(request, attendance_query):
+    fn = request.GET.get('file_name',None) or "Attendance Report.json"
+    serializer = AttendanceSerializer(attendance_query, many=True)
+    response = JsonResponse(serializer.data, safe=False)
+    response["Content-Disposition"] = f"attachment; filename=\"{fn}\""
+    return response
 #=======================
 
+@login_required
 def faculty_view_create_class(request):
     if request.method != 'POST' :
         return HttpResponseBadRequest() #This should only accept POST requests
     
     className = request.POST['class_name']
     moduleName = request.POST['module_name']
+    moduleId = request.POST.get('module_id',None)
     
-    moduleOb = ModuleName.objects.get_or_create(s_moduleName__iexact=moduleName,
-                                                defaults={'s_moduleName':moduleName})[0]
+    if moduleId == '':
+        moduleOb = ModuleName.objects.get_or_create(s_moduleName__iexact=moduleName,
+                                                    defaults={'s_moduleName':moduleName})[0]
+    else:
+        moduleOb = ModuleName.objects.filter(id=moduleId).first()
+
     classOb = ClassName.objects.get_or_create(s_className__iexact=className, moduleName=moduleOb,
                                               defaults={'s_className':className})[0]
 

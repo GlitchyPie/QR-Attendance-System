@@ -1,0 +1,56 @@
+{% extends "FacultyView/view/Base.html" %}
+{% load static %}
+{% load contextual_reverse %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'FacultyView/view/index.css' %}" />
+{% endblock %}
+
+{% block left_block %}
+    {% if modules %}
+        <h3 class="present-list">Select a module to view classes</h3>
+    {% elif classes %}
+        <h3 class="present-list">Select your class</h3>
+    {% endif %}
+
+    <ul class="class-list">
+
+        {% if modules %}
+
+            {% for m in modules %}
+                <li class="module">
+                    <a href="{% url 'faculty_view' m.id %}"><button>{{m.s_moduleName}}</button></a>
+                </li>
+            {% endfor %}
+
+        {% elif classes %}
+
+            {% for c in classes %}
+                <li class="class">
+                    <a href="{% url 'faculty_view' classId=c.id %}"><button>{{c.s_className}}</button></a>
+                    <a href="{% url 'faculty_view_attendance' classId=c.id action='view' %}" title="Attendance History -  {{c}}"><button class="small"><i class="fa-solid fa-clock-rotate-left"></i></button></a>
+                </li>
+            {% endfor %}
+
+        {% endif %}
+
+        <li class="form">
+            <form class="form-create-class" method="POST" action="{% url 'faculty_view_create_class' %}">
+                {% csrf_token %}
+                <input type="hidden" value="{{module.id}}" name="module_id">
+                <label for="form-create-class_module_name">Module:</label><input type="text" name="module_name" id="form-create-class_module_name" {% if module %}value="{{module.s_moduleName}}" readonly{% endif %}>
+                <label for="form-create-class_class_name">Class:</label><input type="text" name="class_name" id="form-create-class_class_name">
+                <button type="submit">+ Create</button>
+            </form>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block right_block %}
+
+    <a href="{% contextual_reverse 'faculty_view_attendance' action='view' %}"><i class="fa-solid fa-clock-rotate-left"></i>Historical data view and export</a><br>
+    
+    {% if request.user.is_staff %}
+        <a href="/faculty/admin/"><i class="fa-solid fa-database"></i>Database admin</a><br>
+    {% endif %}
+{% endblock %}

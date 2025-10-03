@@ -1,0 +1,28 @@
+{% extends "StudentView/view/Base.html" %}
+{% load static %}
+
+{% block only_block %}
+    <h2>
+        {% if "already" in request.path %}
+            Attendance already submitted {% if class %}for <span class="class-name">{{class}}</span> {% endif %}today.
+        {% else %}
+            Attendance {% if class %}for <span class="class-name">{{class}}</span> {% endif %}submitted successfully.
+        {% endif %}
+    </h2>
+    <br>
+    <h2>You may now close this page{% if request.GET.next %},<br>or <a id="next-link" href="{{request.GET.next}}">return to where you were</a>{% endif %}.</h2>
+
+    <script>
+        let timeout = 30;
+        function tick(){
+            timeout--;
+            if(timeout <= 0){
+                const a = document.getElementById('next-link');
+                if(!!a){
+                    window.location = a.href;
+                }
+            }
+        }
+        setTimeout(()=>setInterval(tick,1000),2000);
+    </script>
+{% endblock %}

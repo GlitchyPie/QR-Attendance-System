@@ -1,0 +1,16 @@
+{% extends "StudentView/view/Base.html" %}
+{% load static %}
+
+{%block head %}
+    <link rel="stylesheet" href="{% static 'StudentView/part/qrCode.css' %}" />
+    <style>
+        main > section{
+            height:100% !important;
+            width:unset !important;
+        }
+    </style>
+{% endblock %}
+
+{% block only_block %}
+    {% include "StudentView/part/QRCode.html" %}
+{% endblock %}

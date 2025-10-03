@@ -1,0 +1,10 @@
+{% extends "StudentView/view/Base.html" %}
+{% load static %}
+
+{%block head %}
+    <link rel="stylesheet" href="{% static 'StudentView/part/studentRegistrationForm.css' %}" />
+{% endblock %}
+
+{% block only_block %}
+  {% include "StudentView/part/RegistrationForm.html" %}
+{% endblock %}
