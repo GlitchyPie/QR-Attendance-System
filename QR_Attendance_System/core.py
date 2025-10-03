@@ -173,9 +173,11 @@ def attendance_query(cls : ClassName|None = None,
                 if day:
                     dte = datetime.datetime(year,month,day,23,59,59,999999, pytz.utc)
                 else:
-                    dte = endOfMonth(year, month)
+                    dte_start = datetime.datetime(year, month, 1, 0 ,0, 0, 0, pytz.utc)
+                    dte_end = endOfMonth(year, month)
             else:
-                dte = endOfYear(year)
+                dte_start = datetime.datetime(year, 1, 1, 0 ,0, 0, 0, pytz.utc)
+                dte_end = endOfYear(year)
     #-----------------------------------------
 
     if not dte_start:
