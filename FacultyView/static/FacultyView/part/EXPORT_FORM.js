@@ -53,14 +53,19 @@ var EXPORT_FORM = (function(){
 
                 if(classId != '*'){
                     path = `${path}class/${classId}/`;
-                    const t = classSelect.querySelector(`[value="${classId}"]`).textContent;
-                    title_prefix = t
-                    file_name = `${file_name}-${t}`;
+                    
+                    const C = classSelect.querySelector(`[value="${classId}"]`);
+                    const M = moduleSelect.querySelector(`[value="${C.dataset.moduleid}"]`);
+                    title_prefix = `${M.textContent}-${C.textContent}`
+
+                    file_name = `${file_name}-${title_prefix}`;
                 }else if(moduleId != '*'){
                     path = `${path}module/${moduleId}/`;
-                    const t = moduleSelect.querySelector(`[value="${classId}"]`).textContent;
-                    title_prefix = t;
-                    file_name = `${file_name}-${t}`;
+                    
+                    const M = moduleSelect.querySelector(`[value="${moduleId}"]`);
+                    title_prefix = `${M.textContent}-All`;
+
+                    file_name = `${file_name}-${title_prefix}`;
                 }else{
                     title_prefix = "All"
                     file_name = `${file_name}-All`;
@@ -98,7 +103,7 @@ var EXPORT_FORM = (function(){
                             }
                             if(isValidDate(E)){
                                 path = `${path}to/${E.getFullYear()}-${E.getMonth() + 1}-${E.getDate()}/`
-                                tlte_E = S.toLocaleDateString();
+                                tlte_E = E.toLocaleDateString();
                                 fnE = `${E.getFullYear()}-${E.getMonth() + 1}-${E.getDate()}`;
                             } else {
                                 tlte_E = "####";
@@ -286,6 +291,7 @@ var EXPORT_FORM = (function(){
                 export_dlg_containter.style.display = 'none';
             }
 
+
             updateClassPicker();
             select_date_fieldset(dateSelectorFieldSet.dataset.isstd);
 
@@ -298,15 +304,18 @@ var EXPORT_FORM = (function(){
             }
             cancel_export_btn.addEventListener('click',export_cancel_click);
 
+            //---- Fieldset selector buttons ----//
             for (const element of fieldsetSelectorBtns) {
                 element.addEventListener('mouseenter',(event)=>fieldSetBtn_mouseEnter(event,element));
                 element.addEventListener('mouseleave',(event)=>fieldSetBtn_mouseLeave(event,element));
                 element.addEventListener('click',(event)=>fieldSetBtn_click(event,element));
             }
+            datepicker.addEventListener('input',()=>goto_view(new Date(datepicker.value))); //Single date picker
 
+            //---- Class / Module selectors ----//
             moduleSelect.addEventListener('input', ()=>{classSelect.value = '*'; goto_view();});
             classSelect.addEventListener('input',()=>goto_view());
-            datepicker.addEventListener('input',()=>goto_view(new Date(datepicker.value)));
+            
         });
     }
 
