@@ -99,6 +99,10 @@ var GLOBGOR = GLOBGOR || (function(){
         return xhr;
     }
 
+    function getCookie(name) {
+        return document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')?.pop() || ''
+    }
+
     return {
         'format':{
             'date' : format_date,
@@ -112,6 +116,9 @@ var GLOBGOR = GLOBGOR || (function(){
             'create' : createXHR,
               'post' : postXHR,
                'get' : getXHR,
-        }
+        },
+        'cookies': {
+            'get':getCookie
+        },
     }
 }());
