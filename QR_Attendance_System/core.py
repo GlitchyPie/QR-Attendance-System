@@ -125,6 +125,18 @@ def getClassAndModule(classId : int|None = None, className : str|None = None,
 
     return (clsOb, modOb)
 
+def endOfYear(y : int):
+    return endOfMonth(y,12)
+
+def endOfMonth(y : int, m : int):
+    if m >= 12:
+        m = 1
+        y = y + 1
+        d = datetime.datetime(y,m,1,tzinfo=pytz.utc) - datetime.timedelta(days=1)
+    else:
+        d = datetime.datetime(y, m + 1, 1,tzinfo=pytz.utc) - datetime.timedelta(days=1)
+    return d.replace(hour=23, minute=59, second=59, microsecond=999999)
+
 def attendance_query(cls : ClassName|None = None,
                      mod : ModuleName|None = None, 
                      classId : int|None = None, className : str|None = None, 
@@ -153,49 +165,50 @@ def attendance_query(cls : ClassName|None = None,
     elif(mod):
         present = present.filter(className__moduleName = mod) # pyright: ignore[reportAttributeAccessIssue]
 
-    if dte:
-        year = dte.year
-        month = dte.month
-        day = dte.day
+    #-----------------------------------------
 
-    if dte_start:
-        year_start = dte_start.year
-        month_start = dte_start.month
-        day_end = dte_start.day
+    if not dte:
+        if year:
+            if month:
+                if day:
+                    dte = datetime.datetime(year,month,day,23,59,59,999999, pytz.utc)
+                else:
+                    dte = endOfMonth(year, month)
+            else:
+                dte = endOfYear(year)
+    #-----------------------------------------
+
+    if not dte_start:
+        if year_start:
+            if month_start:
+                if day_start:
+                    dte_start = datetime.datetime(year_start,month_start,day_start,23,59,50,999999, pytz.utc)
+                else:
+                    dte_start = endOfMonth(year_start,month_start)
+            else:
+                dte_start = endOfYear(year_start)
+    #-----------------------------------------
+
+    if not dte_end:
+        if year_end:
+            if month_end:
+                if day_end:
+                    dte_end = datetime.datetime(year_end,month_end,day_end,23,59,50,999999, pytz.utc)
+                else:
+                    dte_end = endOfMonth(year_end,month_end)
+            else:
+                dte_end = endOfYear(year_end)
+    #-----------------------------------------
     
-    if dte_end:
-        year_end = dte_end.year
-        month_end = dte_end.month
-        day_end = dte_end.day
-    
-    if((year_start or month_start or day_start) or (year_end or month_end or day_end)):
-        if(year_start):
-            present = present.filter(dte_date__year__gte=year_start)
-        
-        if(month_start):
-            present = present.filter(dte_date__month__gte=month_start)
+    if(dte_start or dte_end):
+        if dte_start:
+            present = present.filter(dte_date__date__gte=dte_start)
 
-        if(day_start):
-            present = present.filter(dte_date__day__gte=day_start)
-        
-        if(year_end):
-            present = present.filter(dte_date__year__lte=year_end)
-        
-        if(month_end):
-            present = present.filter(dte_date__month__lte=month_end)
+        if dte_end:
+            present = present.filter(dte_date__date__lte=dte_end)
 
-        if(day_end):
-            present = present.filter(dte_date__day__lte=day_end)
-
-    else:
-        if(year):
-            present = present.filter(dte_date__year=year)
-
-        if(month):
-            present = present.filter(dte_date__month=month)
-
-        if(day):
-            present = present.filter(dte_date__day=day)
+    elif(dte):
+        present = present.filter(dte_date__date=dte)
 
     #--------
 
