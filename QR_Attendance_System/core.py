@@ -171,7 +171,7 @@ def attendance_query(cls : ClassName|None = None,
         if year:
             if month:
                 if day:
-                    dte = datetime.datetime(year,month,day,23,59,59,999999, pytz.utc)
+                    dte = datetime.datetime(year, month, day, 0, 0, 0, 0, pytz.utc)
                 else:
                     dte_start = datetime.datetime(year, month, 1, 0 ,0, 0, 0, pytz.utc)
                     dte_end = endOfMonth(year, month)
@@ -184,11 +184,11 @@ def attendance_query(cls : ClassName|None = None,
         if year_start:
             if month_start:
                 if day_start:
-                    dte_start = datetime.datetime(year_start,month_start,day_start,23,59,50,999999, pytz.utc)
+                    dte_start = datetime.datetime(year_start, month_start, day_start, 0, 0, 0, 0, pytz.utc)
                 else:
-                    dte_start = endOfMonth(year_start,month_start)
+                    dte_start = datetime.datetime(year_start, month_start, 1, 0, 0, 0, 0, pytz.utc)
             else:
-                dte_start = endOfYear(year_start)
+                dte_start = datetime.datetime(year_start, 1, 1, 0, 0, 0, 0, pytz.utc)
     #-----------------------------------------
 
     if not dte_end:
@@ -202,6 +202,12 @@ def attendance_query(cls : ClassName|None = None,
                 dte_end = endOfYear(year_end)
     #-----------------------------------------
     
+    if((dte_start and dte_end) and (dte_start.date() == dte_end.date())):
+        dte = dte_start
+        dte_start = None
+        dte_end = None
+
+
     if(dte_start or dte_end):
         if dte_start:
             present = present.filter(dte_date__date__gte=dte_start)
