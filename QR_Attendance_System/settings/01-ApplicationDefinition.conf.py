@@ -51,3 +51,9 @@ LOGOUT_URL = '/faculty/logout/'
 LOGIN_URL = '/faculty/login/'
 LOGIN_REDIRECT_URL = '/'   # where to go after successful login
 LOGOUT_REDIRECT_URL = '/'  # where to go after logout
+
+# Session expires in 60 minutes (3600 seconds)
+SESSION_COOKIE_AGE = 3600 
+
+# If True, session cookie is deleted when browser closes
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False

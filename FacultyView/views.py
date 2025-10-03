@@ -1,16 +1,14 @@
 import datetime
-from typing import Any
 import pytz
 import csv
 import json
 import hashlib
 import xlsxwriter
+from typing import Any
 from .DRF_Serializers import AttendanceSerializer
-#from xlsxwriter.utility import xl_rowcol_to_cell
 from QR_Attendance_System.core import *
 from io import BytesIO
 from itertools import groupby
-#from operator import attrgetter
 from django.shortcuts import render
 from django.utils.http import parse_http_date, http_date
 from django.core import serializers as djserializers
@@ -25,6 +23,7 @@ from django.http import JsonResponse
 from django.urls import reverse
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from .models import Student, ClassName, Attendance, ModuleName
 
 #=======================
@@ -56,6 +55,8 @@ def faculty_view(request,
                  classId : int|None = None, className : str|None = None,
                  moduleId : int|None =None, moduleName : str|None =None):
     
+    request.session.set_expiry(settings.SESSION_COOKIE_AGE)
+
     cls,mod = getClassAndModule(classId, className,
                                 moduleId, moduleName)
     
@@ -143,19 +144,23 @@ def faculty_view_attendance_view(request,
                                  day_end : int|None = None):
 
 
-
-    presentQuery,cls,mod = attendance_query(classId=classId, className=className,
+    #Query our attendance register...
+    query,cls,mod = attendance_query(classId=classId, className=className,
                                             moduleId=moduleId, moduleName=moduleName,
                                             year=year, month=month, day=day,
                                             year_start=year_start,month_start=month_start,day_start=day_start,
                                             year_end=year_end,month_end=month_end,day_end=day_end)
     
+    #Most recently modified
     state_last_attendance_modified = STATE.get_attendance_modified()
+
+    #If we have a class or a module specified we can use the more specific update time
     if(cls):
         state_last_attendance_modified = STATE.get_attendance_modified_class(cls)
     elif(mod):
         state_last_attendance_modified = STATE.get_attendance_modified_module(mod)
 
+    #Compare our last modified date to that provided by the server
     last_modified = request.META.get('HTTP_IF_MODIFIED_SINCE', None)
     if(last_modified):
         ts = parse_http_date(last_modified)
@@ -163,21 +168,24 @@ def faculty_view_attendance_view(request,
         if state_last_attendance_modified < dt:
             return HttpResponseNotModified()
 
-    vals = list(presentQuery.values())
+    #Generate a json representation of the query and generate a hash
+    vals = list(query.values())
     str_json = json.dumps(vals, cls=DjangoJSONEncoder).encode()
     etag = hashlib.md5(str_json, usedforsecurity=False).hexdigest()
     
+    #Compare that hash to the etag provided by the server
     if_none_match = request.META.get("HTTP_IF_NONE_MATCH")
     if if_none_match == etag:
         return HttpResponseNotModified()
 
-    one_date_only = (year and month and day)
 
+    #Should we generate a view with date and clas headers
+    #Usually true for the attendance view, false for the class view
     with_date_headers = (str(request.GET.get('with_date_headers', 'true')).lower() == "true")
     with_class_headers = (str(request.GET.get('with_class_headers', 'true')).lower() == "true")
 
     context : dict[str, Any]= {
-               'present' : presentQuery,
+               'present' : query,
                  'class' : cls,
                 'module' : mod,
 
@@ -199,31 +207,37 @@ def faculty_view_attendance_view(request,
 
     response = None
     match action:
-        case 'view':
+        case 'view': #view the attendance list next to the export form
+            request.session.set_expiry(settings.SESSION_COOKIE_AGE)
+
             #Force the with_date_headers to true for this view...
             context['with_date_headers'] = True
             context['with_class_headers'] = True
-            response = render_faculty_view_attendance_related_template(request,
+            response = render_attendance_template_with_context(request,
                                                                        'FacultyView/view/ExportForm.html',
                                                                        context)
             
-        case 'view-table':
-            response = render_faculty_view_attendance_related_template(request,
+            
+        case 'view-table': #A plain HTML table view
+            request.session.set_expiry(settings.SESSION_COOKIE_AGE)
+
+            response = render_attendance_template_with_context(request,
                                                                        'FacultyView/view/AttendanceTable.html',
                                                                        context)
         
-        case 'list-html':
-            response = render_faculty_view_attendance_related_template(request,
+        case 'list-html': #Just the <ul> list - used for AJAX polling
+            response = render_attendance_template_with_context(request,
                                                                        'FacultyView/part/AttendanceList.html',
                                                                        context)
-        case 'export-csv':
-            response = render_faculty_view_attendance_view_CSV(request, presentQuery)
+            
+        case 'export-csv': #Export as a CSV
+            response = render_attendance_query_csv(request, query)
         
-        case 'export-xlsx':
-            response = render_faculty_view_attendance_view_xlsx(request, presentQuery)
+        case 'export-xlsx': #Export as an Excel workbook
+            response = render_attendance_query_xlsx(request, query)
 
-        case 'export-json':
-            response = render_faculty_view_attendance_json(request, presentQuery)
+        case 'export-json': #Export as json
+            response = render_attendance_query_json(request, query)
 
         case _:
             response = HttpResponseNotFound()
@@ -233,15 +247,15 @@ def faculty_view_attendance_view(request,
     response['ETag'] = etag
     return response
 
-def render_faculty_view_attendance_related_template(request,
-                                                    templateName : str, 
-                                                    context : dict[str, Any]):
+def render_attendance_template_with_context(request,
+                                            templateName : str, 
+                                            context : dict[str, Any]):
     context['classes'] = ClassName.objects.all()
     context['modules'] = ModuleName.objects.all()
 
     return render(request, templateName, context)
 
-def render_faculty_view_attendance_view_CSV(request, present_query):
+def render_attendance_query_csv(request, attendance_query):
     response = HttpResponse (content_type='text/csv')
     csvWriter = csv.writer(response)
 
@@ -255,7 +269,7 @@ def render_faculty_view_attendance_view_CSV(request, present_query):
         'Module ID',
         'Class ID',
     ])
-    for entry in present_query:
+    for entry in attendance_query:
         csvWriter.writerow([
             entry.student.s_eml,
             entry.student.s_fname,
@@ -271,7 +285,7 @@ def render_faculty_view_attendance_view_CSV(request, present_query):
     response["Content-Disposition"] = f"attachment; filename=\"{fn}\""
     return response
 
-def render_faculty_view_attendance_view_xlsx(request, attendance_query):
+def render_attendance_query_xlsx(request, attendance_query):
     headers = [
         'Student Email',
         'First Name',
@@ -330,7 +344,7 @@ def render_faculty_view_attendance_view_xlsx(request, attendance_query):
 
     return response
 
-def render_faculty_view_attendance_json(request, attendance_query):
+def render_attendance_query_json(request, attendance_query):
     fn = request.GET.get('file_name',None) or "Attendance Report.json"
     serializer = AttendanceSerializer(attendance_query, many=True)
     response = JsonResponse(serializer.data, safe=False)
