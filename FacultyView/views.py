@@ -22,20 +22,16 @@ from django.http import HttpResponseForbidden
 from django.http import JsonResponse
 from django.urls import reverse
 from django.core.serializers.json import DjangoJSONEncoder
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
+from django.views.decorators.http import require_POST
 from django.conf import settings
 from .models import Student, ClassName, Attendance, ModuleName
 
 #=======================
 
-@login_required
+@require_POST
+@permission_required('FacultyView.delete_attendance', raise_exception=True)
 def faculty_view_delete_attendance(request):
-    if request.method != 'POST' :
-        return HttpResponseBadRequest() #This should only accept POST requests
-    
-    if request.user.is_staff == False:
-        return HttpResponseForbidden()
-
     r = request.POST['attendance_record']
 
     attendanceOb = Attendance.objects.filter(id=r).first()
@@ -47,7 +43,7 @@ def faculty_view_delete_attendance(request):
         return HttpResponseRedirect(reverse('faculty_view',kwargs={'classId':cls.id})) # pyright: ignore[reportAttributeAccessIssue]
     else:
         return HttpResponseNotFound()
-        
+
 #=======================
 
 @login_required
@@ -352,11 +348,9 @@ def render_attendance_query_json(request, attendance_query):
     return response
 #=======================
 
+@require_POST
 @login_required
 def faculty_view_create_class(request):
-    if request.method != 'POST' :
-        return HttpResponseBadRequest() #This should only accept POST requests
-    
     className = request.POST['class_name']
     moduleName = request.POST['module_name']
     moduleId = request.POST.get('module_id',None)
