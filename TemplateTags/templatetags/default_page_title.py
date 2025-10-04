@@ -30,7 +30,7 @@ def default_page_title(context,userTitle : str|None = None):
                 ttle0 += " - Class index"
             elif r.startswith("/class") == False:
                 ttle0 += " - Module Index"
-        case 'student_view_enter_student':
+        case 'student_view_registration_form':
             ttle0 = "Student Registration"
         case 'student_view_attendance_submitted':
             ttle0 = "Registration Submitted"

@@ -14,7 +14,7 @@ from django.core.exceptions import ValidationError
 
 #=======================
 
-def student_view_name_entry(request, classId : int|None = None, className : str|None = None):
+def student_view_registration_form(request, classId : int|None = None, className : str|None = None):
     cls,mod = getClassAndModule(classId,className)
     if cls == None:
         return HttpResponseBadRequest()
@@ -70,13 +70,13 @@ def student_view_submit_attendance_ajax(request, classId : int|None = None, clas
     return JsonResponse({'created':created, "error":error, "validationError":validationError})
 
 def student_view_submit_attendance(request, classId : int|None = None, className : str|None = None):
-    created = submit_attendance(request, classId, className)[1]
+    created,attendanceOb = submit_attendance(request, classId, className)
 
     path = ''
     if created:
-        path = reverse('student_view_attendance_submitted',kwargs={'classId':classOb.id}) # type: ignore
+        path = reverse('student_view_attendance_submitted',kwargs={'classId':attendanceOb.className.id}) # type: ignore
     else:
-        path = reverse('student_view_attendance_already_submitted',kwargs={'classId':classOb.id}) # type: ignore
+        path = reverse('student_view_attendance_already_submitted',kwargs={'classId':attendanceOb.className.id}) # type: ignore
 
     next = request.POST.get('next', None)
     if next:
