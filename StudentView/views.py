@@ -1,12 +1,15 @@
 import datetime
 import pytz
+
 from QR_Attendance_System.core import *
-from django.shortcuts import render
 from FacultyView.models import Student, ClassName, Attendance
+
+from urllib.parse import urlencode
+
+from django.shortcuts import render
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.urls import reverse
 from django.core.exceptions import ValidationError
-from urllib.parse import urlencode
 
 #=======================
 

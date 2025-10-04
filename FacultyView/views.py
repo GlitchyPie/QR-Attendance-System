@@ -4,28 +4,26 @@ import csv
 import json
 import hashlib
 import xlsxwriter
-from typing import Any
-from .DRF_Serializers import AttendanceSerializer
+
 from QR_Attendance_System.core import *
+from .DRF_Serializers import AttendanceSerializer
+from .models import Student, ClassName, Attendance, ModuleName
+
+from typing import Any
 from io import BytesIO
 from itertools import groupby
+
 from django.shortcuts import render
 from django.utils.http import parse_http_date, http_date
-from django.core import serializers as djserializers
-from django.http import HttpResponse
-from django.http import FileResponse
-from django.http import HttpResponseRedirect
-from django.http import HttpResponseBadRequest
-from django.http import HttpResponseNotFound
-from django.http import HttpResponseNotModified
-from django.http import HttpResponseForbidden
-from django.http import JsonResponse
+from django.http import HttpResponse, FileResponse, HttpResponseRedirect
+from django.http import HttpResponseBadRequest, HttpResponseNotFound
+from django.http import HttpResponseNotModified, JsonResponse
 from django.urls import reverse
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.http import require_POST
 from django.conf import settings
-from .models import Student, ClassName, Attendance, ModuleName
+
 
 #=======================
 
