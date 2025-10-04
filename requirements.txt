@@ -1,6 +1,6 @@
-qrcode
+qrcode[pil]
 django
-pillow
+
 pytz
 XlsxWriter
 django-case-insensitive-field
