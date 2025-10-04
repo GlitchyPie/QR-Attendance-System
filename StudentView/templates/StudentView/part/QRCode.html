@@ -13,7 +13,7 @@
             <p>VPNs may prevent access to this service.</p>
             <p class="qr-links" style="font-size: smaller;">
                 {% if class %}
-                    <a href="{% url 'student_view_qrCode' classId=class.id %}">Open QR code in new window</a> |
+                    <a target="_blank" href="{% url 'student_view_qrCode' classId=class.id %}">Open QR code in new window</a> |
                 {% endif %}
                 <a target="_blank" href="{{qrSrc}}">Save QR Code</a>
             </p>
