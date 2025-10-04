@@ -1,11 +1,14 @@
 import datetime
 import pytz
 import qrcode
+import qrcode.image.svg
+
 import os
 from django.urls import reverse
 from django.conf import settings
 from FacultyView.models import Attendance, ClassName, ModuleName, Student
 from django.db.models.functions import TruncDate, TruncTime
+
 
 class LocalState:
     last_attendance_modified_class : dict[int,datetime.datetime] = {
@@ -50,31 +53,85 @@ class LocalState:
 STATE = LocalState()
 
 def qrgenerator(request, classId : int = -1, boxSize : int=20):
-    link = reverse('student_view_enter_student',kwargs={'classId':classId})
-    link = f"{request.scheme}://{request.META['HTTP_HOST']}{link}"
-    def generate_qr_code(link,classId,boxSize):
-        pth = os.path.join(settings.MEDIA_ROOT,'qrs')
-        try:
-            os.makedirs(pth)
-        except FileExistsError:
-            pass
-        pth = os.path.join(pth,f"qrcode_{classId}_{boxSize}.png")
-        if os.path.isfile(pth) == False:
+    def generate_qr_code(link : str, boxSize : int, image_factory = None):
             qr = qrcode.QRCode(
-                version=1,
+                version=None, #1  https://pypi.org/project/qrcode/
                 error_correction=qrcode.ERROR_CORRECT_H,
                 box_size=boxSize,
                 border=4,
+                image_factory=image_factory
             )
             qr.add_data(link)
-            qr.make(fit=True)
-            img = qr.make_image(fill_color='black', back_color='white')
-            img.save(pth) # pyright: ignore[reportArgumentType]
+            return qr.make_image(fill_color='black', back_color='white')
         #End if
     #End def:
 
-    generate_qr_code(link,classId,boxSize)
-    return f"{settings.MEDIA_URL}qrs/qrcode_{classId}_{boxSize}.png"
+    link = reverse('student_view_registration_form',kwargs={'classId':classId})
+    link = f"{request.scheme}://{request.META['HTTP_HOST']}{link}"
+
+    filePath = os.path.join(settings.MEDIA_ROOT,'qrs')
+    try:
+        os.makedirs(filePath)
+    except FileExistsError:
+        pass
+
+    fileName = f"qrcode_{classId}_{boxSize}"
+
+    preferred_mime = request.GET.get('mime','')
+    if(preferred_mime == ''):
+        preferred_mime = request.get_preferred_type([
+                    'image/svg+xml',
+                    'image/png', 
+                    'image/webp',
+                    'image/gif',
+                    'image/bmp',
+                    'image/jpeg',
+                    'image/tiff',
+                    'application/pdf',
+                    'image/x-icon',
+                    'application/postscript',
+                    'image/x-eps'])
+    
+    factory = None
+    match(preferred_mime):
+        case 'image/png':
+            fileName = f"{fileName}.png"
+        case 'image/jpeg':
+            fileName = f"{fileName}.jpg"   
+        case 'image/bmp':
+            fileName = f"{fileName}.bmp"
+        case 'image/gif':
+            fileName = f"{fileName}.gif"
+        case 'image/tiff':
+            fileName = f"{fileName}.tif"
+        case 'image/webp':
+            fileName = f"{fileName}.webp"
+        case 'image/x-icon':
+            fileName = f"{fileName}.ico"
+
+        case 'application/pdf':
+            fileName = f"{fileName}.pdf"
+            factory = qrcode.image.svg.SvgPathFillImage
+        case 'application/postscript':
+            fileName = f"{fileName}.eps"
+            factory = qrcode.image.svg.SvgPathFillImage
+        case 'image/x-eps':
+            fileName = f"{fileName}.eps"
+            factory = qrcode.image.svg.SvgPathFillImage
+        case 'image/svg+xml':
+            fileName = f"{fileName}.svg"
+            factory = qrcode.image.svg.SvgPathFillImage
+        case _:
+            fileName = f"{fileName}.png"
+            pass
+
+    filePath = os.path.join(filePath, fileName)
+
+    if os.path.isfile(filePath) == False:
+        IMG = generate_qr_code(link, boxSize, factory)
+        IMG.save(filePath) # type: ignore
+
+    return f"{settings.MEDIA_URL}qrs/{fileName}"
 
 def getClass(classId : int|None, className : str|None):
     if((classId == None) and (className == None)):
