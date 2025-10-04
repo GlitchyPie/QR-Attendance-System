@@ -8,6 +8,7 @@ from urllib.parse import urlencode
 
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponseBadRequest
+from django.views.decorators.http import require_POST
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 
@@ -26,10 +27,8 @@ def student_view_name_entry(request, classId : int|None = None, className : str|
                   })
 
 #=======================
+@require_POST
 def submit_attendance(request, classId : int|None = None, className : str|None = None):
-    if request.method != 'POST' :
-        raise ValueError("Not a POST request")
-    
     classOb = getClass(classId,className)
     if classOb == None:
         raise ValueError("No class specified")
@@ -121,10 +120,8 @@ def student_view_attendance_submitted(request,
 def student_is_present(student : Student, cls : ClassName, year : int, month : int, day : int):
     return attendance_query(cls=cls, year=year, month=month, day=day, student=student)[0].exists()
 
+@require_POST
 def student_view_student_lookup(request):
-    if request.method != 'POST' :
-        return HttpResponseBadRequest() #This should only accept POST requests
-    
     stu = None
     eml :str = request.POST['student_email']
 
