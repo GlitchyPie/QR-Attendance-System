@@ -8,6 +8,7 @@ from urllib.parse import urlencode
 
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseNotFound
 from django.views.decorators.http import require_POST
 from django.urls import reverse
 from django.core.exceptions import ValidationError
@@ -87,21 +88,34 @@ def student_view_submit_attendance(request, classId : int|None = None, className
 
 #=======================
 
-def student_view_bigQRcode(request,
-                           classId : int|None = None, className : str|None = None, 
-                           blockSize : int = 20):
-    cls,mod = getClassAndModule(classId,className)
+def student_view_print_qrCode(request,
+                              classId : int|None = None,
+                              boxSize : int|None = None):
+    cls,mod = getClassAndModule(classId, None)
     if cls == None:
         return HttpResponseBadRequest()
 
-    qrSrc = qrgenerator(request, classId, blockSize) # type: ignore
     return render(request,
-                  'StudentView/view/QRCode.html',
+                  'StudentView/view/Print_qrCode.html',
                   {
                        'class' : cls,
                       'module' : mod,
-                       'qrSrc' : qrSrc,
+                     'boxSize' : boxSize,
                   })
+
+def student_view_qrCode_image(request, classId : int, boxSize : int = 20, extension : str = ''):
+    response = None
+    try:
+        path = qrgenerator(request, classId, boxSize, extension)
+        response = HttpResponseRedirect(path)
+
+    except RequestedContentTypeNotFound as e:
+        response = HttpResponseNotFound(str(e))
+
+    except NoAcceptableContentType as e:
+        response = HttpResponse(str(e), status=406)
+    
+    return response
 
 #=======================
 

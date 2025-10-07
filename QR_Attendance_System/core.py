@@ -1,7 +1,14 @@
 import datetime
 import pytz
+
 import qrcode
 import qrcode.image.svg
+
+import PIL.features as Pil_Features
+import PIL.Image as Pil_Image
+
+from qrcode.image.pil import PilImage as qrcode_pilImage
+from qrcode.image.svg import SvgPathImage as qrcode_svgPathImage
 
 import os
 from django.urls import reverse
@@ -9,6 +16,13 @@ from django.conf import settings
 from FacultyView.models import Attendance, ClassName, ModuleName, Student
 from django.db.models.functions import TruncDate, TruncTime
 
+class NoAcceptableContentType(Exception):
+    """Custom exception for my app."""
+    pass
+
+class RequestedContentTypeNotFound(Exception):
+    """Custom exception for my app."""
+    pass
 
 class LocalState:
     last_attendance_modified_class : dict[int,datetime.datetime] = {
@@ -19,6 +33,8 @@ class LocalState:
             -1 : datetime.datetime.now(pytz.utc)
         }
     
+    supported_pil_image_formats : dict = {}
+
     def get_attendance_modified_class(self, cls : ClassName | None = None):
         id = -1
         if(cls):
@@ -48,90 +64,164 @@ class LocalState:
         A = self.get_attendance_modified_class()
         B = self.get_attendance_modified_module()
         return max([A , B])
+
+    def get_supported_PIL_Images(self):
+        if(self.supported_pil_image_formats):
+            return self.supported_pil_image_formats
+        
+        supported = {}
+        # 1. Gather registered extensions (always available formats)
+        for ext, fmt in Pil_Image.registered_extensions().items():
+            if fmt not in supported:
+                supported[fmt] = {'extensions': set(), 'available': True}
+            supported[fmt]['extensions'].add(ext)
+
+        # 2. Check optional features (libs required)
+        # Map Pillow feature names -> format names
+        feature_map = {
+            'webp': 'WEBP',
+            'webp_anim': 'WEBP',   # animation is optional, base WEBP may still work
+            'webp_mux': 'WEBP',    # muxing (advanced WebP features)
+            'jpg_2000': 'JPEG2000',
+            'avif': 'AVIF',
+            'freetype2': 'FREETYPE',
+            'raqm': 'RAQM',
+            'libjpeg_turbo': 'JPEG',  # turbo-optimized JPEG
+        }
+        
+        for feat, fmt in feature_map.items():
+            avail = Pil_Features.check(feat)
+            if fmt not in supported:
+                supported[fmt] = {'extensions': set(), 'available': avail}
+            else:
+                # If already in supported (via registered_extensions), refine availability
+                supported[fmt]['available'] = supported[fmt]['available'] or avail
+
+        # Normalize extensions to lists
+        for fmt in supported:
+            supported[fmt]['extensions'] = sorted(supported[fmt]['extensions'])
+
+        #Inject support for svg as it's not directly supported by PIL but
+        #Is supported via the qr image factory.
+        supported['SVG'] = {
+            'extensions':['.svg'],
+            'available':True,
+        }
+
+        self.supported_pil_image_formats = supported
+        return supported 
+
+    def __init__(self) -> None:
+        self.supported_pil_image_formats = self.get_supported_PIL_Images()
+        pass
 #End Class
 
 STATE = LocalState()
 
-def qrgenerator(request, classId : int = -1, boxSize : int=20):
-    def generate_qr_code(link : str, boxSize : int, image_factory = None):
-            qr = qrcode.QRCode(
-                version=None, #1  https://pypi.org/project/qrcode/
-                error_correction=qrcode.ERROR_CORRECT_H,
-                box_size=boxSize,
-                border=4,
-                image_factory=image_factory
-            )
-            qr.add_data(link)
-            return qr.make_image(fill_color='black', back_color='white')
-        #End if
+PREFERRED_QR_IMAGE_FORMATS = [
+        {'e':'.svg', 'f':'SVG','m':'image/svg+xml', 'c':qrcode_svgPathImage, 'd':['1']},
+        {'e':'.png', 'f':'PNG','m':'image/png', 'c':qrcode_pilImage, 'd':['1']},
+        {'e':'.webp', 'f':'WEBP','m':'image/webp', 'c':qrcode_pilImage, 'd':['1']},
+        {'e':'.gif', 'f':'GIF','m':'image/gif', 'c':qrcode_pilImage, 'd':['1']},
+        {'e':'.bmp', 'f':'BMP','m':'image/bmp', 'c':qrcode_pilImage, 'd':['1']},
+        {'e':'.jpg', 'f':'JPEG','m':'image/jpeg', 'c':qrcode_pilImage, 'd':['1']},
+        {'e':'.tiff', 'f':'TIFF','m':'image/tiff', 'c':qrcode_pilImage, 'd':['1']},
+        {'e':'.avif', 'f':'AVIF', 'm':'image/avif', 'c':qrcode_pilImage, 'd':['1']},
+        {'e':'.jp2', 'f':'JPEG2000', 'm':'image/jp2', 'c':qrcode_pilImage, 'd':['RGB', 'RGBA', 'L', 'CMYK']}
+    ]
+PREFERRED_QR_FORMAT_NAMES = [f['f'] for f in PREFERRED_QR_IMAGE_FORMATS]
+PREFERRED_QR_IMAGE_MIMES = [m['m'] for m in PREFERRED_QR_IMAGE_FORMATS]
+
+def qrgenerator(request, classId : int, boxSize : int, extension : str|None):
+    def generate_qr_code(link : str, boxSize : int, image_factory):
+        qr = qrcode.QRCode(
+            version=None, #https://pypi.org/project/qrcode/
+            error_correction=qrcode.ERROR_CORRECT_H,
+            box_size=boxSize,
+            border=4,
+            image_factory=image_factory
+        )
+        qr.add_data(link)
+        return qr.make_image(fill_color='black', back_color='white')
     #End def:
 
+    #The link to embed in the QR code
     link = reverse('student_view_registration_form',kwargs={'classId':classId})
     link = f"{request.scheme}://{request.META['HTTP_HOST']}{link}"
 
-    filePath = os.path.join(settings.MEDIA_ROOT,'qrs')
+    REMOTE_DIR = f"qrs/{classId}/"
+
+    #Create local directory if it doesn't exist
+    local_file_dir = os.path.join(settings.MEDIA_ROOT,'qrs')
     try:
-        os.makedirs(filePath)
+        os.makedirs(local_file_dir)
     except FileExistsError:
         pass
 
-    fileName = f"qrcode_{classId}_{boxSize}"
+    local_file_dir = os.path.join(local_file_dir, str(classId))
+    try:
+        os.makedirs(local_file_dir)
+    except FileExistsError:
+        pass
 
-    preferred_mime = request.GET.get('mime','')
-    if(preferred_mime == ''):
-        preferred_mime = request.get_preferred_type([
-                    'image/svg+xml',
-                    'image/png', 
-                    'image/webp',
-                    'image/gif',
-                    'image/bmp',
-                    'image/jpeg',
-                    'image/tiff',
-                    'application/pdf',
-                    'image/x-icon',
-                    'application/postscript',
-                    'image/x-eps'])
     
-    factory = None
-    match(preferred_mime):
-        case 'image/png':
-            fileName = f"{fileName}.png"
-        case 'image/jpeg':
-            fileName = f"{fileName}.jpg"   
-        case 'image/bmp':
-            fileName = f"{fileName}.bmp"
-        case 'image/gif':
-            fileName = f"{fileName}.gif"
-        case 'image/tiff':
-            fileName = f"{fileName}.tif"
-        case 'image/webp':
-            fileName = f"{fileName}.webp"
-        case 'image/x-icon':
-            fileName = f"{fileName}.ico"
+    FILENAME_PREFIX = f"qrcode_{boxSize}"
 
-        case 'application/pdf':
-            fileName = f"{fileName}.pdf"
-            factory = qrcode.image.svg.SvgPathFillImage
-        case 'application/postscript':
-            fileName = f"{fileName}.eps"
-            factory = qrcode.image.svg.SvgPathFillImage
-        case 'image/x-eps':
-            fileName = f"{fileName}.eps"
-            factory = qrcode.image.svg.SvgPathFillImage
-        case 'image/svg+xml':
-            fileName = f"{fileName}.svg"
-            factory = qrcode.image.svg.SvgPathFillImage
-        case _:
-            fileName = f"{fileName}.png"
-            pass
+    REQUIRED_EXTENSION = f".{(extension or '').lower()}"
+    REQUIRED_MIME = request.GET.get('mime','').lower()
 
-    filePath = os.path.join(filePath, fileName)
+    negotiated_format = None
 
-    if os.path.isfile(filePath) == False:
-        IMG = generate_qr_code(link, boxSize, factory)
-        IMG.save(filePath) # type: ignore
+    if(REQUIRED_EXTENSION != '.'):
+        required_format_name = ''
+        for k in STATE.supported_pil_image_formats:
+            e = STATE.supported_pil_image_formats[k]['extensions']
+            if REQUIRED_EXTENSION in e:
+                required_format_name = k
+                break
 
-    return f"{settings.MEDIA_URL}qrs/{fileName}"
+        if(not required_format_name in PREFERRED_QR_FORMAT_NAMES):
+            raise RequestedContentTypeNotFound('No supported format for requested extension.')
+    
+        negotiated_format = PREFERRED_QR_IMAGE_FORMATS[PREFERRED_QR_FORMAT_NAMES.index(required_format_name)]
+
+    elif(REQUIRED_MIME != ''):
+        if(not REQUIRED_MIME in PREFERRED_QR_IMAGE_MIMES):
+            raise RequestedContentTypeNotFound('No supported format for requested content-type.')
+    
+        negotiated_format = PREFERRED_QR_IMAGE_FORMATS[PREFERRED_QR_IMAGE_MIMES.index(REQUIRED_MIME)]
+    
+    else:
+        negotiated_mime = request.get_preferred_type(PREFERRED_QR_IMAGE_MIMES)
+        if(not negotiated_mime in PREFERRED_QR_IMAGE_MIMES):
+            raise NoAcceptableContentType("Unable to negotiate an acceptable content type.")
+        
+        negotiated_format = PREFERRED_QR_IMAGE_FORMATS[PREFERRED_QR_IMAGE_MIMES.index(negotiated_mime)]
+
+    SUPPORTED_FORMAT_ENTRY = STATE.supported_pil_image_formats[negotiated_format['f']]
+    if not SUPPORTED_FORMAT_ENTRY['available']:
+        raise  NoAcceptableContentType(f"A format was selected [{negotiated_format['f']}], but it's not supported.")
+
+    FILENAME = f"{FILENAME_PREFIX}{negotiated_format['e']}"
+
+    local_file_path = os.path.join(local_file_dir, FILENAME)
+
+    if os.path.isfile(local_file_path) == False:
+        IMG = generate_qr_code(link, boxSize, negotiated_format['c'])
+        match(negotiated_format['f']):
+            case 'SVG':
+                IMG.save(local_file_path) # type: ignore
+            case _:
+                options = {
+                    'quality' : 95,
+                   'lossless' : True,
+                     'effort' : 9
+                }
+                if IMG.mode not in negotiated_format['d']: # type: ignore
+                    IMG = IMG.convert(negotiated_format['d'][0]) # type: ignore
+                IMG.save(local_file_path,format=negotiated_format['f'], **options) # type: ignore
+
+    return f"{settings.MEDIA_URL}{REMOTE_DIR}{FILENAME}"
 
 def getClass(classId : int|None, className : str|None):
     if((classId == None) and (className == None)):

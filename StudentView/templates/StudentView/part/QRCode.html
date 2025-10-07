@@ -1,10 +1,18 @@
-
-{% if qrSrc %}
+{% if class %}
+    {% if boxSize %}
+        {% url 'student_view_qrCode_image' classId=class.id boxSize=boxSize as image_url %}
+        {% url 'student_view_qrCode_image' classId=class.id boxSize=boxSize extension='png' as  png_url %}
+        {% url 'student_view_print_qrCode' classId=class.id boxSize=boxSize as print_url %}
+    {% else %}
+        {% url 'student_view_qrCode_image' classId=class.id as image_url %}
+        {% url 'student_view_qrCode_image' classId=class.id extension='png' as  png_url %}
+        {% url 'student_view_print_qrCode' classId=class.id as print_url %}
+    {% endif %}
     <div class="qr-code-container">
         <h2>Connect to {{settings.SITE_WIFI_SSD}} and Scan the QR Code to Mark Attendance</h2>
         <img
             class="qr-code-img"
-            src="{{qrSrc}}"
+            src="{{image_url}}"
             alt="QR Code"
         />
         </a>
@@ -12,13 +20,11 @@
             <p>Please scan the QR code to mark your attendance.</p>
             <p>VPNs may prevent access to this service.</p>
             <p class="qr-links" style="font-size: smaller;">
-                {% if class %}
-                    <a target="_blank" href="{% url 'student_view_qrCode' classId=class.id %}">Open QR code in new window</a> |
-                {% endif %}
-                <a target="_blank" href="{{qrSrc}}">Save QR Code</a>
+                <a target="_blank" href="{{print_url}}">Open QR code in new window</a> |
+                <a target="_blank" href="{{png_url}}">Save QR Code - PNG</a>
             </p>
         </div>
     </div>
-{% else %}       
-    <h4>No qr code provided</h4>
-{% endif %}  
+{% else %}
+    <h4>No class provided</h4>
+{% endif %}

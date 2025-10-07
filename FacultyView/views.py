@@ -89,8 +89,6 @@ def render_faculty_view_class(request, cls : ClassName|None):
     if cls == None:
         return HttpResponseBadRequest()
     
-    qrSrc = qrgenerator(request,cls.id) # pyright: ignore[reportAttributeAccessIssue]
-
     present,cls,mod = attendance_query(cls = cls, 
                                        dte=datetime.datetime.now(pytz.utc))
 
@@ -101,7 +99,6 @@ def render_faculty_view_class(request, cls : ClassName|None):
               'present' : present,
                 'class' : cls,
                'module' : mod,
-                'qrSrc' : qrSrc,
         },
     )
 
@@ -110,8 +107,10 @@ def render_faculty_view_class(request, cls : ClassName|None):
 def faculty_view_attendance_view_today(request,
                                        classId : int|None = None, className : str|None = None,
                                        moduleId : int|None = None, moduleName : str|None = None,
-                                       action : str|None = 'view',):
-    
+                                       action : str|None = None,):
+    if(not action):
+        return HttpResponseRedirect('view/')
+
     D = datetime.datetime.now(pytz.utc)
     y = D.year
     m = D.month
@@ -126,7 +125,7 @@ def faculty_view_attendance_view_today(request,
 def faculty_view_attendance_view(request,
                                  classId : int|None = None, className : str|None = None,
                                  moduleId : int|None = None, moduleName : str|None = None,
-                                 action : str|None = 'view',
+                                 action : str|None = None,
                                  year : int|None = None,
                                  month : int|None = None,
                                  day : int|None = None,
@@ -136,7 +135,9 @@ def faculty_view_attendance_view(request,
                                  year_end : int|None = None,
                                  month_end : int|None = None,
                                  day_end : int|None = None):
-
+    
+    if(not action):
+        return HttpResponseRedirect('view/')
 
     #Query our attendance register...
     query,cls,mod = attendance_query(classId=classId, className=className,

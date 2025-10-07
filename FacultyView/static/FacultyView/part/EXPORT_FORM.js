@@ -49,7 +49,7 @@ var EXPORT_FORM = (function(){
                 let title_prefix = '';
                 let title_date = '';
 
-                let path = '/attendance/';
+                let path = '/faculty/attendance-history/';
 
                 if(classId != '*'){
                     path = `${path}class/${classId}/`;
