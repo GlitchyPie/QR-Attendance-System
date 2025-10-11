@@ -4,12 +4,10 @@ var ATTENDANCE_TABLE = ATTENDANCE_TABLE || (function(){
         minute: '2-digit'
     }
     let lang;
-    document.addEventListener('DOMContentLoaded',()=>{lang = document.documentElement.lang??'en';});
+    GLOBGOR.registerOnLoad(()=>{lang = document.documentElement.lang??'en';});
 
     function registerPage(){
-        document.addEventListener('DOMContentLoaded',()=>{
-            GLOBGOR.format.all();
-        });
+        GLOBGOR.registerOnLoad(GLOBGOR.format.all);
     }
 
     return {

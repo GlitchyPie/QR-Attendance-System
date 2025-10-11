@@ -10,7 +10,7 @@ var EXPORT_FORM = (function(){
     }
 
     function registerForm(formId){
-        document.addEventListener('DOMContentLoaded',()=>{
+        GLOBGOR.registerOnLoad(()=>{
             const FORM = document.getElementById(formId);
             
             const export_dlg_containter = FORM.querySelector('.export-selection-container');
