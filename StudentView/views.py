@@ -1,6 +1,8 @@
 import datetime
 import pytz
 
+from os.path import getmtime as getfilemtime
+
 from QR_Attendance_System.core import *
 from FacultyView.models import Student, ClassName, Attendance
 
@@ -8,10 +10,11 @@ from urllib.parse import urlencode
 
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponseBadRequest
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotModified
 from django.views.decorators.http import require_POST
 from django.urls import reverse
 from django.core.exceptions import ValidationError
+from django.utils.http import parse_http_date, http_date
 
 #=======================
 
@@ -106,9 +109,21 @@ def student_view_print_qrCode(request,
 def student_view_qrCode_image(request, classId : int, boxSize : int = 20, extension : str = ''):
     response = None
     try:
-        path = qrgenerator(request, classId, boxSize, extension)
-        response = HttpResponseRedirect(path)
+        remotePath, localPath = qrgenerator(request, classId, boxSize, extension)
+        mtimestamp = getfilemtime(localPath)
+        file_last_modified = datetime.datetime.fromtimestamp(mtimestamp, pytz.utc)
 
+        #Compare our last modified date to that provided by the server
+        last_modified = request.META.get('HTTP_IF_MODIFIED_SINCE', None)
+        if(last_modified):
+            ts = parse_http_date(last_modified)
+            dt = datetime.datetime.fromtimestamp(ts,tz=pytz.utc)
+            if file_last_modified < dt:
+                return HttpResponseNotModified()
+
+        response = HttpResponseRedirect(remotePath)
+        response['Last-Modified'] = http_date(mtimestamp)
+        response['cache-control'] = 'max-age=604800, immutable, public, stale-while-revalidate=604800, stale-if-error'
     except RequestedContentTypeNotFound as e:
         response = HttpResponseNotFound(str(e))
 
