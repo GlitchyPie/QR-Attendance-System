@@ -21,6 +21,8 @@ from django.http import HttpResponseNotModified, JsonResponse
 from django.urls import reverse
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required, permission_required
+from django.views.decorators.http import condition
+
 from django.views.decorators.http import require_POST
 from django.conf import settings
 
@@ -139,21 +141,11 @@ def faculty_view_attendance_view(request,
     if(not action):
         return HttpResponseRedirect('view/')
 
-    #Query our attendance register...
-    query,cls,mod = attendance_query(classId=classId, className=className,
-                                            moduleId=moduleId, moduleName=moduleName,
-                                            year=year, month=month, day=day,
-                                            year_start=year_start,month_start=month_start,day_start=day_start,
-                                            year_end=year_end,month_end=month_end,day_end=day_end)
+    cls, mod = getClassAndModule(classId=classId, className=className,
+                                 moduleId=moduleId, moduleName=moduleName)
     
     #Most recently modified
-    state_last_attendance_modified = STATE.get_attendance_modified()
-
-    #If we have a class or a module specified we can use the more specific update time
-    if(cls):
-        state_last_attendance_modified = STATE.get_attendance_modified_class(cls)
-    elif(mod):
-        state_last_attendance_modified = STATE.get_attendance_modified_module(mod)
+    state_last_attendance_modified = STATE.get_attendance_modified(cls or mod)
 
     #Compare our last modified date to that provided by the server
     last_modified = request.META.get('HTTP_IF_MODIFIED_SINCE', None)
@@ -163,6 +155,14 @@ def faculty_view_attendance_view(request,
         if state_last_attendance_modified < dt:
             return HttpResponseNotModified()
 
+
+    #Query our attendance register...
+    query = attendance_query(cls=cls, mod=mod,
+                             moduleId=moduleId, moduleName=moduleName,
+                             year=year, month=month, day=day,
+                             year_start=year_start,month_start=month_start,day_start=day_start,
+                             year_end=year_end,month_end=month_end,day_end=day_end)[0]
+    
     #Generate a json representation of the query and generate a hash
     vals = list(query.values())
     str_json = json.dumps(vals, cls=DjangoJSONEncoder).encode()
