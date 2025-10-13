@@ -49,8 +49,8 @@ def default_page_title(context,userTitle : str|None = None):
 
     ttle2 = userTitle or settings.COPYRIGHT_APP_NAME
 
-    isstd = export_date_type.export_date_type(context)
-    match isstd:
+    lookuptype = export_date_type.export_date_type(context)
+    match lookuptype:
         case 1:
             ttle3 = f"{context.get('dte_year')}-{context.get('dte_month')}-{context.get('dte_day')}"
         case 2:
