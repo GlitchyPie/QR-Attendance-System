@@ -10,7 +10,7 @@ var EXPORT_FORM = (function(){
     }
 
     function registerForm(formId){
-        document.addEventListener('DOMContentLoaded',()=>{
+        GLOBGOR.registerOnLoad(()=>{
             const FORM = document.getElementById(formId);
             
             const export_dlg_containter = FORM.querySelector('.export-selection-container');
@@ -24,8 +24,8 @@ var EXPORT_FORM = (function(){
             const view_btns = FORM.querySelectorAll('button[name="btn-view"]');
 
             const dateSelectorFieldSet = FORM.querySelector('.fs-date');
-            const fieldsetSelectorBtns = dateSelectorFieldSet.querySelectorAll('button[data-isstd]');
-            const fieldsetSelectorDivs = dateSelectorFieldSet.querySelectorAll('div[data-isstd]');
+            const fieldsetSelectorBtns = dateSelectorFieldSet.querySelectorAll('button[data-lookuptype]');
+            const fieldsetSelectorDivs = dateSelectorFieldSet.querySelectorAll('div[data-lookuptype]');
             
             const moduleSelect = FORM.querySelector('select[name="select-export-module"]');
             const classSelect = FORM.querySelector('select[name="select-export-class"]');
@@ -49,7 +49,7 @@ var EXPORT_FORM = (function(){
                 let title_prefix = '';
                 let title_date = '';
 
-                let path = '/attendance/';
+                let path = '/faculty/attendance-history/';
 
                 if(classId != '*'){
                     path = `${path}class/${classId}/`;
@@ -72,8 +72,8 @@ var EXPORT_FORM = (function(){
                 }
 
                 if(dte === undefined){ //Use current selection
-                    const isStd = dateSelectorFieldSet.dataset.isstd;
-                    switch(isStd){
+                    const lookuptype = dateSelectorFieldSet.dataset.lookuptype;
+                    switch(lookuptype){
                         case '1': //Single date
                             const N = new Date();
                             const D = new Date(datepicker.value);
@@ -141,7 +141,7 @@ var EXPORT_FORM = (function(){
                             }
                             break;
                         default:
-                            throw Error(`Unknown isStd "${isStd}"`)
+                            throw Error(`Unknown lookuptype "${lookuptype}"`)
                     }
 
                 } else {
@@ -202,18 +202,18 @@ var EXPORT_FORM = (function(){
             }
 
             function select_date_fieldset(set){
-                dateSelectorFieldSet.dataset.isstd = set
+                dateSelectorFieldSet.dataset.lookuptype = set
                 for (const element of fieldsetSelectorDivs) {
-                    element.style.display = (element.dataset.isstd == set)?'initial':'none';
+                    element.style.display = (element.dataset.lookuptype == set)?'initial':'none';
                 }
                 for (const element of fieldsetSelectorBtns) {
-                    element.style.border = (element.dataset.isstd == set)?'1px solid black':'none';
+                    element.style.border = (element.dataset.lookuptype == set)?'1px solid black':'none';
                     fieldSetBtn_setSpanDisplay(element);
                 }
             }
             function fieldSetBtn_setSpanDisplay(elm){
                 const span = elm.querySelector('span');
-                if(elm.isHovered || (elm.dataset.isstd == dateSelectorFieldSet.dataset.isstd)){
+                if(elm.isHovered || (elm.dataset.lookuptype == dateSelectorFieldSet.dataset.lookuptype)){
                     span.style.display = 'inline';
                 }else{
                     span.style.display = 'none';
@@ -229,13 +229,13 @@ var EXPORT_FORM = (function(){
             }
             function fieldSetBtn_mouseLeave(event, elm){
                 elm.isHovered = false;
-                if(elm.dataset.isstd != dateSelectorFieldSet.dataset.isstd){
+                if(elm.dataset.lookuptype != dateSelectorFieldSet.dataset.lookuptype){
                     elm.dataset.tm = setTimeout(()=>fieldSetBtn_setSpanDisplay(elm), 150);
                 }
             }
             function fieldSetBtn_click(event, elm){
                 event.preventDefault();
-                select_date_fieldset(elm.dataset.isstd);
+                select_date_fieldset(elm.dataset.lookuptype);
             }
 
 
@@ -293,7 +293,7 @@ var EXPORT_FORM = (function(){
 
 
             updateClassPicker();
-            select_date_fieldset(dateSelectorFieldSet.dataset.isstd);
+            select_date_fieldset(dateSelectorFieldSet.dataset.lookuptype);
 
             //---- Export and view buttons ----//
             for (const view_btn of view_btns) {

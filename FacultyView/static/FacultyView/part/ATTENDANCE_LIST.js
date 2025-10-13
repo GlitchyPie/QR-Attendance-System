@@ -29,7 +29,7 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
     }
 
     function registerList(listId){
-        document.addEventListener('DOMContentLoaded',()=>{
+        GLOBGOR.registerOnLoad(()=>{
             let currentList = document.getElementById(listId);
             let etag;
             let last_modified = new Date();
@@ -41,7 +41,7 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
                 const refererpath = currentList.dataset.refererpath;
                 const csrf = currentList.dataset.csrftoken;
 
-                GLOBGOR.xhr.post(
+                GLOBGOR.fetch.post(
                     deletePath,
                     {
                         'attendance_record':btn.value,
@@ -70,7 +70,7 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
             function mouseLeftListItem(event){
                 hide_ConfirmDelete.call(this.getElementsByTagName('BUTTON')[0], event);
             }
-            function applyMouseLeaveFunction(li){          
+            function applyMouseLeaveFunction(li){
                 li.addEventListener('mouseleave',mouseLeftListItem);
             }
 
@@ -85,7 +85,7 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
             }
 
             function lookForUpdate(){
-                GLOBGOR.xhr.get(
+                GLOBGOR.fetch.get(
                     currentList.dataset.querypath,
                     undefined,
                     lookForUpdateReadystateChange,
@@ -96,10 +96,13 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
                     }
                 )
             }
-            function lookForUpdateReadystateChange(event,xhr){
+            function lookForUpdateReadystateChange(event, xhr){
                 if(xhr.readyState === 4){
-                    if(xhr.status === 200){
-                        etag = xhr.getResponseHeader("ETag"); // save new ETag
+                    if(xhr.redirected == true){
+                        currentList.parentElement.innerHTML = "<hr><h3>Your login session has timed out</h3><h4>Refresh the page to log back in</h4><hr>";
+                        return;                        
+                    }else if(xhr.status === 200){
+                        etag = xhr.getResponseHeader('ETag'); // save new ETag
                         last_modified = new Date(xhr.getResponseHeader('last-modified'));
                         lookForUpdateDoUpdate.call(xhr);
                     }else if(xhr.status === 304){
@@ -112,6 +115,10 @@ var ATTENDANCE_LIST = ATTENDANCE_LIST || (function(){
                 const parser = new DOMParser();
                 const domDoc = parser.parseFromString(this.responseText, 'text/html');
                 const ul = domDoc.getElementsByTagName("UL")[0]; //('student_present_list');
+                if(!(!!ul)){
+                    currentList.parentElement.innerHTML = "<hr><h4>Invalid response from server</h4><hr>"
+                    return;
+                }
                 const newUL = ul.cloneNode(true);
 
                 processUL(newUL);

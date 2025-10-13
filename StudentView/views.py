@@ -1,16 +1,24 @@
 import datetime
 import pytz
+
+from os.path import getmtime as getfilemtime
+
 from QR_Attendance_System.core import *
-from django.shortcuts import render
 from FacultyView.models import Student, ClassName, Attendance
+
+from urllib.parse import urlencode
+
+from django.shortcuts import render
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotModified
+from django.views.decorators.http import require_POST
 from django.urls import reverse
 from django.core.exceptions import ValidationError
-from urllib.parse import urlencode
+from django.utils.http import parse_http_date, http_date
 
 #=======================
 
-def student_view_name_entry(request, classId : int|None = None, className : str|None = None):
+def student_view_registration_form(request, classId : int|None = None, className : str|None = None):
     cls,mod = getClassAndModule(classId,className)
     if cls == None:
         return HttpResponseBadRequest()
@@ -23,10 +31,8 @@ def student_view_name_entry(request, classId : int|None = None, className : str|
                   })
 
 #=======================
+@require_POST
 def submit_attendance(request, classId : int|None = None, className : str|None = None):
-    if request.method != 'POST' :
-        raise ValueError("Not a POST request")
-    
     classOb = getClass(classId,className)
     if classOb == None:
         raise ValueError("No class specified")
@@ -68,13 +74,13 @@ def student_view_submit_attendance_ajax(request, classId : int|None = None, clas
     return JsonResponse({'created':created, "error":error, "validationError":validationError})
 
 def student_view_submit_attendance(request, classId : int|None = None, className : str|None = None):
-    created = submit_attendance(request, classId, className)[1]
+    created,attendanceOb = submit_attendance(request, classId, className)
 
     path = ''
     if created:
-        path = reverse('student_view_attendance_submitted',kwargs={'classId':classOb.id}) # type: ignore
+        path = reverse('student_view_attendance_submitted',kwargs={'classId':attendanceOb.className.id}) # type: ignore
     else:
-        path = reverse('student_view_attendance_already_submitted',kwargs={'classId':classOb.id}) # type: ignore
+        path = reverse('student_view_attendance_already_submitted',kwargs={'classId':attendanceOb.className.id}) # type: ignore
 
     next = request.POST.get('next', None)
     if next:
@@ -85,21 +91,46 @@ def student_view_submit_attendance(request, classId : int|None = None, className
 
 #=======================
 
-def student_view_bigQRcode(request,
-                           classId : int|None = None, className : str|None = None, 
-                           blockSize : int = 20):
-    cls,mod = getClassAndModule(classId,className)
+def student_view_print_qrCode(request,
+                              classId : int|None = None,
+                              boxSize : int|None = None):
+    cls,mod = getClassAndModule(classId, None)
     if cls == None:
         return HttpResponseBadRequest()
 
-    qrSrc = qrgenerator(request, classId, blockSize) # type: ignore
     return render(request,
-                  'StudentView/view/QRCode.html',
+                  'StudentView/view/Print_qrCode.html',
                   {
                        'class' : cls,
                       'module' : mod,
-                       'qrSrc' : qrSrc,
+                     'boxSize' : boxSize,
                   })
+
+def student_view_qrCode_image(request, classId : int, boxSize : int = 20, extension : str = ''):
+    response = None
+    try:
+        remotePath, localPath = qrgenerator(request, classId, boxSize, extension)
+        mtimestamp = getfilemtime(localPath)
+        file_last_modified = datetime.datetime.fromtimestamp(mtimestamp, pytz.utc)
+
+        #Compare our last modified date to that provided by the server
+        last_modified = request.META.get('HTTP_IF_MODIFIED_SINCE', None)
+        if(last_modified):
+            ts = parse_http_date(last_modified)
+            dt = datetime.datetime.fromtimestamp(ts,tz=pytz.utc)
+            if file_last_modified < dt:
+                return HttpResponseNotModified()
+
+        response = HttpResponseRedirect(remotePath)
+        response['Last-Modified'] = http_date(mtimestamp)
+        response['cache-control'] = 'max-age=604800, immutable, public, stale-while-revalidate=604800, stale-if-error'
+    except RequestedContentTypeNotFound as e:
+        response = HttpResponseNotFound(str(e))
+
+    except NoAcceptableContentType as e:
+        response = HttpResponse(str(e), status=406)
+    
+    return response
 
 #=======================
 
@@ -118,10 +149,8 @@ def student_view_attendance_submitted(request,
 def student_is_present(student : Student, cls : ClassName, year : int, month : int, day : int):
     return attendance_query(cls=cls, year=year, month=month, day=day, student=student)[0].exists()
 
+@require_POST
 def student_view_student_lookup(request):
-    if request.method != 'POST' :
-        return HttpResponseBadRequest() #This should only accept POST requests
-    
     stu = None
     eml :str = request.POST['student_email']
 

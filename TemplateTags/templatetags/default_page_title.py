@@ -30,7 +30,7 @@ def default_page_title(context,userTitle : str|None = None):
                 ttle0 += " - Class index"
             elif r.startswith("/class") == False:
                 ttle0 += " - Module Index"
-        case 'student_view_enter_student':
+        case 'student_view_registration_form':
             ttle0 = "Student Registration"
         case 'student_view_attendance_submitted':
             ttle0 = "Registration Submitted"
@@ -49,8 +49,8 @@ def default_page_title(context,userTitle : str|None = None):
 
     ttle2 = userTitle or settings.COPYRIGHT_APP_NAME
 
-    isstd = export_date_type.export_date_type(context)
-    match isstd:
+    lookuptype = export_date_type.export_date_type(context)
+    match lookuptype:
         case 1:
             ttle3 = f"{context.get('dte_year')}-{context.get('dte_month')}-{context.get('dte_day')}"
         case 2:

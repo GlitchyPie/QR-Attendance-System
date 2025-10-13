@@ -49,7 +49,7 @@
           
             {% if class %}
               {% url 'faculty_view' classId=class.id as faculty_view_class_url %}
-              {% url 'student_view_enter_student' classId=class.id as student_view_registration_url %}
+              {% url 'student_view_registration_form' classId=class.id as student_view_registration_url %}
 
               {% if request.path == faculty_view_class_url %}
                 <a href="{{student_view_registration_url}}" title="Student View - {{class}}"><i class="fa-solid fa-users-line"></i></a>

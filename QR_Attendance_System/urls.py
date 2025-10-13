@@ -31,7 +31,8 @@ urlpatterns = [
     path('faculty/login/', auth_views.LoginView.as_view(), name="login"),
     path('faculty/logout/', auth_views.LogoutView.as_view(), name="logout"),
 
-    path('', include('FacultyView.urls')),
-    path('', include('StudentView.urls')),
+    path('',RedirectView.as_view(url='/faculty/')),
+    path('faculty/', include('FacultyView.urls')),
+    path('student/', include('StudentView.urls')),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
