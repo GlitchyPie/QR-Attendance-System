@@ -39,12 +39,14 @@ var GLOBGOR = GLOBGOR || (function(){
 
     function format_dates_times(context, dates=true, times=true, opts=true){
         const c = context ?? document;
-        const times = dates ? c.querySelectorAll('*[data-ISOTime') : [];
-        const dates = times ? c.querySelectorAll('*[data-ISODate') : [];
-        const customs = opts ? c.querySelectorAll('*[data-ISOOpt') : [];
-        times.forEach(format_datetime);
-        dates.forEach(format_datetime);
-        customs.forEach(format_datetime);
+        
+        const datesAr = dates ? c.querySelectorAll('*[data-ISODate') : [];        
+        const timesAr = times ? c.querySelectorAll('*[data-ISOTime') : [];
+        const customsAr = opts ? c.querySelectorAll('*[data-ISOOpt') : [];
+
+        datesAr.forEach(format_datetime);
+        timesAr.forEach(format_datetime);
+        customsAr.forEach(format_datetime);
     }
 
     //### URLS ##################################################
