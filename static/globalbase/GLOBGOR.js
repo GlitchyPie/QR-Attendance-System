@@ -12,39 +12,39 @@ var GLOBGOR = GLOBGOR || (function(){
     document.addEventListener('DOMContentLoaded',()=>{lang = document.documentElement.lang??'en';});
 
     //### FORMAT ##################################################
-    function format_time(elem){
-        if((!!elem.dataset) && (!!elem.dataset.isotime)){
-            const utcDateStr = elem.dataset.isotime;
-            const utcDate = new Date(utcDateStr);
-            elem.textContent = utcDate.toLocaleString(lang, localeOpts_times);
-        }
-    }
-    function format_date(elem){
-        if((!!elem.dataset) && (!!elem.dataset.isodate)){
-            const utcDateStr = elem.dataset.isodate;
-            const utcDate = new Date(utcDateStr);
-            elem.textContent = utcDate.toLocaleString(lang, localeOpts_YMD);
-        }
-    }
-    function format_opt(elem){
-        if((!!elem.dataset) && (!!elem.dataset.isoopt)){
-            const utcDateStr = elem.dataset.isoopt;
-            const utcDate = new Date(utcDateStr);
-            if(!!elem.dataset.localeopts){
-                elem.textContent = utcDate.toLocaleString(lang, elem.dataset.localeopts);
-            }else{
-                elem.textContent = utcDate.toLocaleString(lang);
+    function format_datetime(elem){
+        if(!!elem.dataset){
+            let utcDateStr;
+            let utcOpt;
+            switch(true){
+                case(!!elem.dataset.isotime):
+                    utcDateStr = elem.dataset.isotime;
+                    utcOpt = localeOpts_times;
+                    break;
+                case(!!elem.dataset.isodate):
+                    utcDateStr = elem.dataset.isodate;
+                    utcOpt = localeOpts_YMD;
+                    break;
+                case(!!elem.dataset.isoopt):
+                    utcDateStr = elem.dataset.isoopt;
+                    utcOpt = elem.dataset.localeopts;
+                    break;
+                default:
+                    throw Error('No ')
             }
+            const utcDate = new Date(utcDateStr);
+            elem.textContent = utcDate.toLocaleString(lang, utcOpt);
         }
     }
-    function format_dates_times(context){
+
+    function format_dates_times(context, dates=true, times=true, opts=true){
         const c = context ?? document;
-        const times = c.querySelectorAll('*[data-ISOTime');
-        const dates = c.querySelectorAll('*[data-ISODate');
-        const customs = c.querySelectorAll('*[data-ISOOpt');
-        times.forEach(format_time);
-        dates.forEach(format_date);
-        customs.forEach(format_opt);
+        const times = dates ? c.querySelectorAll('*[data-ISOTime') : [];
+        const dates = times ? c.querySelectorAll('*[data-ISODate') : [];
+        const customs = opts ? c.querySelectorAll('*[data-ISOOpt') : [];
+        times.forEach(format_datetime);
+        dates.forEach(format_datetime);
+        customs.forEach(format_datetime);
     }
 
     //### URLS ##################################################
@@ -241,8 +241,9 @@ var GLOBGOR = GLOBGOR || (function(){
 
     return {
         'format':{
-            'date' : format_date,
-            'time' : format_time,
+            'dates': (c)=>format_dates_times(c,true,false,false),
+            'times': (c)=>format_dates_times(c,false,true,false),
+           'custom': (c)=>format_dates_times(c,false,false,true),
              'all' : format_dates_times,
         },
         'urls': {
