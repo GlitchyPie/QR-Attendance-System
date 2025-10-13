@@ -72,8 +72,8 @@ var EXPORT_FORM = (function(){
                 }
 
                 if(dte === undefined){ //Use current selection
-                    const isStd = dateSelectorFieldSet.dataset.lookuptype;
-                    switch(isStd){
+                    const lookuptype = dateSelectorFieldSet.dataset.lookuptype;
+                    switch(lookuptype){
                         case '1': //Single date
                             const N = new Date();
                             const D = new Date(datepicker.value);
@@ -141,7 +141,7 @@ var EXPORT_FORM = (function(){
                             }
                             break;
                         default:
-                            throw Error(`Unknown isStd "${isStd}"`)
+                            throw Error(`Unknown lookuptype "${lookuptype}"`)
                     }
 
                 } else {
