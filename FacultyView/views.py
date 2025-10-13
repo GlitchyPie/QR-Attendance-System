@@ -4,38 +4,34 @@ import csv
 import json
 import hashlib
 import xlsxwriter
-from typing import Any
-from .DRF_Serializers import AttendanceSerializer
+
 from QR_Attendance_System.core import *
+from .DRF_Serializers import AttendanceSerializer
+from .models import Student, ClassName, Attendance, ModuleName
+
+from typing import Any
 from io import BytesIO
 from itertools import groupby
+
 from django.shortcuts import render
 from django.utils.http import parse_http_date, http_date
-from django.core import serializers as djserializers
-from django.http import HttpResponse
-from django.http import FileResponse
-from django.http import HttpResponseRedirect
-from django.http import HttpResponseBadRequest
-from django.http import HttpResponseNotFound
-from django.http import HttpResponseNotModified
-from django.http import HttpResponseForbidden
-from django.http import JsonResponse
+from django.http import HttpResponse, FileResponse, HttpResponseRedirect
+from django.http import HttpResponseBadRequest, HttpResponseNotFound
+from django.http import HttpResponseNotModified, JsonResponse
 from django.urls import reverse
 from django.core.serializers.json import DjangoJSONEncoder
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
+from django.views.decorators.http import condition
+
+from django.views.decorators.http import require_POST
 from django.conf import settings
-from .models import Student, ClassName, Attendance, ModuleName
+
 
 #=======================
 
-@login_required
+@require_POST
+@permission_required('FacultyView.delete_attendance', raise_exception=True)
 def faculty_view_delete_attendance(request):
-    if request.method != 'POST' :
-        return HttpResponseBadRequest() #This should only accept POST requests
-    
-    if request.user.is_staff == False:
-        return HttpResponseForbidden()
-
     r = request.POST['attendance_record']
 
     attendanceOb = Attendance.objects.filter(id=r).first()
@@ -47,7 +43,7 @@ def faculty_view_delete_attendance(request):
         return HttpResponseRedirect(reverse('faculty_view',kwargs={'classId':cls.id})) # pyright: ignore[reportAttributeAccessIssue]
     else:
         return HttpResponseNotFound()
-        
+
 #=======================
 
 @login_required
@@ -95,8 +91,6 @@ def render_faculty_view_class(request, cls : ClassName|None):
     if cls == None:
         return HttpResponseBadRequest()
     
-    qrSrc = qrgenerator(request,cls.id) # pyright: ignore[reportAttributeAccessIssue]
-
     present,cls,mod = attendance_query(cls = cls, 
                                        dte=datetime.datetime.now(pytz.utc))
 
@@ -107,7 +101,6 @@ def render_faculty_view_class(request, cls : ClassName|None):
               'present' : present,
                 'class' : cls,
                'module' : mod,
-                'qrSrc' : qrSrc,
         },
     )
 
@@ -116,8 +109,10 @@ def render_faculty_view_class(request, cls : ClassName|None):
 def faculty_view_attendance_view_today(request,
                                        classId : int|None = None, className : str|None = None,
                                        moduleId : int|None = None, moduleName : str|None = None,
-                                       action : str|None = 'view',):
-    
+                                       action : str|None = None,):
+    if(not action):
+        return HttpResponseRedirect('view/')
+
     D = datetime.datetime.now(pytz.utc)
     y = D.year
     m = D.month
@@ -132,7 +127,7 @@ def faculty_view_attendance_view_today(request,
 def faculty_view_attendance_view(request,
                                  classId : int|None = None, className : str|None = None,
                                  moduleId : int|None = None, moduleName : str|None = None,
-                                 action : str|None = 'view',
+                                 action : str|None = None,
                                  year : int|None = None,
                                  month : int|None = None,
                                  day : int|None = None,
@@ -142,23 +137,15 @@ def faculty_view_attendance_view(request,
                                  year_end : int|None = None,
                                  month_end : int|None = None,
                                  day_end : int|None = None):
+    
+    if(not action):
+        return HttpResponseRedirect('view/')
 
-
-    #Query our attendance register...
-    query,cls,mod = attendance_query(classId=classId, className=className,
-                                            moduleId=moduleId, moduleName=moduleName,
-                                            year=year, month=month, day=day,
-                                            year_start=year_start,month_start=month_start,day_start=day_start,
-                                            year_end=year_end,month_end=month_end,day_end=day_end)
+    cls, mod = getClassAndModule(classId=classId, className=className,
+                                 moduleId=moduleId, moduleName=moduleName)
     
     #Most recently modified
-    state_last_attendance_modified = STATE.get_attendance_modified()
-
-    #If we have a class or a module specified we can use the more specific update time
-    if(cls):
-        state_last_attendance_modified = STATE.get_attendance_modified_class(cls)
-    elif(mod):
-        state_last_attendance_modified = STATE.get_attendance_modified_module(mod)
+    state_last_attendance_modified = STATE.get_attendance_modified(cls or mod)
 
     #Compare our last modified date to that provided by the server
     last_modified = request.META.get('HTTP_IF_MODIFIED_SINCE', None)
@@ -168,6 +155,14 @@ def faculty_view_attendance_view(request,
         if state_last_attendance_modified < dt:
             return HttpResponseNotModified()
 
+
+    #Query our attendance register...
+    query = attendance_query(cls=cls, mod=mod,
+                             moduleId=moduleId, moduleName=moduleName,
+                             year=year, month=month, day=day,
+                             year_start=year_start,month_start=month_start,day_start=day_start,
+                             year_end=year_end,month_end=month_end,day_end=day_end)[0]
+    
     #Generate a json representation of the query and generate a hash
     vals = list(query.values())
     str_json = json.dumps(vals, cls=DjangoJSONEncoder).encode()
@@ -352,11 +347,9 @@ def render_attendance_query_json(request, attendance_query):
     return response
 #=======================
 
+@require_POST
 @login_required
 def faculty_view_create_class(request):
-    if request.method != 'POST' :
-        return HttpResponseBadRequest() #This should only accept POST requests
-    
     className = request.POST['class_name']
     moduleName = request.POST['module_name']
     moduleId = request.POST.get('module_id',None)

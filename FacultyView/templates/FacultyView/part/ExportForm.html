@@ -28,15 +28,15 @@
             {% endfor %}
         </select>
     </fieldset>
-    <fieldset class="fs-date" data-isstd="{{is_std}}">
+    <fieldset class="fs-date" data-lookuptype="{{is_std}}">
         <legend>
-            <button title="Date picker" class="date-btn day" data-isstd="1"><i class="fa-solid fa-calendar-days"></i><span> Date picker</span></button>
-            <button title="Date range" class="date-btn range" data-isstd="2"><i class="fa-solid fa-calendar-week"></i><span> Date range</span></button>
-            <button title="Year / Month / Day" class="date-btn ymd" data-isstd="3"><i class="fa-solid fa-calendar-day"></i><span> Year / Month / Day</span></button>
+            <button title="Date picker" class="date-btn day" data-lookuptype="1"><i class="fa-solid fa-calendar-days"></i><span> Date picker</span></button>
+            <button title="Date range" class="date-btn range" data-lookuptype="2"><i class="fa-solid fa-calendar-week"></i><span> Date range</span></button>
+            <button title="Year / Month / Day" class="date-btn ymd" data-lookuptype="3"><i class="fa-solid fa-calendar-day"></i><span> Year / Month / Day</span></button>
         </legend>
         <div class="fs-standard-date"
         style="{% if not is_std == 1 %}display:none;{% endif %}"
-        data-isstd="1"
+        data-lookuptype="1"
         >
             <label>
                 Date: 
@@ -47,7 +47,7 @@
         </div>
         <div class="fs-range-date"
         style="{% if not is_std == 2 %}display:none;{% endif %}"
-        data-isstd="2"
+        data-lookuptype="2"
         >
             <label>
                 Start: 
@@ -64,7 +64,7 @@
         </div>
         <div class="fs-ymd-date"
         style="{% if not is_std == 3 %}display:none;{% endif %}"
-        data-isstd="3"
+        data-lookuptype="3"
         >
             <label>
                 Year: 

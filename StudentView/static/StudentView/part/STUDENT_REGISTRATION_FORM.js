@@ -27,7 +27,7 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
     }
 
     function registerForm(formId){
-        document.addEventListener('DOMContentLoaded',()=>{
+        GLOBGOR.registerOnLoad(()=>{
             const FORM = document.getElementById(formId);
             const submit_action = FORM.action + 'ajax/';
 
@@ -85,7 +85,7 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
             function lookupStudent(eml){
                 clearTimeout(lookupTimeout);
 
-                GLOBGOR.xhr.post(
+                GLOBGOR.fetch.post(
                     '/student/lookup/',
                     {
                         'classId' : classId,
@@ -149,8 +149,7 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
                 }
             }
             function registrationSubmittelSuccessfull(){
-                const j = this.responseText;
-                const response = JSON.parse(j);
+                const response = this.responseJSON;
 
                 switch(true){
                     case (response.created):
@@ -176,7 +175,7 @@ var STUDENT_REGISTRATION_FORM = STUDENT_REGISTRATION_FORM || (function(){
                 fname.readOnly = true;
                 lname.readOnly = true;
 
-                GLOBGOR.xhr.post(
+                GLOBGOR.fetch.post(
                     submit_action,
                     {
                         'classId': classId,
