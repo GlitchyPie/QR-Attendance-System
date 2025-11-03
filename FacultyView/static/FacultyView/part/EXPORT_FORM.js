@@ -182,7 +182,7 @@ var EXPORT_FORM = (function(){
                 const path = GenerateViewAndExportInfo(dte).view_path
                 window.location = path;
             }
-            function updateClassPicker(event){
+            function module_select_changed(event){
                 const v = moduleSelect.value;
                 if(v == '*'){
                     for (const element of classSelect.children) {
@@ -208,12 +208,12 @@ var EXPORT_FORM = (function(){
                 }
                 for (const element of fieldsetSelectorBtns) {
                     element.style.border = (element.dataset.lookuptype == set)?'1px solid black':'none';
-                    fieldSetBtn_setSpanDisplay(element);
+                    toggle_fieldset_button_text(element);
                 }
             }
-            function fieldSetBtn_setSpanDisplay(elm){
-                const span = elm.querySelector('span');
-                if(elm.isHovered || (elm.dataset.lookuptype == dateSelectorFieldSet.dataset.lookuptype)){
+            function toggle_fieldset_button_text(btn){
+                const span = btn.querySelector('span');
+                if(btn.isHovered || (btn.dataset.lookuptype == dateSelectorFieldSet.dataset.lookuptype)){
                     span.style.display = 'inline';
                 }else{
                     span.style.display = 'none';
@@ -221,16 +221,16 @@ var EXPORT_FORM = (function(){
             }
             function fieldSetBtn_mouseEnter(event, elm){
                 elm.isHovered = true;
-                if(!!elm.dataset.tm){
-                    clearTimeout(elm.dataset.tm);
-                    elm.dataset.tm = undefined;
+                if(!!elm.leaveTimeout){
+                    clearTimeout(elm.leaveTimeout);
+                    elm.leaveTimeout = undefined;
                 }
-                fieldSetBtn_setSpanDisplay(elm);
+                toggle_fieldset_button_text(elm);
             }
             function fieldSetBtn_mouseLeave(event, elm){
                 elm.isHovered = false;
                 if(elm.dataset.lookuptype != dateSelectorFieldSet.dataset.lookuptype){
-                    elm.dataset.tm = setTimeout(()=>fieldSetBtn_setSpanDisplay(elm), 150);
+                    elm.leaveTimeout = setTimeout(()=>toggle_fieldset_button_text(elm), 150);
                 }
             }
             function fieldSetBtn_click(event, elm){
@@ -292,7 +292,7 @@ var EXPORT_FORM = (function(){
             }
 
 
-            updateClassPicker();
+            module_select_changed();
             select_date_fieldset(dateSelectorFieldSet.dataset.lookuptype);
 
             //---- Export and view buttons ----//

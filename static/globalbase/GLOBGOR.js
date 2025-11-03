@@ -9,7 +9,7 @@ var GLOBGOR = GLOBGOR || (function(){
         day: "2-digit",
     }
     let lang;
-    document.addEventListener('DOMContentLoaded',()=>{lang = document.documentElement.lang??'en';});
+    registerOnDomLoad(()=>{lang = document.documentElement.lang??'en';});
 
     //### FORMAT ##################################################
     function format_datetime(elem){
